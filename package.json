@@ -1,0 +1,78 @@
+{
+	"name": "@valeera/ecs",
+	"version": "1.0.0",
+	"description": "ECS framework written in TS for web application.",
+	"main": "build/ecs.js",
+	"repository": "ValeeraJS/ecs",
+	"jsnext:main": "build/ecs.module.js",
+	"module": "build/ecs.module.js",
+	"types": "build/ecs.d.ts",
+	"files": [
+		"build",
+		"LICENSE",
+		"package.json",
+		"README.md",
+		"src"
+	],
+	"directories": {
+		"docs": "docs",
+		"examples": "examples",
+		"src": "src"
+	},
+	"scripts": {
+		"build": "rollup -c scripts/rollup.config.js",
+		"build-legacy": "rollup -c scripts/rollup.config.legacy.js",
+		"build-closure": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT_NEXT --js build/ecs.js --js_output_file build/ecs.min.js",
+		"build-closure-legacy": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT5 --js build/ecs.legacy.js --js_output_file build/ecs.legacy.min.js",
+		"build-all": "npm run build && npm run build-legacy && npm run build-closure && npm run build-closure-legacy",
+		"start": "npm run dev",
+		"lint": "eslint src --ext js --ext ts",
+		"test": "nyc --reporter=html --reporter=text mocha --require esm",
+		"travis": "npm run lint && npm test"
+	},
+	"keywords": [
+		"ecs",
+		"module",
+		"valeera",
+		"framework"
+	],
+	"author": "hypnosnova",
+	"license": "MIT",
+	"dependencies": {
+		"@valeera/idgenerator": "^0.1.0"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^2.19.0",
+		"@typescript-eslint/parser": "^2.19.0",
+		"chai": "^4.2.0",
+		"concurrently": "^5.0.2",
+		"eslint": "^6.8.0",
+		"eslint-config-valeera": "^0.1.1",
+		"eslint-plugin-html": "^6.0.0",
+		"eslint-plugin-prettier": "^3.1.2",
+		"esm": "^3.2.25",
+		"google-closure-compiler": "20200204.0.0",
+		"http-server": "^0.12.0",
+		"mocha": "6.2.2",
+		"nyc": "15.0.0",
+		"prettier": "^1.19.1",
+		"rollup": "^2.0.3",
+		"rollup-plugin-json": "^4.0.0",
+		"rollup-plugin-typescript2": "^0.25.3",
+		"typescript": "^3.8.3"
+	},
+	"jspm": {
+		"files": [
+			"package.json",
+			"LICENSE",
+			"README.md",
+			"build/ecs.js",
+			"build/ecs.min.js",
+			"build/ecs.module.js",
+			"build/ecs.legacy.js",
+			"build/ecs.legacy.min.js",
+			"build/ecs.legacy.module.js"
+		],
+		"directories": {}
+	}
+}
