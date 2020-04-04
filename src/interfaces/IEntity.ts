@@ -1,8 +1,11 @@
 import IComponentManager from "./IComponentManager";
-import IWorld from "./IWorld";
+import IEntityManager from "./IEntityManager";
+import IEventDispatcher from "@valeera/eventdispatcher"
 
-export default interface IEntity extends IComponentManager {
+export default interface IEntity extends IEventDispatcher{
 	readonly id: number;
 	readonly isEntity: true;
-	world: IWorld | null;
+	componentManager: IComponentManager | null;
+	name: string;
+	usedBy: IEntityManager[];
 }

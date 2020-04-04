@@ -1,5 +1,6 @@
 import typescript from 'rollup-plugin-typescript2';
 import json from 'rollup-plugin-json';
+// import resolve from "@rollup/plugin-node-resolve";
 
 export default {
 	input: 'src/index.ts',
@@ -12,16 +13,21 @@ export default {
 	output: [
 		{
 			format: 'umd',
-			name: 'EventDispatcher',
-			file: 'build/EventDispatcher.js',
-			sourceMap: true,
-			indent: '\t'
+			name: 'X',
+			file: 'build/x.js',
+			sourcemap: true,
+			indent: '\t',
+			globals: {
+				"@valeera/idgenerator": "IdGenerator",
+				"@valeera/eventdispatcher": "EventDispatcher"
+			}
 		},
 		{
 			format: 'es',
-			file: 'build/EventDispatcher.module.js',
-			sourceMap: true,
+			file: 'build/x.module.js',
+			sourcemap: true,
 			indent: '\t'
 		}
-	]
+	],
+	external: ["@valeera/idgenerator", "@valeera/eventdispatcher"]
 };

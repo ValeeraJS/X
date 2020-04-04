@@ -1,12 +1,12 @@
 {
-	"name": "@valeera/ecs",
+	"name": "@valeera/x",
 	"version": "1.0.0",
 	"description": "ECS framework written in TS for web application.",
-	"main": "build/ecs.js",
-	"repository": "ValeeraJS/ecs",
-	"jsnext:main": "build/ecs.module.js",
-	"module": "build/ecs.module.js",
-	"types": "build/ecs.d.ts",
+	"main": "build/x.js",
+	"repository": "ValeeraJS/x",
+	"jsnext:main": "build/x.module.js",
+	"module": "build/x.module.js",
+	"types": "build/x.d.ts",
 	"files": [
 		"build",
 		"LICENSE",
@@ -20,10 +20,10 @@
 		"src": "src"
 	},
 	"scripts": {
-		"build": "rollup -c scripts/rollup.config.js",
+		"build": "rollup -w -c scripts/rollup.config.js",
 		"build-legacy": "rollup -c scripts/rollup.config.legacy.js",
-		"build-closure": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT_NEXT --js build/ecs.js --js_output_file build/ecs.min.js",
-		"build-closure-legacy": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT5 --js build/ecs.legacy.js --js_output_file build/ecs.legacy.min.js",
+		"build-closure": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT_NEXT --js build/x.js --js_output_file build/x.min.js",
+		"build-closure-legacy": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT5 --js build/x.legacy.js --js_output_file build/x.legacy.min.js",
 		"build-all": "npm run build && npm run build-legacy && npm run build-closure && npm run build-closure-legacy",
 		"start": "npm run dev",
 		"lint": "eslint src --ext js --ext ts",
@@ -31,6 +31,7 @@
 		"travis": "npm run lint && npm test"
 	},
 	"keywords": [
+		"x",
 		"ecs",
 		"module",
 		"valeera",
@@ -39,9 +40,11 @@
 	"author": "hypnosnova",
 	"license": "MIT",
 	"dependencies": {
-		"@valeera/idgenerator": "^0.1.0"
+		"@valeera/idgenerator": "^0.1.0",
+		"@valeera/eventdispatcher": "^1.1.0"
 	},
 	"devDependencies": {
+		"@rollup/plugin-node-resolve": "^7.1.1",
 		"@typescript-eslint/eslint-plugin": "^2.19.0",
 		"@typescript-eslint/parser": "^2.19.0",
 		"chai": "^4.2.0",
@@ -51,27 +54,30 @@
 		"eslint-plugin-html": "^6.0.0",
 		"eslint-plugin-prettier": "^3.1.2",
 		"esm": "^3.2.25",
-		"google-closure-compiler": "20200204.0.0",
-		"http-server": "^0.12.0",
+		"google-closure-compiler": "20200315.0.0",
+		"http-server": "^0.12.1",
 		"mocha": "6.2.2",
 		"nyc": "15.0.0",
 		"prettier": "^1.19.1",
-		"rollup": "^2.0.3",
+		"rollup": "^2.1.0",
 		"rollup-plugin-json": "^4.0.0",
-		"rollup-plugin-typescript2": "^0.25.3",
+		"rollup-plugin-typescript2": "^0.27.0",
 		"typescript": "^3.8.3"
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"jspm": {
 		"files": [
 			"package.json",
 			"LICENSE",
 			"README.md",
-			"build/ecs.js",
-			"build/ecs.min.js",
-			"build/ecs.module.js",
-			"build/ecs.legacy.js",
-			"build/ecs.legacy.min.js",
-			"build/ecs.legacy.module.js"
+			"build/x.js",
+			"build/x.min.js",
+			"build/x.module.js",
+			"build/x.legacy.js",
+			"build/x.legacy.min.js",
+			"build/x.legacy.module.js"
 		],
 		"directories": {}
 	}

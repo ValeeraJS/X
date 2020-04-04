@@ -1,87 +1,82 @@
+import ComponentManager from "./ComponentManager";
 import IComponent from "./interfaces/IComponent";
 import { IdGeneratorInstance } from "./Global";
 import IEntity from "./interfaces/IEntity";
 import IWorld from "./interfaces/IWorld";
+import IEntityManager from "./interfaces/IEntityManager";
+import EventDispatcher from "@valeera/eventdispatcher";
+import IComponentManager from "./interfaces/IComponentManager";
 
-// 私有全局变量，外部无法访问
-let componentTmp: IComponent | undefined;
+let arr: any[];
 
-export default class Entity implements IEntity {
+export default class Entity extends EventDispatcher implements IEntity {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
-	public components: Map<string, IComponent> = new Map();
-	public world: IWorld | null = null;
+	public componentManager: IComponentManager | null;
+	public name: string = "";
+	public usedBy: IEntityManager[] = [];
 
-	public addComponent(component: IComponent): this {
-		if (this.hasComponent(component)) {
-			this.removeComponentByInstance(component);
-		}
-
-		return this.addComponentDirect(component);
+	public constructor(name: string, componentManager?: IComponentManager) {
+		super();
+		this.name = name;
+		this.registerComponentManager(componentManager);
 	}
 
-	public addComponentDirect(component: IComponent): this {
-		this.components.set(component.name, component);
-		component.usedBy.push(this);
+	public addComponent(component: IComponent): this {
+		if (this.componentManager) {
+			this.componentManager.add(component);
+		} else {
+			throw new Error("Current entity hasn't registered a component manager yet.");
+		}
 
 		return this;
 	}
 
-	public addTo(world: IWorld): this {
-		world.entities.push(this);
-		this.world = world;
+	public addTo(manager: IEntityManager): this {
+		manager.add(this);
+
+		return this;
+	}
+
+	public addToWorld(world: IWorld<any>): this {
+		if (world.entityManager) {
+			world.entityManager.add(this);
+		}
 
 		return this;
 	}
 
 	public getComponent(name: string): IComponent | null {
-		const c = this.components.get(name);
-
-		if (!c) {
-			return null;
-		} else {
-			return c;
-		}
+		return this.componentManager ? this.componentManager.get(name) : null;
 	}
 
 	public hasComponent(component: IComponent | string): boolean {
-		if (typeof component === "string") {
-			return this.components.has(component);
-		} else {
-			return this.components.has(component.name);
+		return this.componentManager ? this.componentManager.has(component) : false;
+	}
+
+	public registerComponentManager(manager: IComponentManager = new ComponentManager()): this {
+		this.unregisterComponentManager();
+		this.componentManager = manager;
+		if (!this.componentManager.usedBy.includes(this)) {
+			this.componentManager.usedBy.push(this);
 		}
-	}
 
-	// TODO
-	public isMixedFrom(entity: IEntity): boolean {
-		return false;
-	}
-
-	// TODO
-	public mixComponentsFrom(entity: IEntity): this {
 		return this;
 	}
 
 	public removeComponent(component: IComponent | string): this {
-		return typeof component === "string"
-			? this.removeComponentByName(component)
-			: this.removeComponentByInstance(component);
-	}
-
-	public removeComponentByName(name: string): this {
-		componentTmp = this.components.get(name);
-		if (componentTmp) {
-			this.components.delete(name);
-			componentTmp.usedBy.splice(componentTmp.usedBy.indexOf(this), 1);
+		if (this.componentManager) {
+			this.componentManager.remove(component);
 		}
 
 		return this;
 	}
 
-	public removeComponentByInstance(component: IComponent): this {
-		if (this.components.has(component.name)) {
-			this.components.delete(component.name);
-			component.usedBy.splice(component.usedBy.indexOf(this), 1);
+	public unregisterComponentManager() {
+		if (this.componentManager) {
+			arr = this.componentManager.usedBy;
+			arr.splice(arr.indexOf(this) - 1, 1);
+			this.componentManager = null;
 		}
 
 		return this;

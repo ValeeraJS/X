@@ -12,16 +12,21 @@ export default {
 	output: [
 		{
 			format: 'umd',
-			name: 'EventDispatcher',
-			file: 'build/EventDispatcher.legacy.js',
-			sourceMap: true,
-			indent: '\t'
+			name: 'X',
+			file: 'build/x.legacy.js',
+			sourcemap: true,
+			indent: '\t',
+			globals: {
+				"@valeera/idgenerator": "IdGenerator",
+				"@valeera/eventdispatcher": "EventDispatcher"
+			}
 		},
 		{
 			format: 'es',
-			file: 'build/EventDispatcher.legacy.module.js',
-			sourceMap: true,
+			file: 'build/x.legacy.module.js',
+			sourcemap: true,
 			indent: '\t'
 		}
-	]
+	],
+	external: ["@valeera/idgenerator", "@valeera/eventdispatcher"]
 };
