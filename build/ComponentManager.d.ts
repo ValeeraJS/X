@@ -6,27 +6,29 @@ export declare enum EComponentEvent {
     REMOVE_COMPONENT = "removeComponent"
 }
 export declare type ComponentEventObject = {
-    type: EComponentEvent;
+    eventKey: EComponentEvent;
+    life: number;
     manager: ComponentManager;
-    component: IComponent;
+    component: IComponent<any>;
+    target: IComponent<any>;
 };
 export default class ComponentManager implements IComponentManager {
-    elements: Map<string, IComponent>;
+    elements: Map<string, IComponent<any>>;
     disabled: boolean;
     usedBy: IEntity[];
     readonly isComponentManager = true;
     private static readonly ADD_COMPONENT;
     private static readonly REMOVE_COMPONENT;
     private static eventObject;
-    add(component: IComponent): this;
-    addComponentDirect(component: IComponent): this;
+    add(component: IComponent<any>): this;
+    addComponentDirect(component: IComponent<any>): this;
     clear(): this;
-    get(name: string): IComponent | null;
-    has(component: IComponent | string): boolean;
+    get(name: string): IComponent<any> | null;
+    has(component: IComponent<any> | string): boolean;
     isMixedFrom(componentManager: IComponentManager): boolean;
     mixFrom(componentManager: IComponentManager): this;
-    remove(component: IComponent | string): this;
+    remove(component: IComponent<any> | string): this;
     removeByName(name: string): this;
-    removeByInstance(component: IComponent): this;
+    removeByInstance(component: IComponent<any>): this;
     private entityComponentChangeDispatch;
 }

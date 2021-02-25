@@ -22,7 +22,7 @@ export default class Entity extends EventDispatcher implements IEntity {
 		this.registerComponentManager(componentManager);
 	}
 
-	public addComponent(component: IComponent): this {
+	public addComponent(component: IComponent<any>): this {
 		if (this.componentManager) {
 			this.componentManager.add(component);
 		} else {
@@ -46,11 +46,11 @@ export default class Entity extends EventDispatcher implements IEntity {
 		return this;
 	}
 
-	public getComponent(name: string): IComponent | null {
+	public getComponent(name: string): IComponent<any> | null {
 		return this.componentManager ? this.componentManager.get(name) : null;
 	}
 
-	public hasComponent(component: IComponent | string): boolean {
+	public hasComponent(component: IComponent<any> | string): boolean {
 		return this.componentManager ? this.componentManager.has(component) : false;
 	}
 
@@ -64,7 +64,7 @@ export default class Entity extends EventDispatcher implements IEntity {
 		return this;
 	}
 
-	public removeComponent(component: IComponent | string): this {
+	public removeComponent(component: IComponent<any> | string): this {
 		if (this.componentManager) {
 			this.componentManager.remove(component);
 		}

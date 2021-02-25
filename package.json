@@ -1,6 +1,6 @@
 {
 	"name": "@valeera/x",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "ECS framework written in TS for web application.",
 	"main": "build/x.js",
 	"repository": "ValeeraJS/x",
@@ -20,10 +20,10 @@
 		"src": "src"
 	},
 	"scripts": {
-		"build": "rollup -w -c scripts/rollup.config.js",
+		"build": "rollup -c scripts/rollup.config.js",
 		"build-legacy": "rollup -c scripts/rollup.config.legacy.js",
-		"build-closure": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT_NEXT --js build/x.js --js_output_file build/x.min.js",
-		"build-closure-legacy": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT5 --js build/x.legacy.js --js_output_file build/x.legacy.min.js",
+		"build-closure": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT_NEXT --language_out=ECMASCRIPT_NEXT --js build/x.js --js_output_file build/x.min.js",
+		"build-closure-legacy": "google-closure-compiler --compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs scripts/externs.js --language_in=ECMASCRIPT5 --language_out=ECMASCRIPT5 --js build/x.legacy.js --js_output_file build/x.legacy.min.js",
 		"build-all": "npm run build && npm run build-legacy && npm run build-closure && npm run build-closure-legacy",
 		"start": "npm run dev",
 		"lint": "eslint src --ext js --ext ts",
@@ -41,28 +41,28 @@
 	"license": "MIT",
 	"dependencies": {
 		"@valeera/idgenerator": "^0.1.0",
-		"@valeera/eventdispatcher": "^1.1.0"
+		"@valeera/eventdispatcher": "^2.0.0"
 	},
 	"devDependencies": {
-		"@rollup/plugin-node-resolve": "^7.1.1",
-		"@typescript-eslint/eslint-plugin": "^2.19.0",
-		"@typescript-eslint/parser": "^2.19.0",
+		"@rollup/plugin-node-resolve": "^11.2.0",
+		"@typescript-eslint/eslint-plugin": "^4.15.2",
+		"@typescript-eslint/parser": "^4.15.2",
 		"chai": "^4.2.0",
-		"concurrently": "^5.0.2",
-		"eslint": "^6.8.0",
+		"concurrently": "^6.0.0",
+		"eslint": "^7.20.0",
 		"eslint-config-valeera": "^0.1.1",
 		"eslint-plugin-html": "^6.0.0",
-		"eslint-plugin-prettier": "^3.1.2",
+		"eslint-plugin-prettier": "^3.3.1",
 		"esm": "^3.2.25",
-		"google-closure-compiler": "20200315.0.0",
+		"google-closure-compiler": "20210202.0.0",
 		"http-server": "^0.12.1",
 		"mocha": "6.2.2",
 		"nyc": "15.0.0",
 		"prettier": "^1.19.1",
-		"rollup": "^2.1.0",
+		"rollup": "^2.39.1",
 		"rollup-plugin-json": "^4.0.0",
-		"rollup-plugin-typescript2": "^0.27.0",
-		"typescript": "^3.8.3"
+		"rollup-plugin-typescript2": "^0.30.0",
+		"typescript": "^4.2.2"
 	},
 	"publishConfig": {
 		"access": "public"

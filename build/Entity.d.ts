@@ -11,12 +11,12 @@ export default class Entity extends EventDispatcher implements IEntity {
     name: string;
     usedBy: IEntityManager[];
     constructor(name: string, componentManager?: IComponentManager);
-    addComponent(component: IComponent): this;
+    addComponent(component: IComponent<any>): this;
     addTo(manager: IEntityManager): this;
     addToWorld(world: IWorld<any>): this;
-    getComponent(name: string): IComponent | null;
-    hasComponent(component: IComponent | string): boolean;
+    getComponent(name: string): IComponent<any> | null;
+    hasComponent(component: IComponent<any> | string): boolean;
     registerComponentManager(manager?: IComponentManager): this;
-    removeComponent(component: IComponent | string): this;
+    removeComponent(component: IComponent<any> | string): this;
     unregisterComponentManager(): this;
 }

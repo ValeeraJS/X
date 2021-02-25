@@ -7,8 +7,10 @@ export declare enum ESystemEvent {
     AFTER_RUN = "afterRun"
 }
 export declare type SystemEventObject = {
-    type: ESystemEvent;
+    eventKey: ESystemEvent;
     manager: SystemManager<any>;
+    life: number;
+    target: ISystem<any>;
 };
 export default class SystemManager<T> extends EventDispatcher implements ISystemManager<T> {
     disabled: boolean;
@@ -26,5 +28,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
     remove(system: ISystem<T> | string): this;
     removeByName(name: string): this;
     removeByInstance(system: ISystem<T>): this;
+    private updateSystemEntitySetByRemovedFromManager;
+    private updateSystemEntitySetByAddFromManager;
     run(world: IWorld<T>, params?: T): this;
 }

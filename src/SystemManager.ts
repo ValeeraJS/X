@@ -11,8 +11,10 @@ export enum ESystemEvent {
 };
 
 export type SystemEventObject = {
-	type: ESystemEvent,
+	eventKey: ESystemEvent,
 	manager: SystemManager<any>,
+	life: number,
+	target: ISystem<any>
 };
 
 export default class SystemManager<T> extends EventDispatcher implements ISystemManager<T> {
@@ -36,7 +38,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 			return this;
 		}
 		this.elements.set(system.name, system);
-
+		this.updateSystemEntitySetByAddFromManager(system);
 		return this;
 	}
 
@@ -70,6 +72,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		systemTmp = this.elements.get(name);
 		if (systemTmp) {
 			this.elements.delete(name);
+			this.updateSystemEntitySetByRemovedFromManager(systemTmp);
 			systemTmp.usedBy.splice(systemTmp.usedBy.indexOf(this), 1);
 		}
 
@@ -79,14 +82,33 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 	public removeByInstance(system: ISystem<T>): this {
 		if (this.elements.has(system.name)) {
 			this.elements.delete(system.name);
+			this.updateSystemEntitySetByRemovedFromManager(system);
 			system.usedBy.splice(system.usedBy.indexOf(this), 1);
 		}
 
 		return this;
 	}
 
+	private updateSystemEntitySetByRemovedFromManager(system: ISystem<T>): this {
+		for(let item of this.usedBy) {
+			if (item.entityManager) {
+				system.entitySet.delete(item.entityManager);
+			}
+		}
+		return this;
+	}
+	
+	private updateSystemEntitySetByAddFromManager(system: ISystem<T>): this {
+		for(let item of this.usedBy) {
+			if (item.entityManager) {
+				system.checkEntityManager(item.entityManager);
+			}
+		}
+		return this;
+	}
+
 	public run(world: IWorld<T>, params?: T): this {
-		SystemManager.eventObject.type = SystemManager.BEFORE_RUN;
+		SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
 		SystemManager.eventObject.manager = this;
 		this.dispatchEvent(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 
@@ -99,7 +121,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		}
 		this.loopTimes++;
 
-		SystemManager.eventObject.type = SystemManager.AFTER_RUN;
+		SystemManager.eventObject.eventKey = SystemManager.AFTER_RUN;
 		this.dispatchEvent(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 
 		return this;

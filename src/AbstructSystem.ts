@@ -5,7 +5,8 @@ import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
 import IEntityManager from "./interfaces/IEntityManager";
 
-type TFitRule = (entity: IEntity) => boolean;
+type TQueryRule = (entity: IEntity) => boolean;
+let weakMapTmp: Set<IEntity> | undefined;
 
 export default abstract class AbstructSystem<T> implements ISystem<T> {
 	public readonly id: number = IdGeneratorInstance.next();
@@ -13,17 +14,17 @@ export default abstract class AbstructSystem<T> implements ISystem<T> {
 	public name: string = "";
 	public disabled: boolean = false;
 	public loopTimes: number = 0;
-	public entitySet: Set<IEntity> = new Set();
+	public entitySet: WeakMap<IEntityManager, Set<IEntity>>  = new WeakMap();
 	public usedBy: ISystemManager<T>[] = [];
-	private fitRule: TFitRule;
+	private queryRule: TQueryRule;
 
-	public constructor(name: string, fitRule: TFitRule) {
+	public constructor(name: string, fitRule: TQueryRule) {
 		this.name = name;
-		this.fitRule = fitRule;
+		this.queryRule = fitRule;
 	}
 
-	public fit(entity: IEntity): boolean {
-		return this.fitRule(entity);
+	public query(entity: IEntity): boolean {
+		return this.queryRule(entity);
 	}
 
 	public abstract destroy(): void;
@@ -31,11 +32,37 @@ export default abstract class AbstructSystem<T> implements ISystem<T> {
 
 	public checkUpdatedEntities(manager: IEntityManager | null): this {
 		if (manager) {
+			weakMapTmp = this.entitySet.get(manager);
+			if (!weakMapTmp) {
+				weakMapTmp = new Set();
+				this.entitySet.set(manager, weakMapTmp);
+			}
 			manager.updatedEntities.forEach((item: IEntity) => {
-				if (this.fit(item)) {
-					this.entitySet.add(item);
+				if (this.query(item)) {
+					(weakMapTmp as Set<IEntity>).add(item);
 				} else {
-					this.entitySet.delete(item);
+					(weakMapTmp as Set<IEntity>).delete(item);
+				}
+			});
+		}
+
+		return this;
+	}
+
+	public checkEntityManager(manager: IEntityManager | null): this {
+		if (manager) {
+			weakMapTmp = this.entitySet.get(manager);
+			if (!weakMapTmp) {
+				weakMapTmp = new Set();
+				this.entitySet.set(manager, weakMapTmp);
+			} else {
+				weakMapTmp.clear();
+			}
+			manager.elements.forEach((item: IEntity) => {
+				if (this.query(item)) {
+					(weakMapTmp as Set<IEntity>).add(item);
+				} else {
+					(weakMapTmp as Set<IEntity>).delete(item);
 				}
 			});
 		}
@@ -45,9 +72,11 @@ export default abstract class AbstructSystem<T> implements ISystem<T> {
 
 	public run(world: IWorld<T>, params: T): this {
 		(params as any).world = world;
-		this.entitySet.forEach((item: IEntity) => {
-			this.handle(item, params);
-		});
+		if (world.entityManager) {
+			this.entitySet.get(world.entityManager)?.forEach((item: IEntity) => {
+				this.handle(item, params);
+			});
+		}
 
 		return this;
 	}

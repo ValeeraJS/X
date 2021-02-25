@@ -3,7 +3,7 @@ import IComponentManager from "./interfaces/IComponentManager";
 import IEntity from "./interfaces/IEntity";
 
 // 私有全局变量，外部无法访问
-let componentTmp: IComponent | undefined;
+let componentTmp: IComponent<any> | undefined;
 
 export enum EComponentEvent {
 	ADD_COMPONENT = "addComponent",
@@ -11,13 +11,15 @@ export enum EComponentEvent {
 };
 
 export type ComponentEventObject = {
-	type: EComponentEvent,
+	eventKey: EComponentEvent,
+	life: number,
 	manager: ComponentManager,
-	component: IComponent
+	component: IComponent<any>,
+	target: IComponent<any>
 };
 
 export default class ComponentManager implements IComponentManager {
-	public elements: Map<string, IComponent> = new Map();
+	public elements: Map<string, IComponent<any>> = new Map();
 	public disabled = false;
 	public usedBy: IEntity[] = [];
 	public readonly isComponentManager = true;
@@ -25,7 +27,7 @@ export default class ComponentManager implements IComponentManager {
 	private static readonly REMOVE_COMPONENT = EComponentEvent.REMOVE_COMPONENT;
 	private static eventObject: ComponentEventObject = {} as ComponentEventObject;
 
-	public add(component: IComponent): this {
+	public add(component: IComponent<any>): this {
 		if (this.has(component)) {
 			this.removeByInstance(component);
 		}
@@ -33,13 +35,15 @@ export default class ComponentManager implements IComponentManager {
 		return this.addComponentDirect(component);
 	}
 
-	public addComponentDirect(component: IComponent): this {
+	public addComponentDirect(component: IComponent<any>): this {
 		this.elements.set(component.name, component);
 		component.usedBy.push(this);
 		ComponentManager.eventObject = {
 			component,
 			manager: this,
-			type: ComponentManager.ADD_COMPONENT
+			eventKey: ComponentManager.ADD_COMPONENT,
+			life: Infinity,
+			target: component
 		}
 		this.entityComponentChangeDispatch(ComponentManager.ADD_COMPONENT, ComponentManager.eventObject);
 
@@ -52,13 +56,13 @@ export default class ComponentManager implements IComponentManager {
 		return this;
 	};
 
-	public get(name: string): IComponent | null {
+	public get(name: string): IComponent<any> | null {
 		componentTmp = this.elements.get(name);
 
 		return componentTmp ? componentTmp : null;
 	}
 
-	public has(component: IComponent | string): boolean {
+	public has(component: IComponent<any> | string): boolean {
 		if (typeof component === "string") {
 			return this.elements.has(component);
 		} else {
@@ -78,7 +82,7 @@ export default class ComponentManager implements IComponentManager {
 		return this;
 	}
 
-	public remove(component: IComponent | string): this {
+	public remove(component: IComponent<any> | string): this {
 		return typeof component === "string"
 			? this.removeByName(component)
 			: this.removeByInstance(component);
@@ -93,7 +97,9 @@ export default class ComponentManager implements IComponentManager {
 			ComponentManager.eventObject = {
 				component: componentTmp,
 				manager: this,
-				type: ComponentManager.REMOVE_COMPONENT
+				eventKey: ComponentManager.REMOVE_COMPONENT,
+				life: Infinity,
+				target: componentTmp
 			}
 			this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
 		}
@@ -101,14 +107,16 @@ export default class ComponentManager implements IComponentManager {
 		return this;
 	}
 
-	public removeByInstance(component: IComponent): this {
+	public removeByInstance(component: IComponent<any>): this {
 		if (this.elements.has(component.name)) {
 			this.elements.delete(component.name);
 			component.usedBy.splice(component.usedBy.indexOf(this), 1);
 			ComponentManager.eventObject = {
 				component,
 				manager: this,
-				type: ComponentManager.REMOVE_COMPONENT
+				eventKey: ComponentManager.REMOVE_COMPONENT,
+				life: Infinity,
+				target: component
 			}
 			this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
 		}

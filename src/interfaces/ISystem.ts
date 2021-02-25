@@ -6,13 +6,14 @@ import IEntityManager from "./IEntityManager";
 export default interface ISystem<T> {
 	readonly id: number;
 	disabled: boolean;
-	entitySet: Set<IEntity>;
+	entitySet: WeakMap<IEntityManager, Set<IEntity>>;
 	loopTimes: number;
 	name: string;
 	usedBy: ISystemManager<T>[];
 
+	checkEntityManager: (entityManager: IEntityManager) => this;
 	checkUpdatedEntities: (manager: IEntityManager | null) => this;
-	fit: (entity: IEntity) => boolean;
+	query: (entity: IEntity) => boolean;
 	handle: (entity: IEntity, params?: T) => this;
 	run: (world: IWorld<T>, params?: T) => this;
 }

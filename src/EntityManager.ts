@@ -87,7 +87,9 @@ export default class EntityManager implements IEntityManager {
 		for (let world of this.usedBy) {
 			if (world.systemManager) {
 				world.systemManager.elements.forEach((system: ISystem<any>) => {
-					system.entitySet.delete(entity);
+					if (system.entitySet.get(this)) {
+						(system.entitySet.get(this) as any).delete(entity);
+					}
 				});
 			}
 		}
