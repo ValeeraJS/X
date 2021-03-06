@@ -1,30 +1,34 @@
+import EventDispatcher from "@valeera/eventdispatcher";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
-import EventDispatcher from "@valeera/eventdispatcher";
 
 let systemTmp: ISystem<any> | undefined;
 
 export enum ESystemEvent {
 	BEFORE_RUN = "beforeRun",
 	AFTER_RUN = "afterRun"
-};
+}
 
-export type SystemEventObject = {
-	eventKey: ESystemEvent,
-	manager: SystemManager<any>,
-	life: number,
-	target: ISystem<any>
-};
+export interface ISystemEventObject {
+	eventKey: ESystemEvent;
+	manager: ISystemManager<any>;
+	target: ISystem<any>;
+}
 
 export default class SystemManager<T> extends EventDispatcher implements ISystemManager<T> {
-	public disabled = false;
-	public elements: Map<string, ISystem<T>> = new Map();
-	public loopTimes: number = 0;
-	public usedBy: IWorld<T>[] = [];
 	public static readonly AFTER_RUN: ESystemEvent = ESystemEvent.AFTER_RUN;
 	public static readonly BEFORE_RUN: ESystemEvent = ESystemEvent.BEFORE_RUN;
-	private static eventObject: SystemEventObject = {} as SystemEventObject;
+	private static eventObject: ISystemEventObject = {
+		eventKey: null as any,
+		manager: null as any,
+		target: null as any
+	};
+
+	public disabled = false;
+	public elements: Map<string, ISystem<T>> = new Map();
+	public loopTimes = 0;
+	public usedBy: IWorld<T>[] = [];
 
 	public constructor(world?: IWorld<T>) {
 		super();
@@ -39,6 +43,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		}
 		this.elements.set(system.name, system);
 		this.updateSystemEntitySetByAddFromManager(system);
+
 		return this;
 	}
 
@@ -53,14 +58,14 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 
 		return systemTmp ? systemTmp : null;
 	}
-	
+
 	public has(element: string | ISystem<T>): boolean {
-		if (typeof element === 'string') {
+		if (typeof element === "string") {
 			return this.elements.has(element);
 		} else {
 			return this.elements.has(element.name);
 		}
-	};
+	}
 
 	public remove(system: ISystem<T> | string): this {
 		return typeof system === "string"
@@ -89,28 +94,10 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		return this;
 	}
 
-	private updateSystemEntitySetByRemovedFromManager(system: ISystem<T>): this {
-		for(let item of this.usedBy) {
-			if (item.entityManager) {
-				system.entitySet.delete(item.entityManager);
-			}
-		}
-		return this;
-	}
-	
-	private updateSystemEntitySetByAddFromManager(system: ISystem<T>): this {
-		for(let item of this.usedBy) {
-			if (item.entityManager) {
-				system.checkEntityManager(item.entityManager);
-			}
-		}
-		return this;
-	}
-
 	public run(world: IWorld<T>, params?: T): this {
 		SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
 		SystemManager.eventObject.manager = this;
-		this.dispatchEvent(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+		this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 
 		this.elements.forEach((item) => {
 			item.checkUpdatedEntities(world.entityManager);
@@ -122,8 +109,28 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		this.loopTimes++;
 
 		SystemManager.eventObject.eventKey = SystemManager.AFTER_RUN;
-		this.dispatchEvent(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+		this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 
 		return this;
-	};
+	}
+
+	private updateSystemEntitySetByRemovedFromManager(system: ISystem<T>): this {
+		for (const item of this.usedBy) {
+			if (item.entityManager) {
+				system.entitySet.delete(item.entityManager);
+			}
+		}
+
+		return this;
+	}
+
+	private updateSystemEntitySetByAddFromManager(system: ISystem<T>): this {
+		for (const item of this.usedBy) {
+			if (item.entityManager) {
+				system.checkEntityManager(item.entityManager);
+			}
+		}
+
+		return this;
+	}
 }

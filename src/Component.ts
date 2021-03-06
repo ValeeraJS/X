@@ -2,17 +2,18 @@ import IComponent from "./interfaces/IComponent";
 
 export default class Component<T> implements IComponent<T> {
 	public readonly isComponent = true;
-	public data: any = null;
+	public data: T | null = null;
 	public disabled = false;
 	public name: string;
 	public usedBy = [];
+	public isDirty = false;
 
-	public constructor(name: string, data: any) {
+	public constructor(name: string, data: T | null) {
 		this.name = name;
 		this.data = data;
 	}
 
-	clone() {
+	public clone(): IComponent<T> {
 		return new Component(this.name, this.data);
 	}
 }

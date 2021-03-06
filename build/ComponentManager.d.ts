@@ -5,21 +5,20 @@ export declare enum EComponentEvent {
     ADD_COMPONENT = "addComponent",
     REMOVE_COMPONENT = "removeComponent"
 }
-export declare type ComponentEventObject = {
+export interface ComponentEventObject {
     eventKey: EComponentEvent;
-    life: number;
-    manager: ComponentManager;
+    manager: IComponentManager;
     component: IComponent<any>;
     target: IComponent<any>;
-};
+}
 export default class ComponentManager implements IComponentManager {
+    private static readonly ADD_COMPONENT;
+    private static readonly REMOVE_COMPONENT;
+    private static eventObject;
     elements: Map<string, IComponent<any>>;
     disabled: boolean;
     usedBy: IEntity[];
     readonly isComponentManager = true;
-    private static readonly ADD_COMPONENT;
-    private static readonly REMOVE_COMPONENT;
-    private static eventObject;
     add(component: IComponent<any>): this;
     addComponentDirect(component: IComponent<any>): this;
     clear(): this;

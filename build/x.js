@@ -88,6 +88,7 @@
 	        this.data = null;
 	        this.disabled = false;
 	        this.usedBy = [];
+	        this.isDirty = false;
 	        this.name = name;
 	        this.data = data;
 	    }
@@ -121,9 +122,8 @@
 	        component.usedBy.push(this);
 	        ComponentManager.eventObject = {
 	            component,
-	            manager: this,
 	            eventKey: ComponentManager.ADD_COMPONENT,
-	            life: Infinity,
+	            manager: this,
 	            target: component
 	        };
 	        this.entityComponentChangeDispatch(ComponentManager.ADD_COMPONENT, ComponentManager.eventObject);
@@ -133,7 +133,6 @@
 	        this.elements.clear();
 	        return this;
 	    }
-	    ;
 	    get(name) {
 	        componentTmp = this.elements.get(name);
 	        return componentTmp ? componentTmp : null;
@@ -168,9 +167,8 @@
 	            componentTmp.usedBy.splice(componentTmp.usedBy.indexOf(this), 1);
 	            ComponentManager.eventObject = {
 	                component: componentTmp,
-	                manager: this,
 	                eventKey: ComponentManager.REMOVE_COMPONENT,
-	                life: Infinity,
+	                manager: this,
 	                target: componentTmp
 	            };
 	            this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
@@ -183,9 +181,8 @@
 	            component.usedBy.splice(component.usedBy.indexOf(this), 1);
 	            ComponentManager.eventObject = {
 	                component,
-	                manager: this,
 	                eventKey: ComponentManager.REMOVE_COMPONENT,
-	                life: Infinity,
+	                manager: this,
 	                target: component
 	            };
 	            this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
@@ -193,9 +190,9 @@
 	        return this;
 	    }
 	    entityComponentChangeDispatch(type, eventObject) {
-	        for (let entity of this.usedBy) {
-	            entity.dispatchEvent(type, eventObject);
-	            for (let manager of entity.usedBy) {
+	        for (const entity of this.usedBy) {
+	            entity.fire(type, eventObject);
+	            for (const manager of entity.usedBy) {
 	                manager.updatedEntities.add(entity);
 	            }
 	        }
@@ -203,9 +200,14 @@
 	}
 	ComponentManager.ADD_COMPONENT = EComponentEvent.ADD_COMPONENT;
 	ComponentManager.REMOVE_COMPONENT = EComponentEvent.REMOVE_COMPONENT;
-	ComponentManager.eventObject = {};
+	ComponentManager.eventObject = {
+	    component: null,
+	    eventKey: null,
+	    manager: null,
+	    target: null
+	};
 
-	let arr;
+	let arr$1;
 	class Entity extends EventDispatcher__default['default'] {
 	    constructor(name, componentManager) {
 	        super();
@@ -257,8 +259,8 @@
 	    }
 	    unregisterComponentManager() {
 	        if (this.componentManager) {
-	            arr = this.componentManager.usedBy;
-	            arr.splice(arr.indexOf(this) - 1, 1);
+	            arr$1 = this.componentManager.usedBy;
+	            arr$1.splice(arr$1.indexOf(this) - 1, 1);
 	            this.componentManager = null;
 	        }
 	        return this;
@@ -295,7 +297,6 @@
 	        this.elements.clear();
 	        return this;
 	    }
-	    ;
 	    get(name) {
 	        entityTmp = this.elements.get(name);
 	        return entityTmp ? entityTmp : null;
@@ -330,7 +331,7 @@
 	    }
 	    deleteEntityFromSystemSet(entity) {
 	        entity.usedBy.splice(entity.usedBy.indexOf(this), 1);
-	        for (let world of this.usedBy) {
+	        for (const world of this.usedBy) {
 	            if (world.systemManager) {
 	                world.systemManager.elements.forEach((system) => {
 	                    if (system.entitySet.get(this)) {
@@ -376,14 +377,13 @@
 	        return systemTmp ? systemTmp : null;
 	    }
 	    has(element) {
-	        if (typeof element === 'string') {
+	        if (typeof element === "string") {
 	            return this.elements.has(element);
 	        }
 	        else {
 	            return this.elements.has(element.name);
 	        }
 	    }
-	    ;
 	    remove(system) {
 	        return typeof system === "string"
 	            ? this.removeByName(system)
@@ -406,26 +406,10 @@
 	        }
 	        return this;
 	    }
-	    updateSystemEntitySetByRemovedFromManager(system) {
-	        for (let item of this.usedBy) {
-	            if (item.entityManager) {
-	                system.entitySet.delete(item.entityManager);
-	            }
-	        }
-	        return this;
-	    }
-	    updateSystemEntitySetByAddFromManager(system) {
-	        for (let item of this.usedBy) {
-	            if (item.entityManager) {
-	                system.checkEntityManager(item.entityManager);
-	            }
-	        }
-	        return this;
-	    }
 	    run(world, params) {
 	        SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
 	        SystemManager.eventObject.manager = this;
-	        this.dispatchEvent(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 	        this.elements.forEach((item) => {
 	            item.checkUpdatedEntities(world.entityManager);
 	            item.run(world, params);
@@ -435,16 +419,35 @@
 	        }
 	        this.loopTimes++;
 	        SystemManager.eventObject.eventKey = SystemManager.AFTER_RUN;
-	        this.dispatchEvent(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 	        return this;
 	    }
-	    ;
+	    updateSystemEntitySetByRemovedFromManager(system) {
+	        for (const item of this.usedBy) {
+	            if (item.entityManager) {
+	                system.entitySet.delete(item.entityManager);
+	            }
+	        }
+	        return this;
+	    }
+	    updateSystemEntitySetByAddFromManager(system) {
+	        for (const item of this.usedBy) {
+	            if (item.entityManager) {
+	                system.checkEntityManager(item.entityManager);
+	            }
+	        }
+	        return this;
+	    }
 	}
 	SystemManager.AFTER_RUN = ESystemEvent.AFTER_RUN;
 	SystemManager.BEFORE_RUN = ESystemEvent.BEFORE_RUN;
-	SystemManager.eventObject = {};
+	SystemManager.eventObject = {
+	    eventKey: null,
+	    manager: null,
+	    target: null
+	};
 
-	let arr$1;
+	let arr;
 	class World {
 	    constructor(name, entityManager, systemManager) {
 	        this.id = IdGeneratorInstance.next();
@@ -535,16 +538,16 @@
 	    }
 	    unregisterEntityManager() {
 	        if (this.entityManager) {
-	            arr$1 = this.entityManager.usedBy;
-	            arr$1.splice(arr$1.indexOf(this) - 1, 1);
+	            arr = this.entityManager.usedBy;
+	            arr.splice(arr.indexOf(this) - 1, 1);
 	            this.entityManager = null;
 	        }
 	        return this;
 	    }
 	    unregisterSystemManager() {
 	        if (this.systemManager) {
-	            arr$1 = this.systemManager.usedBy;
-	            arr$1.splice(arr$1.indexOf(this) - 1, 1);
+	            arr = this.systemManager.usedBy;
+	            arr.splice(arr.indexOf(this) - 1, 1);
 	            this.entityManager = null;
 	        }
 	        return this;

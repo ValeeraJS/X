@@ -8,24 +8,29 @@ let componentTmp: IComponent<any> | undefined;
 export enum EComponentEvent {
 	ADD_COMPONENT = "addComponent",
 	REMOVE_COMPONENT = "removeComponent"
-};
+}
 
-export type ComponentEventObject = {
-	eventKey: EComponentEvent,
-	life: number,
-	manager: ComponentManager,
-	component: IComponent<any>,
-	target: IComponent<any>
-};
+export interface ComponentEventObject {
+	eventKey: EComponentEvent;
+	manager: IComponentManager;
+	component: IComponent<any>;
+	target: IComponent<any>;
+}
 
 export default class ComponentManager implements IComponentManager {
+	private static readonly ADD_COMPONENT = EComponentEvent.ADD_COMPONENT;
+	private static readonly REMOVE_COMPONENT = EComponentEvent.REMOVE_COMPONENT;
+	private static eventObject: ComponentEventObject = {
+		component: null as any,
+		eventKey: null as any,
+		manager: null as any,
+		target: null as any
+	};
+
 	public elements: Map<string, IComponent<any>> = new Map();
 	public disabled = false;
 	public usedBy: IEntity[] = [];
 	public readonly isComponentManager = true;
-	private static readonly ADD_COMPONENT = EComponentEvent.ADD_COMPONENT;
-	private static readonly REMOVE_COMPONENT = EComponentEvent.REMOVE_COMPONENT;
-	private static eventObject: ComponentEventObject = {} as ComponentEventObject;
 
 	public add(component: IComponent<any>): this {
 		if (this.has(component)) {
@@ -40,12 +45,14 @@ export default class ComponentManager implements IComponentManager {
 		component.usedBy.push(this);
 		ComponentManager.eventObject = {
 			component,
-			manager: this,
 			eventKey: ComponentManager.ADD_COMPONENT,
-			life: Infinity,
+			manager: this,
 			target: component
-		}
-		this.entityComponentChangeDispatch(ComponentManager.ADD_COMPONENT, ComponentManager.eventObject);
+		};
+		this.entityComponentChangeDispatch(
+			ComponentManager.ADD_COMPONENT,
+			ComponentManager.eventObject
+		);
 
 		return this;
 	}
@@ -54,7 +61,7 @@ export default class ComponentManager implements IComponentManager {
 		this.elements.clear();
 
 		return this;
-	};
+	}
 
 	public get(name: string): IComponent<any> | null {
 		componentTmp = this.elements.get(name);
@@ -73,12 +80,14 @@ export default class ComponentManager implements IComponentManager {
 	// TODO
 	public isMixedFrom(componentManager: IComponentManager): boolean {
 		console.log(componentManager);
+
 		return false;
 	}
 
 	// TODO
 	public mixFrom(componentManager: IComponentManager): this {
 		console.log(componentManager);
+
 		return this;
 	}
 
@@ -96,12 +105,14 @@ export default class ComponentManager implements IComponentManager {
 
 			ComponentManager.eventObject = {
 				component: componentTmp,
-				manager: this,
 				eventKey: ComponentManager.REMOVE_COMPONENT,
-				life: Infinity,
+				manager: this,
 				target: componentTmp
-			}
-			this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
+			};
+			this.entityComponentChangeDispatch(
+				ComponentManager.REMOVE_COMPONENT,
+				ComponentManager.eventObject
+			);
 		}
 
 		return this;
@@ -113,21 +124,26 @@ export default class ComponentManager implements IComponentManager {
 			component.usedBy.splice(component.usedBy.indexOf(this), 1);
 			ComponentManager.eventObject = {
 				component,
-				manager: this,
 				eventKey: ComponentManager.REMOVE_COMPONENT,
-				life: Infinity,
+				manager: this,
 				target: component
-			}
-			this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
+			};
+			this.entityComponentChangeDispatch(
+				ComponentManager.REMOVE_COMPONENT,
+				ComponentManager.eventObject
+			);
 		}
 
 		return this;
 	}
 
-	private entityComponentChangeDispatch(type: EComponentEvent, eventObject: ComponentEventObject) {
-		for(let entity of this.usedBy) {
-			entity.dispatchEvent(type, eventObject);
-			for(let manager of entity.usedBy) {
+	private entityComponentChangeDispatch(
+		type: EComponentEvent,
+		eventObject: ComponentEventObject
+	) {
+		for (const entity of this.usedBy) {
+			entity.fire(type, eventObject);
+			for (const manager of entity.usedBy) {
 				manager.updatedEntities.add(entity);
 			}
 		}

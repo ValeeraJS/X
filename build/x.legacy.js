@@ -93,6 +93,7 @@
 	        this.data = null;
 	        this.disabled = false;
 	        this.usedBy = [];
+	        this.isDirty = false;
 	        this.name = name;
 	        this.data = data;
 	    }
@@ -170,9 +171,8 @@
 	        component.usedBy.push(this);
 	        ComponentManager.eventObject = {
 	            component: component,
-	            manager: this,
 	            eventKey: ComponentManager.ADD_COMPONENT,
-	            life: Infinity,
+	            manager: this,
 	            target: component
 	        };
 	        this.entityComponentChangeDispatch(ComponentManager.ADD_COMPONENT, ComponentManager.eventObject);
@@ -216,9 +216,8 @@
 	            componentTmp.usedBy.splice(componentTmp.usedBy.indexOf(this), 1);
 	            ComponentManager.eventObject = {
 	                component: componentTmp,
-	                manager: this,
 	                eventKey: ComponentManager.REMOVE_COMPONENT,
-	                life: Infinity,
+	                manager: this,
 	                target: componentTmp
 	            };
 	            this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
@@ -231,9 +230,8 @@
 	            component.usedBy.splice(component.usedBy.indexOf(this), 1);
 	            ComponentManager.eventObject = {
 	                component: component,
-	                manager: this,
 	                eventKey: ComponentManager.REMOVE_COMPONENT,
-	                life: Infinity,
+	                manager: this,
 	                target: component
 	            };
 	            this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
@@ -245,7 +243,7 @@
 	        try {
 	            for (var _c = __values(this.usedBy), _d = _c.next(); !_d.done; _d = _c.next()) {
 	                var entity = _d.value;
-	                entity.dispatchEvent(type, eventObject);
+	                entity.fire(type, eventObject);
 	                try {
 	                    for (var _e = (e_2 = void 0, __values(entity.usedBy)), _f = _e.next(); !_f.done; _f = _e.next()) {
 	                        var manager = _f.value;
@@ -271,11 +269,16 @@
 	    };
 	    ComponentManager.ADD_COMPONENT = EComponentEvent.ADD_COMPONENT;
 	    ComponentManager.REMOVE_COMPONENT = EComponentEvent.REMOVE_COMPONENT;
-	    ComponentManager.eventObject = {};
+	    ComponentManager.eventObject = {
+	        component: null,
+	        eventKey: null,
+	        manager: null,
+	        target: null
+	    };
 	    return ComponentManager;
 	}());
 
-	var arr;
+	var arr$1;
 	var Entity = /** @class */ (function (_super) {
 	    __extends(Entity, _super);
 	    function Entity(name, componentManager) {
@@ -330,8 +333,8 @@
 	    };
 	    Entity.prototype.unregisterComponentManager = function () {
 	        if (this.componentManager) {
-	            arr = this.componentManager.usedBy;
-	            arr.splice(arr.indexOf(this) - 1, 1);
+	            arr$1 = this.componentManager.usedBy;
+	            arr$1.splice(arr$1.indexOf(this) - 1, 1);
 	            this.componentManager = null;
 	        }
 	        return this;
@@ -464,7 +467,7 @@
 	        return systemTmp ? systemTmp : null;
 	    };
 	    SystemManager.prototype.has = function (element) {
-	        if (typeof element === 'string') {
+	        if (typeof element === "string") {
 	            return this.elements.has(element);
 	        }
 	        else {
@@ -491,6 +494,22 @@
 	            this.updateSystemEntitySetByRemovedFromManager(system);
 	            system.usedBy.splice(system.usedBy.indexOf(this), 1);
 	        }
+	        return this;
+	    };
+	    SystemManager.prototype.run = function (world, params) {
+	        SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
+	        SystemManager.eventObject.manager = this;
+	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+	        this.elements.forEach(function (item) {
+	            item.checkUpdatedEntities(world.entityManager);
+	            item.run(world, params);
+	        });
+	        if (world.entityManager) {
+	            world.entityManager.updatedEntities.clear();
+	        }
+	        this.loopTimes++;
+	        SystemManager.eventObject.eventKey = SystemManager.AFTER_RUN;
+	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 	        return this;
 	    };
 	    SystemManager.prototype.updateSystemEntitySetByRemovedFromManager = function (system) {
@@ -531,29 +550,17 @@
 	        }
 	        return this;
 	    };
-	    SystemManager.prototype.run = function (world, params) {
-	        SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
-	        SystemManager.eventObject.manager = this;
-	        this.dispatchEvent(SystemManager.BEFORE_RUN, SystemManager.eventObject);
-	        this.elements.forEach(function (item) {
-	            item.checkUpdatedEntities(world.entityManager);
-	            item.run(world, params);
-	        });
-	        if (world.entityManager) {
-	            world.entityManager.updatedEntities.clear();
-	        }
-	        this.loopTimes++;
-	        SystemManager.eventObject.eventKey = SystemManager.AFTER_RUN;
-	        this.dispatchEvent(SystemManager.BEFORE_RUN, SystemManager.eventObject);
-	        return this;
-	    };
 	    SystemManager.AFTER_RUN = ESystemEvent.AFTER_RUN;
 	    SystemManager.BEFORE_RUN = ESystemEvent.BEFORE_RUN;
-	    SystemManager.eventObject = {};
+	    SystemManager.eventObject = {
+	        eventKey: null,
+	        manager: null,
+	        target: null
+	    };
 	    return SystemManager;
 	}(EventDispatcher__default['default']));
 
-	var arr$1;
+	var arr;
 	var World = /** @class */ (function () {
 	    function World(name, entityManager, systemManager) {
 	        this.id = IdGeneratorInstance.next();
@@ -644,16 +651,16 @@
 	    };
 	    World.prototype.unregisterEntityManager = function () {
 	        if (this.entityManager) {
-	            arr$1 = this.entityManager.usedBy;
-	            arr$1.splice(arr$1.indexOf(this) - 1, 1);
+	            arr = this.entityManager.usedBy;
+	            arr.splice(arr.indexOf(this) - 1, 1);
 	            this.entityManager = null;
 	        }
 	        return this;
 	    };
 	    World.prototype.unregisterSystemManager = function () {
 	        if (this.systemManager) {
-	            arr$1 = this.systemManager.usedBy;
-	            arr$1.splice(arr$1.indexOf(this) - 1, 1);
+	            arr = this.systemManager.usedBy;
+	            arr.splice(arr.indexOf(this) - 1, 1);
 	            this.entityManager = null;
 	        }
 	        return this;

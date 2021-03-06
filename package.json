@@ -41,7 +41,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"@valeera/idgenerator": "^0.1.0",
-		"@valeera/eventdispatcher": "^2.0.0"
+		"@valeera/eventdispatcher": "^2.1.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-node-resolve": "^11.2.0",

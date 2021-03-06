@@ -1,7 +1,7 @@
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
-import IWorld from "./interfaces/IWorld";
 import ISystem from "./interfaces/ISystem";
+import IWorld from "./interfaces/IWorld";
 
 // 私有全局变量，外部无法访问
 let entityTmp: IEntity | undefined;
@@ -40,7 +40,7 @@ export default class EntityManager implements IEntityManager {
 		this.elements.clear();
 
 		return this;
-	};
+	}
 
 	public get(name: string): IEntity | null {
 		entityTmp = this.elements.get(name);
@@ -84,7 +84,7 @@ export default class EntityManager implements IEntityManager {
 	private deleteEntityFromSystemSet(entity: IEntity) {
 		entity.usedBy.splice(entity.usedBy.indexOf(this), 1);
 
-		for (let world of this.usedBy) {
+		for (const world of this.usedBy) {
 			if (world.systemManager) {
 				world.systemManager.elements.forEach((system: ISystem<any>) => {
 					if (system.entitySet.get(this)) {
