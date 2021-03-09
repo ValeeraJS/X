@@ -21,9 +21,6 @@ var AbstructSystem = /** @class */ (function () {
         this.name = name;
         this.queryRule = fitRule;
     }
-    AbstructSystem.prototype.query = function (entity) {
-        return this.queryRule(entity);
-    };
     AbstructSystem.prototype.checkUpdatedEntities = function (manager) {
         var _this = this;
         if (manager) {
@@ -64,6 +61,9 @@ var AbstructSystem = /** @class */ (function () {
             });
         }
         return this;
+    };
+    AbstructSystem.prototype.query = function (entity) {
+        return this.queryRule(entity);
     };
     AbstructSystem.prototype.run = function (world, params) {
         var _this = this;

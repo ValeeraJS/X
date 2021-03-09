@@ -29,9 +29,6 @@
 	        this.name = name;
 	        this.queryRule = fitRule;
 	    }
-	    query(entity) {
-	        return this.queryRule(entity);
-	    }
 	    checkUpdatedEntities(manager) {
 	        if (manager) {
 	            weakMapTmp = this.entitySet.get(manager);
@@ -70,6 +67,9 @@
 	            });
 	        }
 	        return this;
+	    }
+	    query(entity) {
+	        return this.queryRule(entity);
 	    }
 	    run(world, params) {
 	        params.world = world;
