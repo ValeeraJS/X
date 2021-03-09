@@ -661,5 +661,5 @@ var World = /** @class */ (function () {
     return World;
 }());
 
-export { AbstructSystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, Global, SystemManager, World };
+export { AbstructSystem as ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, Global, SystemManager, World };
 //# sourceMappingURL=x.legacy.module.js.map

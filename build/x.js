@@ -554,7 +554,7 @@
 	    }
 	}
 
-	exports.AbstructSystem = AbstructSystem;
+	exports.ASystem = AbstructSystem;
 	exports.Component = Component;
 	exports.ComponentManager = ComponentManager;
 	exports.Entity = Entity;

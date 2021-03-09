@@ -1,4 +1,4 @@
-export { default as AbstructSystem } from './AbstructSystem';
+export { default as ASystem } from './ASystem';
 export { default as Component } from './Component';
 export { default as ComponentManager } from './ComponentManager';
 export { default as Entity } from './Entity';
