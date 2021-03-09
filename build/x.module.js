@@ -75,7 +75,7 @@ class AbstructSystem {
 }
 
 class Component {
-    constructor(name, data) {
+    constructor(name, data = null) {
         this.isComponent = true;
         this.data = null;
         this.disabled = false;

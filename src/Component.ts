@@ -8,7 +8,7 @@ export default class Component<T> implements IComponent<T> {
 	public usedBy = [];
 	public dirty = false;
 
-	public constructor(name: string, data: T | null) {
+	public constructor(name: string, data: T | null = null) {
 		this.name = name;
 		this.data = data;
 	}
