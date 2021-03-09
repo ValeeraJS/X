@@ -85,7 +85,7 @@ var Component = /** @class */ (function () {
         this.data = null;
         this.disabled = false;
         this.usedBy = [];
-        this.isDirty = false;
+        this.dirty = false;
         this.name = name;
         this.data = data;
     }

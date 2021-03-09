@@ -5,7 +5,7 @@ export default class Component<T> implements IComponent<T> {
     disabled: boolean;
     name: string;
     usedBy: never[];
-    isDirty: boolean;
+    dirty: boolean;
     constructor(name: string, data: T | null);
     clone(): IComponent<T>;
 }

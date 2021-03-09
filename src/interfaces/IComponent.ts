@@ -6,7 +6,7 @@ export default interface IComponent<T> {
 	disabled: boolean;
 	name: string;
 	usedBy: IComponentManager[];
-	isDirty: boolean;
+	dirty: boolean;
 
 	clone(): IComponent<T>;
 }

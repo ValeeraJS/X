@@ -6,7 +6,7 @@ export default class Component<T> implements IComponent<T> {
 	public disabled = false;
 	public name: string;
 	public usedBy = [];
-	public isDirty = false;
+	public dirty = false;
 
 	public constructor(name: string, data: T | null) {
 		this.name = name;
