@@ -1,11 +1,11 @@
-import { IdGeneratorInstance } from "./Global";
 import EntityManager from "./EntityManager";
+import { IdGeneratorInstance } from "./Global";
+import IEntity from "./interfaces/IEntity";
+import IEntityManager from "./interfaces/IEntityManager";
+import ISystem from "./interfaces/ISystem";
+import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
 import SystemManager from "./SystemManager";
-import IEntity from "./interfaces/IEntity";
-import ISystem from "./interfaces/ISystem";
-import IEntityManager from "./interfaces/IEntityManager";
-import ISystemManager from "./interfaces/ISystemManager";
 
 let arr: any[];
 
@@ -17,13 +17,17 @@ export default class World<T> implements IWorld<T> {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isWorld = true;
 
-	public constructor(name: string, entityManager?: IEntityManager, systemManager?: ISystemManager<T>) {
+	public constructor(
+		name: string,
+		entityManager?: IEntityManager,
+		systemManager?: ISystemManager<T>
+	) {
 		this.name = name;
 		this.registerEntityManager(entityManager);
 		this.registerSystemManager(systemManager);
 	}
 
-	public add(element: IEntity | ISystem<T>) {
+	public add(element: IEntity | ISystem<T>): this {
 		if ((element as IEntity).isEntity) {
 			return this.addEntity(element as IEntity);
 		} else {
@@ -51,7 +55,7 @@ export default class World<T> implements IWorld<T> {
 		return this;
 	}
 
-	public hasEntity(entity: IEntity | string) {
+	public hasEntity(entity: IEntity | string): boolean {
 		if (this.entityManager) {
 			return this.entityManager.has(entity);
 		}
@@ -118,8 +122,8 @@ export default class World<T> implements IWorld<T> {
 
 		return this;
 	}
-	
-	public unregisterEntityManager() {
+
+	public unregisterEntityManager(): this {
 		if (this.entityManager) {
 			arr = this.entityManager.usedBy;
 			arr.splice(arr.indexOf(this) - 1, 1);
@@ -129,7 +133,7 @@ export default class World<T> implements IWorld<T> {
 		return this;
 	}
 
-	public unregisterSystemManager() {
+	public unregisterSystemManager(): this {
 		if (this.systemManager) {
 			arr = this.systemManager.usedBy;
 			arr.splice(arr.indexOf(this) - 1, 1);
