@@ -4,7 +4,7 @@ import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
 declare type TQueryRule = (entity: IEntity) => boolean;
-export default abstract class AbstructSystem<T> implements ISystem<T> {
+export default abstract class ASystem<T> implements ISystem<T> {
     readonly id: number;
     readonly isSystem = true;
     name: string;

@@ -17,7 +17,7 @@
 	});
 
 	let weakMapTmp;
-	class AbstructSystem {
+	class ASystem {
 	    constructor(name, fitRule) {
 	        this.id = IdGeneratorInstance.next();
 	        this.isSystem = true;
@@ -554,7 +554,7 @@
 	    }
 	}
 
-	exports.ASystem = AbstructSystem;
+	exports.ASystem = ASystem;
 	exports.Component = Component;
 	exports.ComponentManager = ComponentManager;
 	exports.Entity = Entity;

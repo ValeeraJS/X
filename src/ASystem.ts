@@ -8,7 +8,7 @@ import IWorld from "./interfaces/IWorld";
 type TQueryRule = (entity: IEntity) => boolean;
 let weakMapTmp: Set<IEntity> | undefined;
 
-export default abstract class AbstructSystem<T> implements ISystem<T> {
+export default abstract class ASystem<T> implements ISystem<T> {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isSystem = true;
 	public name = "";

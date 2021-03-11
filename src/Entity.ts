@@ -1,11 +1,11 @@
 import ComponentManager from "./ComponentManager";
+import EventDispatcher from "@valeera/eventdispatcher";
 import IComponent from "./interfaces/IComponent";
+import IComponentManager from "./interfaces/IComponentManager";
 import { IdGeneratorInstance } from "./Global";
 import IEntity from "./interfaces/IEntity";
-import IWorld from "./interfaces/IWorld";
 import IEntityManager from "./interfaces/IEntityManager";
-import EventDispatcher from "@valeera/eventdispatcher";
-import IComponentManager from "./interfaces/IComponentManager";
+import IWorld from "./interfaces/IWorld";
 
 let arr: any[];
 
@@ -13,7 +13,7 @@ export default class Entity extends EventDispatcher implements IEntity {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
 	public componentManager: IComponentManager | null;
-	public name: string = "";
+	public name = "";
 	public usedBy: IEntityManager[] = [];
 
 	public constructor(name: string, componentManager?: IComponentManager) {
@@ -72,7 +72,7 @@ export default class Entity extends EventDispatcher implements IEntity {
 		return this;
 	}
 
-	public unregisterComponentManager() {
+	public unregisterComponentManager(): this {
 		if (this.componentManager) {
 			arr = this.componentManager.usedBy;
 			arr.splice(arr.indexOf(this) - 1, 1);

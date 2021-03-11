@@ -9,8 +9,8 @@ var Global = /*#__PURE__*/Object.freeze({
 });
 
 var weakMapTmp;
-var AbstructSystem = /** @class */ (function () {
-    function AbstructSystem(name, fitRule) {
+var ASystem = /** @class */ (function () {
+    function ASystem(name, fitRule) {
         this.id = IdGeneratorInstance.next();
         this.isSystem = true;
         this.name = "";
@@ -21,7 +21,7 @@ var AbstructSystem = /** @class */ (function () {
         this.name = name;
         this.queryRule = fitRule;
     }
-    AbstructSystem.prototype.checkUpdatedEntities = function (manager) {
+    ASystem.prototype.checkUpdatedEntities = function (manager) {
         var _this = this;
         if (manager) {
             weakMapTmp = this.entitySet.get(manager);
@@ -40,7 +40,7 @@ var AbstructSystem = /** @class */ (function () {
         }
         return this;
     };
-    AbstructSystem.prototype.checkEntityManager = function (manager) {
+    ASystem.prototype.checkEntityManager = function (manager) {
         var _this = this;
         if (manager) {
             weakMapTmp = this.entitySet.get(manager);
@@ -62,10 +62,10 @@ var AbstructSystem = /** @class */ (function () {
         }
         return this;
     };
-    AbstructSystem.prototype.query = function (entity) {
+    ASystem.prototype.query = function (entity) {
         return this.queryRule(entity);
     };
-    AbstructSystem.prototype.run = function (world, params) {
+    ASystem.prototype.run = function (world, params) {
         var _this = this;
         var _a;
         params.world = world;
@@ -76,7 +76,7 @@ var AbstructSystem = /** @class */ (function () {
         }
         return this;
     };
-    return AbstructSystem;
+    return ASystem;
 }());
 
 var Component = /** @class */ (function () {
@@ -661,5 +661,5 @@ var World = /** @class */ (function () {
     return World;
 }());
 
-export { AbstructSystem as ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, Global, SystemManager, World };
+export { ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, Global, SystemManager, World };
 //# sourceMappingURL=x.legacy.module.js.map

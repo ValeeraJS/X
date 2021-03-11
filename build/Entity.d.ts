@@ -1,9 +1,9 @@
-import IComponent from "./interfaces/IComponent";
-import IEntity from "./interfaces/IEntity";
-import IWorld from "./interfaces/IWorld";
-import IEntityManager from "./interfaces/IEntityManager";
 import EventDispatcher from "@valeera/eventdispatcher";
+import IComponent from "./interfaces/IComponent";
 import IComponentManager from "./interfaces/IComponentManager";
+import IEntity from "./interfaces/IEntity";
+import IEntityManager from "./interfaces/IEntityManager";
+import IWorld from "./interfaces/IWorld";
 export default class Entity extends EventDispatcher implements IEntity {
     readonly id: number;
     readonly isEntity = true;

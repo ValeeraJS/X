@@ -17,8 +17,8 @@
 	});
 
 	var weakMapTmp;
-	var AbstructSystem = /** @class */ (function () {
-	    function AbstructSystem(name, fitRule) {
+	var ASystem = /** @class */ (function () {
+	    function ASystem(name, fitRule) {
 	        this.id = IdGeneratorInstance.next();
 	        this.isSystem = true;
 	        this.name = "";
@@ -29,7 +29,7 @@
 	        this.name = name;
 	        this.queryRule = fitRule;
 	    }
-	    AbstructSystem.prototype.checkUpdatedEntities = function (manager) {
+	    ASystem.prototype.checkUpdatedEntities = function (manager) {
 	        var _this = this;
 	        if (manager) {
 	            weakMapTmp = this.entitySet.get(manager);
@@ -48,7 +48,7 @@
 	        }
 	        return this;
 	    };
-	    AbstructSystem.prototype.checkEntityManager = function (manager) {
+	    ASystem.prototype.checkEntityManager = function (manager) {
 	        var _this = this;
 	        if (manager) {
 	            weakMapTmp = this.entitySet.get(manager);
@@ -70,10 +70,10 @@
 	        }
 	        return this;
 	    };
-	    AbstructSystem.prototype.query = function (entity) {
+	    ASystem.prototype.query = function (entity) {
 	        return this.queryRule(entity);
 	    };
-	    AbstructSystem.prototype.run = function (world, params) {
+	    ASystem.prototype.run = function (world, params) {
 	        var _this = this;
 	        var _a;
 	        params.world = world;
@@ -84,7 +84,7 @@
 	        }
 	        return this;
 	    };
-	    return AbstructSystem;
+	    return ASystem;
 	}());
 
 	var Component = /** @class */ (function () {
@@ -669,7 +669,7 @@
 	    return World;
 	}());
 
-	exports.ASystem = AbstructSystem;
+	exports.ASystem = ASystem;
 	exports.Component = Component;
 	exports.ComponentManager = ComponentManager;
 	exports.Entity = Entity;

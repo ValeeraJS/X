@@ -9,7 +9,7 @@ var Global = /*#__PURE__*/Object.freeze({
 });
 
 let weakMapTmp;
-class AbstructSystem {
+class ASystem {
     constructor(name, fitRule) {
         this.id = IdGeneratorInstance.next();
         this.isSystem = true;
@@ -546,5 +546,5 @@ class World {
     }
 }
 
-export { AbstructSystem as ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, Global, SystemManager, World };
+export { ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, Global, SystemManager, World };
 //# sourceMappingURL=x.module.js.map
