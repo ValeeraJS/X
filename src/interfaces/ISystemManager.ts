@@ -1,6 +1,6 @@
+import IManager from "./IManager";
 import ISystem from "./ISystem";
 import IWorld from "./IWorld";
-import IManager from "./IManager";
 
 export default interface ISystemManager<T> extends IManager<ISystem<T>> {
 	disabled: boolean;

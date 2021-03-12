@@ -1,8 +1,8 @@
-import IWorld from "./interfaces/IWorld";
 import IEntity from "./interfaces/IEntity";
-import ISystem from "./interfaces/ISystem";
 import IEntityManager from "./interfaces/IEntityManager";
+import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
+import IWorld from "./interfaces/IWorld";
 export default class World<T> implements IWorld<T> {
     name: string;
     entityManager: IEntityManager | null;

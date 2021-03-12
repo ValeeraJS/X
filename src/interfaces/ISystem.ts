@@ -1,7 +1,7 @@
-import ISystemManager from "./ISystemManager";
 import IEntity from "./IEntity";
-import IWorld from "./IWorld";
 import IEntityManager from "./IEntityManager";
+import ISystemManager from "./ISystemManager";
+import IWorld from "./IWorld";
 
 export default interface ISystem<T> {
 	readonly id: number;
