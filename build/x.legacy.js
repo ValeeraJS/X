@@ -76,6 +76,7 @@
 	    ASystem.prototype.run = function (world, params) {
 	        var _this = this;
 	        var _a;
+	        if (params === void 0) { params = {}; }
 	        params.world = world;
 	        if (world.entityManager) {
 	            (_a = this.entitySet.get(world.entityManager)) === null || _a === void 0 ? void 0 : _a.forEach(function (item) {

@@ -71,7 +71,7 @@
 	    query(entity) {
 	        return this.queryRule(entity);
 	    }
-	    run(world, params) {
+	    run(world, params = {}) {
 	        params.world = world;
 	        if (world.entityManager) {
 	            this.entitySet.get(world.entityManager)?.forEach((item) => {

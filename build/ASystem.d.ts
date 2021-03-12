@@ -4,9 +4,7 @@ import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
 declare type TQueryRule = (entity: IEntity) => boolean;
-export default abstract class ASystem<T extends {
-    world: IWorld<any>;
-}> implements ISystem<T> {
+export default abstract class ASystem<T> implements ISystem<T> {
     readonly id: number;
     readonly isSystem = true;
     name: string;
@@ -19,7 +17,7 @@ export default abstract class ASystem<T extends {
     checkUpdatedEntities(manager: IEntityManager | null): this;
     checkEntityManager(manager: IEntityManager | null): this;
     query(entity: IEntity): boolean;
-    run(world: IWorld<T>, params: T): this;
+    run(world: IWorld<T>, params?: T): this;
     abstract destroy(): void;
     abstract handle(entity: IEntity, params?: T): this;
 }

@@ -8,7 +8,7 @@ import IWorld from "./interfaces/IWorld";
 type TQueryRule = (entity: IEntity) => boolean;
 let weakMapTmp: Set<IEntity> | undefined;
 
-export default abstract class ASystem<T extends { world: IWorld<any> }> implements ISystem<T> {
+export default abstract class ASystem<T> implements ISystem<T> {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isSystem = true;
 	public name = "";
@@ -67,8 +67,8 @@ export default abstract class ASystem<T extends { world: IWorld<any> }> implemen
 		return this.queryRule(entity);
 	}
 
-	public run(world: IWorld<T>, params: T): this {
-		params.world = world;
+	public run(world: IWorld<T>, params: T = {} as any): this {
+		(params as any).world = world;
 		if (world.entityManager) {
 			this.entitySet.get(world.entityManager)?.forEach((item: IEntity) => {
 				this.handle(item, params);
