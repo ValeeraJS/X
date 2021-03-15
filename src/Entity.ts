@@ -38,7 +38,7 @@ export default class Entity extends EventDispatcher implements IEntity {
 		return this;
 	}
 
-	public addToWorld(world: IWorld<any>): this {
+	public addToWorld(world: IWorld): this {
 		if (world.entityManager) {
 			world.entityManager.add(this);
 		}

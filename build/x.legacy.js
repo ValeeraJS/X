@@ -73,14 +73,12 @@
 	    ASystem.prototype.query = function (entity) {
 	        return this.queryRule(entity);
 	    };
-	    ASystem.prototype.run = function (world, params) {
+	    ASystem.prototype.run = function (world) {
 	        var _this = this;
 	        var _a;
-	        if (params === void 0) { params = {}; }
-	        params.world = world;
 	        if (world.entityManager) {
 	            (_a = this.entitySet.get(world.entityManager)) === null || _a === void 0 ? void 0 : _a.forEach(function (item) {
-	                _this.handle(item, params);
+	                _this.handle(item, world.store);
 	            });
 	        }
 	        return this;
@@ -498,13 +496,13 @@
 	        }
 	        return this;
 	    };
-	    SystemManager.prototype.run = function (world, params) {
+	    SystemManager.prototype.run = function (world) {
 	        SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
 	        SystemManager.eventObject.manager = this;
 	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 	        this.elements.forEach(function (item) {
 	            item.checkUpdatedEntities(world.entityManager);
-	            item.run(world, params);
+	            item.run(world);
 	        });
 	        if (world.entityManager) {
 	            world.entityManager.updatedEntities.clear();
@@ -565,6 +563,7 @@
 	var arr;
 	var World = /** @class */ (function () {
 	    function World(name, entityManager, systemManager) {
+	        this.store = new Map();
 	        this.id = IdGeneratorInstance.next();
 	        this.isWorld = true;
 	        this.name = name;
@@ -645,9 +644,9 @@
 	        }
 	        return this;
 	    };
-	    World.prototype.run = function (params) {
+	    World.prototype.run = function () {
 	        if (this.systemManager) {
-	            this.systemManager.run(this, params);
+	            this.systemManager.run(this);
 	        }
 	        return this;
 	    };

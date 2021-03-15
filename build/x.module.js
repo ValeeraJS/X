@@ -63,11 +63,10 @@ class ASystem {
     query(entity) {
         return this.queryRule(entity);
     }
-    run(world, params = {}) {
-        params.world = world;
+    run(world) {
         if (world.entityManager) {
             this.entitySet.get(world.entityManager)?.forEach((item) => {
-                this.handle(item, params);
+                this.handle(item, world.store);
             });
         }
         return this;
@@ -398,13 +397,13 @@ class SystemManager extends EventDispatcher {
         }
         return this;
     }
-    run(world, params) {
+    run(world) {
         SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
         SystemManager.eventObject.manager = this;
         this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
         this.elements.forEach((item) => {
             item.checkUpdatedEntities(world.entityManager);
-            item.run(world, params);
+            item.run(world);
         });
         if (world.entityManager) {
             world.entityManager.updatedEntities.clear();
@@ -442,6 +441,7 @@ SystemManager.eventObject = {
 let arr;
 class World {
     constructor(name, entityManager, systemManager) {
+        this.store = new Map();
         this.id = IdGeneratorInstance.next();
         this.isWorld = true;
         this.name = name;
@@ -522,9 +522,9 @@ class World {
         }
         return this;
     }
-    run(params) {
+    run() {
         if (this.systemManager) {
-            this.systemManager.run(this, params);
+            this.systemManager.run(this);
         }
         return this;
     }

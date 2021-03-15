@@ -1,21 +1,21 @@
+import IWorld, { TWorldInjection } from "./interfaces/IWorld";
 import { IdGeneratorInstance } from "./Global";
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
-import IWorld from "./interfaces/IWorld";
 
 type TQueryRule = (entity: IEntity) => boolean;
 let weakMapTmp: Set<IEntity> | undefined;
 
-export default abstract class ASystem<T> implements ISystem<T> {
+export default abstract class ASystem implements ISystem {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isSystem = true;
 	public name = "";
 	public disabled = false;
 	public loopTimes = 0;
 	public entitySet: WeakMap<IEntityManager, Set<IEntity>> = new WeakMap();
-	public usedBy: ISystemManager<T>[] = [];
+	public usedBy: ISystemManager[] = [];
 	private queryRule: TQueryRule;
 
 	public constructor(name: string, fitRule: TQueryRule) {
@@ -67,11 +67,10 @@ export default abstract class ASystem<T> implements ISystem<T> {
 		return this.queryRule(entity);
 	}
 
-	public run(world: IWorld<T>, params: T = {} as any): this {
-		(params as any).world = world;
+	public run(world: IWorld): this {
 		if (world.entityManager) {
 			this.entitySet.get(world.entityManager)?.forEach((item: IEntity) => {
-				this.handle(item, params);
+				this.handle(item, world.store);
 			});
 		}
 
@@ -79,5 +78,5 @@ export default abstract class ASystem<T> implements ISystem<T> {
 	}
 
 	public abstract destroy(): void;
-	public abstract handle(entity: IEntity, params?: T): this;
+	public abstract handle(entity: IEntity, params: TWorldInjection): this;
 }

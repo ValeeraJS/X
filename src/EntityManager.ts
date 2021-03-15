@@ -12,9 +12,9 @@ export default class EntityManager implements IEntityManager {
 	public disabled = false;
 	public updatedEntities: Set<IEntity> = new Set();
 	public readonly isEntityManager = true;
-	public usedBy: IWorld<any>[] = [];
+	public usedBy: IWorld[] = [];
 
-	public constructor(world?: IWorld<any>) {
+	public constructor(world?: IWorld) {
 		if (world) {
 			this.usedBy.push(world);
 		}
@@ -86,7 +86,7 @@ export default class EntityManager implements IEntityManager {
 
 		for (const world of this.usedBy) {
 			if (world.systemManager) {
-				world.systemManager.elements.forEach((system: ISystem<any>) => {
+				world.systemManager.elements.forEach((system: ISystem) => {
 					if (system.entitySet.get(this)) {
 						(system.entitySet.get(this) as any).delete(entity);
 					}

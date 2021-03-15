@@ -2,10 +2,10 @@ import IManager from "./IManager";
 import ISystem from "./ISystem";
 import IWorld from "./IWorld";
 
-export default interface ISystemManager<T> extends IManager<ISystem<T>> {
+export default interface ISystemManager extends IManager<ISystem> {
 	disabled: boolean;
 	loopTimes: number;
-	usedBy: IWorld<T>[];
+	usedBy: IWorld[];
 
-	run: (world: IWorld<T>, params?: T) => this;
+	run(world: IWorld): this;
 }

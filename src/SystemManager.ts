@@ -3,7 +3,7 @@ import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
 
-let systemTmp: ISystem<any> | undefined;
+let systemTmp: ISystem | undefined;
 
 export enum ESystemEvent {
 	BEFORE_RUN = "beforeRun",
@@ -12,11 +12,11 @@ export enum ESystemEvent {
 
 export interface ISystemEventObject {
 	eventKey: ESystemEvent;
-	manager: ISystemManager<any>;
-	target: ISystem<any>;
+	manager: ISystemManager;
+	target: ISystem;
 }
 
-export default class SystemManager<T> extends EventDispatcher implements ISystemManager<T> {
+export default class SystemManager extends EventDispatcher implements ISystemManager {
 	public static readonly AFTER_RUN: ESystemEvent = ESystemEvent.AFTER_RUN;
 	public static readonly BEFORE_RUN: ESystemEvent = ESystemEvent.BEFORE_RUN;
 	private static eventObject: ISystemEventObject = {
@@ -26,18 +26,18 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 	};
 
 	public disabled = false;
-	public elements: Map<string, ISystem<T>> = new Map();
+	public elements: Map<string, ISystem> = new Map();
 	public loopTimes = 0;
-	public usedBy: IWorld<T>[] = [];
+	public usedBy: IWorld[] = [];
 
-	public constructor(world?: IWorld<T>) {
+	public constructor(world?: IWorld) {
 		super();
 		if (world) {
 			this.usedBy.push(world);
 		}
 	}
 
-	public add(system: ISystem<T>): this {
+	public add(system: ISystem): this {
 		if (this.elements.has(system.name)) {
 			return this;
 		}
@@ -53,13 +53,13 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		return this;
 	}
 
-	public get(name: string): ISystem<T> | null {
+	public get(name: string): ISystem | null {
 		systemTmp = this.elements.get(name);
 
 		return systemTmp ? systemTmp : null;
 	}
 
-	public has(element: string | ISystem<T>): boolean {
+	public has(element: string | ISystem): boolean {
 		if (typeof element === "string") {
 			return this.elements.has(element);
 		} else {
@@ -67,7 +67,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		}
 	}
 
-	public remove(system: ISystem<T> | string): this {
+	public remove(system: ISystem | string): this {
 		return typeof system === "string"
 			? this.removeByName(system)
 			: this.removeByInstance(system);
@@ -84,7 +84,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		return this;
 	}
 
-	public removeByInstance(system: ISystem<T>): this {
+	public removeByInstance(system: ISystem): this {
 		if (this.elements.has(system.name)) {
 			this.elements.delete(system.name);
 			this.updateSystemEntitySetByRemovedFromManager(system);
@@ -94,14 +94,14 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		return this;
 	}
 
-	public run(world: IWorld<T>, params?: T): this {
+	public run(world: IWorld): this {
 		SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
 		SystemManager.eventObject.manager = this;
 		this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 
 		this.elements.forEach((item) => {
 			item.checkUpdatedEntities(world.entityManager);
-			item.run(world, params);
+			item.run(world);
 		});
 		if (world.entityManager) {
 			world.entityManager.updatedEntities.clear();
@@ -114,7 +114,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		return this;
 	}
 
-	private updateSystemEntitySetByRemovedFromManager(system: ISystem<T>): this {
+	private updateSystemEntitySetByRemovedFromManager(system: ISystem): this {
 		for (const item of this.usedBy) {
 			if (item.entityManager) {
 				system.entitySet.delete(item.entityManager);
@@ -124,7 +124,7 @@ export default class SystemManager<T> extends EventDispatcher implements ISystem
 		return this;
 	}
 
-	private updateSystemEntitySetByAddFromManager(system: ISystem<T>): this {
+	private updateSystemEntitySetByAddFromManager(system: ISystem): this {
 		for (const item of this.usedBy) {
 			if (item.entityManager) {
 				system.checkEntityManager(item.entityManager);

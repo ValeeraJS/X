@@ -1,228 +1,226 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<meta charset="UTF-8" />
+		<title></title>
+		<link rel="stylesheet" href="./common.css" />
+		<style>
+			.controls-container {
+				position: fixed;
+				height: 200px;
+				width: 100%;
+				bottom: 0;
+				background: rgba(0, 0, 0, 0.5);
+			}
+			.controls-container button {
+				padding: 8px;
+				font-size: 16px;
+			}
+			.controls-container div {
+				color: white;
+			}
+		</style>
+	</head>
 
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-    <link rel="stylesheet" href="./common.css">
-    <style>
-        .controls-container {
-            position: fixed;
-            height: 200px;
-            width: 100%;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-        }
-        .controls-container button {
-            padding: 8px;
-            font-size: 16px;
-        }
-        .controls-container div {
-            color: white;
-        }
-    </style>
-</head>
+	<body>
+		<div class="controls-container">
+			<div>World</div>
+			<button id="worldEntity1Btn">移除Entity 1</button>
+			<button id="worldEntity2Btn">移除Entity 2</button>
+			<button id="worldRenderBtn">移除渲染System</button>
+			<button id="worldRotationBtn">移除旋转System</button>
+			<div>Entity 1</div>
+			<button id="entity1Btn">移除旋转组件</button>
+			<div>Entity 2</div>
+			<button id="entity2Btn">切换顺时针旋转</button>
+		</div>
+		<script src="./IdGenerator.js"></script>
+		<script src="./EventDispatcher.js"></script>
+		<script src="./three.min.js"></script>
+		<script src="../../build/x.js"></script>
+		<script>
+			class RotationComponent extends X.Component {
+				constructor(speed) {
+					super("rotationSpeed", speed);
+				}
+			}
 
-<body>
-    <div class="controls-container">
-        <div>World</div>
-        <button id="worldEntity1Btn">移除Entity 1</button>
-        <button id="worldEntity2Btn">移除Entity 2</button>
-        <button id="worldRenderBtn">移除渲染System</button>
-        <button id="worldRotationBtn">移除旋转System</button>
-        <div>Entity 1</div>
-        <button id="entity1Btn">移除旋转组件</button>
-        <div>Entity 2</div>
-        <button id="entity2Btn">切换顺时针旋转</button>
-    </div>
-    <script src="./IdGenerator.js"></script>
-    <script src="./EventDispatcher.js"></script>
-    <script src="./three.min.js"></script>
-    <script src="../../build/x.js"></script>
-    <script>
-        class RotationComponent extends X.Component {
-        	constructor(speed) {
-        		super("rotationSpeed", speed);
-        	}
-        }
+			class MeshEntity extends X.Entity {
+				constructor(name, geometry, material) {
+					super(name);
+					this.mesh = new THREE.Mesh(geometry, material);
+					this.mesh.name = name;
+				}
+			}
 
-        class MeshEntity extends X.Entity {
-        	constructor(name, geometry, material) {
-        		super(name);
-        		this.mesh = new THREE.Mesh(geometry, material);
-        		this.mesh.name = name;
-        	}
-        }
+			class RotationSystem extends X.ASystem {
+				constructor() {
+					super("Rotation System", (entity) => {
+						return entity.hasComponent("rotationSpeed");
+					});
+				}
 
-        class RotationSystem extends X.ASystem {
-        	constructor() {
-        		super("Rotation System", (entity) => {
-        			return entity.hasComponent("rotationSpeed");
-        		});
-        	}
+				handle(entity) {
+					entity.mesh.rotation.y += entity.getComponent("rotationSpeed").data;
+				}
+			}
 
-        	handle(entity) {
-        		entity.mesh.rotation.y += entity.getComponent("rotationSpeed").data;
-        	}
-        }
+			class RenderSystem extends X.ASystem {
+				constructor() {
+					super("Render System", (entity) => {
+						return true;
+					});
+					this.renderer = new THREE.WebGLRenderer({ antialias: true });
+					this.renderer.setSize(window.innerWidth, window.innerHeight);
+					document.body.appendChild(this.renderer.domElement);
+				}
 
-        class RenderSystem extends X.ASystem {
-        	constructor() {
-        		super("Render System", (entity) => {
-        			return true;
-        		});
-        		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        		this.renderer.setSize(window.innerWidth, window.innerHeight);
-        		document.body.appendChild(this.renderer.domElement);
-        	}
+				run({ camera, scene }) {
+					this.renderer.render(scene, camera);
+				}
+			}
 
-        	run({ camera, scene }) {
-        		this.renderer.render(scene, camera);
-        	}
-        }
+			class ThreeWorld extends X.World {
+				constructor(name) {
+					super(name);
+					this.scene = new THREE.Scene();
+					this.camera = new THREE.PerspectiveCamera(
+						70,
+						window.innerWidth / window.innerHeight,
+						0.01,
+						10
+					);
+					this.camera.position.z = 1;
+					this.runParams = {
+						scene: this.scene,
+						camera: this.camera,
+						entities: this.entityManager.elements
+					};
+				}
 
-        class ThreeWorld extends X.World {
-        	constructor(name) {
-        		super(name);
-        		this.scene = new THREE.Scene();
-        		this.camera = new THREE.PerspectiveCamera(
-			70,
-			window.innerWidth / window.innerHeight,
-			0.01,
-			10
-		);
-        		this.camera.position.z = 1;
-        		this.runParams = {
-        			scene: this.scene,
-        			camera: this.camera,
-        			entities: this.entityManager.elements
-        		};
-        	}
+				addEntity(entity) {
+					super.addEntity(entity);
+					this.scene.add(entity.mesh);
 
-        	addEntity(entity) {
-        		super.addEntity(entity);
-        		this.scene.add(entity.mesh);
+					return this;
+				}
 
-        		return this;
-        	}
+				removeEntity(entity) {
+					super.removeEntity(entity);
+					this.scene.remove(entity.mesh);
 
-        	removeEntity(entity) {
-        		super.removeEntity(entity);
-        		this.scene.remove(entity.mesh);
+					return this;
+				}
 
-        		return this;
-        	}
+				run(params) {
+					super.run();
+					requestAnimationFrame(() => {
+						this.run(params);
+					});
+				}
+			}
 
-        	run(params) {
-        		super.run(params);
-        		requestAnimationFrame(() => {
-        			this.run(params);
-        		});
-        	}
-        }
+			const r1 = new RotationComponent(0.01);
+			const r2 = new RotationComponent(-0.01);
 
-        const r1 = new RotationComponent(0.01);
-        const r2 = new RotationComponent(-0.01);
+			const world = new ThreeWorld("My World");
+			const entity = new MeshEntity(
+				"test",
+				new THREE.BoxGeometry(0.2, 0.2, 0.2),
+				new THREE.MeshNormalMaterial()
+			);
 
-        const world = new ThreeWorld("My World");
-        const entity = new MeshEntity(
-	"test",
-	new THREE.BoxGeometry(0.2, 0.2, 0.2),
-	new THREE.MeshNormalMaterial()
-);
+			entity.addComponent(r1);
 
-        entity.addComponent(r1);
+			const entity2 = new MeshEntity(
+				"test2",
+				new THREE.BoxGeometry(0.2, 0.2, 0.2),
+				new THREE.MeshNormalMaterial()
+			);
 
-        const entity2 = new MeshEntity(
-	"test2",
-	new THREE.BoxGeometry(0.2, 0.2, 0.2),
-	new THREE.MeshNormalMaterial()
-);
+			entity2.addComponent(r2);
+			entity2.mesh.position.x = -0.5;
 
-        entity2.addComponent(r2);
-        entity2.mesh.position.x = -0.5;
+			const rotationSystem = new RotationSystem();
+			const renderSystem = new RenderSystem();
 
-        const rotationSystem = new RotationSystem();
-        const renderSystem = new RenderSystem();
+			world
+				.add(rotationSystem)
+				.add(renderSystem)
+				.add(entity)
+				.add(entity2)
+				.run(world.runParams);
 
-        world
-	.add(rotationSystem)
-	.add(renderSystem)
-	.add(entity)
-	.add(entity2)
-	.run(world.runParams);
+			initControls();
+			function initControls() {
+				const be1 = document.getElementById("worldEntity1Btn");
 
-        initControls();
-        function initControls() {
-        	const be1 = document.getElementById("worldEntity1Btn");
+				be1.addEventListener("click", () => {
+					if (world.hasEntity(entity)) {
+						world.removeEntity(entity);
+						be1.innerText = "添加Entity 1";
+					} else {
+						world.addEntity(entity);
+						be1.innerText = "移除Entity 1";
+					}
+				});
+				const be2 = document.getElementById("worldEntity2Btn");
 
-        	be1.addEventListener("click", () => {
-        		if (world.hasEntity(entity)) {
-        			world.removeEntity(entity);
-        			be1.innerText = "添加Entity 1";
-        		} else {
-        			world.addEntity(entity);
-        			be1.innerText = "移除Entity 1";
-        		}
-        	});
-        	const be2 = document.getElementById("worldEntity2Btn");
+				be2.addEventListener("click", () => {
+					if (world.hasEntity(entity2)) {
+						world.removeEntity(entity2);
+						be2.innerText = "添加Entity 2";
+					} else {
+						world.addEntity(entity2);
+						be2.innerText = "移除Entity 2";
+					}
+				});
+				const bs2 = document.getElementById("worldRenderBtn");
 
-        	be2.addEventListener("click", () => {
-        		if (world.hasEntity(entity2)) {
-        			world.removeEntity(entity2);
-        			be2.innerText = "添加Entity 2";
-        		} else {
-        			world.addEntity(entity2);
-        			be2.innerText = "移除Entity 2";
-        		}
-        	});
-        	const bs2 = document.getElementById("worldRenderBtn");
+				bs2.addEventListener("click", () => {
+					if (world.hasSystem(renderSystem)) {
+						world.removeSystem(renderSystem);
+						bs2.innerText = "添加渲染System";
+					} else {
+						world.addSystem(renderSystem);
+						bs2.innerText = "移除渲染System";
+					}
+				});
+				const bs1 = document.getElementById("worldRotationBtn");
 
-        	bs2.addEventListener("click", () => {
-        		if (world.hasSystem(renderSystem)) {
-        			world.removeSystem(renderSystem);
-        			bs2.innerText = "添加渲染System";
-        		} else {
-        			world.addSystem(renderSystem);
-        			bs2.innerText = "移除渲染System";
-        		}
-        	});
-        	const bs1 = document.getElementById("worldRotationBtn");
+				bs1.addEventListener("click", () => {
+					if (world.hasSystem(rotationSystem)) {
+						world.removeSystem(rotationSystem);
+						bs1.innerText = "添加旋转System";
+					} else {
+						world.addSystem(rotationSystem);
+						bs1.innerText = "移除旋转System";
+					}
+				});
 
-        	bs1.addEventListener("click", () => {
-        		if (world.hasSystem(rotationSystem)) {
-        			world.removeSystem(rotationSystem);
-        			bs1.innerText = "添加旋转System";
-        		} else {
-        			world.addSystem(rotationSystem);
-        			bs1.innerText = "移除旋转System";
-        		}
-        	});
+				const e1 = document.getElementById("entity1Btn");
 
-        	const e1 = document.getElementById("entity1Btn");
+				e1.addEventListener("click", () => {
+					if (entity.hasComponent(r1)) {
+						entity.removeComponent(r1);
+						e1.innerText = "添加旋转组件";
+					} else {
+						entity.addComponent(r1);
+						e1.innerText = "移除旋转组件";
+					}
+				});
+				const e2 = document.getElementById("entity2Btn");
 
-        	e1.addEventListener("click", () => {
-        		if (entity.hasComponent(r1)) {
-        			entity.removeComponent(r1);
-        			e1.innerText = "添加旋转组件";
-        		} else {
-        			entity.addComponent(r1);
-        			e1.innerText = "移除旋转组件";
-        		}
-        	});
-        	const e2 = document.getElementById("entity2Btn");
-
-        	e2.addEventListener("click", () => {
-        		if (entity2.getComponent("rotationSpeed").data > 0) {
-        			entity2.addComponent(r2);
-        			e2.innerText = "切换逆时针旋转";
-        		} else {
-        			entity2.addComponent(r1);
-        			e2.innerText = "切换顺时针旋转";
-        		}
-        	});
-        }
-    </script>
-</body>
-
+				e2.addEventListener("click", () => {
+					if (entity2.getComponent("rotationSpeed").data > 0) {
+						entity2.addComponent(r2);
+						e2.innerText = "切换逆时针旋转";
+					} else {
+						entity2.addComponent(r1);
+						e2.innerText = "切换顺时针旋转";
+					}
+				});
+			}
+		</script>
+	</body>
 </html>

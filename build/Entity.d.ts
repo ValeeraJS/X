@@ -13,7 +13,7 @@ export default class Entity extends EventDispatcher implements IEntity {
     constructor(name: string, componentManager?: IComponentManager);
     addComponent(component: IComponent<any>): this;
     addTo(manager: IEntityManager): this;
-    addToWorld(world: IWorld<any>): this;
+    addToWorld(world: IWorld): this;
     getComponent(name: string): IComponent<any> | null;
     hasComponent(component: IComponent<any> | string): boolean;
     registerComponentManager(manager?: IComponentManager): this;

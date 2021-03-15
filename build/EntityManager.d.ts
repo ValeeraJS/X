@@ -7,8 +7,8 @@ export default class EntityManager implements IEntityManager {
     disabled: boolean;
     updatedEntities: Set<IEntity>;
     readonly isEntityManager = true;
-    usedBy: IWorld<any>[];
-    constructor(world?: IWorld<any>);
+    usedBy: IWorld[];
+    constructor(world?: IWorld);
     add(entity: IEntity): this;
     addComponentDirect(entity: IEntity): this;
     clear(): this;

@@ -3,16 +3,19 @@ import IEntityManager from "./IEntityManager";
 import ISystem from "./ISystem";
 import ISystemManager from "./ISystemManager";
 
-export default interface IWorld<T> {
+export type TWorldInjection = Map<string, IEntity | string | number>;
+
+export default interface IWorld {
 	name: string;
 	entityManager: IEntityManager | null;
-	systemManager: ISystemManager<T> | null;
+	store: TWorldInjection;
+	systemManager: ISystemManager | null;
 
 	addEntity(entity: IEntity): this;
-	addSystem(system: ISystem<T>): this;
+	addSystem(system: ISystem): this;
 	hasEntity(entity: IEntity | string): boolean;
-	hasSystem(system: ISystem<T> | string): boolean;
+	hasSystem(system: ISystem | string): boolean;
 	removeEntity(entity: IEntity): this;
-	removeSystem(system: ISystem<T>): this;
-	run(params?: T): this;
+	removeSystem(system: ISystem): this;
+	run(): this;
 }

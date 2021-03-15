@@ -3,24 +3,25 @@ import IEntityManager from "./interfaces/IEntityManager";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
-export default class World<T> implements IWorld<T> {
+export default class World implements IWorld {
     name: string;
     entityManager: IEntityManager | null;
-    systemManager: ISystemManager<T> | null;
+    systemManager: ISystemManager | null;
+    store: Map<string, IEntity | string | number>;
     readonly id: number;
     readonly isWorld = true;
-    constructor(name: string, entityManager?: IEntityManager, systemManager?: ISystemManager<T>);
-    add(element: IEntity | ISystem<T>): this;
+    constructor(name: string, entityManager?: IEntityManager, systemManager?: ISystemManager);
+    add(element: IEntity | ISystem): this;
     addEntity(entity: IEntity): this;
-    addSystem(system: ISystem<T>): this;
+    addSystem(system: ISystem): this;
     hasEntity(entity: IEntity | string): boolean;
-    hasSystem(system: ISystem<T> | string): boolean;
+    hasSystem(system: ISystem | string): boolean;
     registerEntityManager(manager?: IEntityManager): this;
-    registerSystemManager(manager?: ISystemManager<T>): this;
-    remove(element: IEntity | ISystem<T>): this;
+    registerSystemManager(manager?: ISystemManager): this;
+    remove(element: IEntity | ISystem): this;
     removeEntity(entity: IEntity): this;
-    removeSystem(system: ISystem<T> | string): this;
-    run(params?: T): this;
+    removeSystem(system: ISystem | string): this;
+    run(): this;
     unregisterEntityManager(): this;
     unregisterSystemManager(): this;
 }

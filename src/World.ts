@@ -9,10 +9,11 @@ import SystemManager from "./SystemManager";
 
 let arr: any[];
 
-export default class World<T> implements IWorld<T> {
+export default class World implements IWorld {
 	public name: string;
 	public entityManager: IEntityManager | null;
-	public systemManager: ISystemManager<T> | null;
+	public systemManager: ISystemManager | null;
+	public store: Map<string, IEntity | string | number> = new Map();
 
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isWorld = true;
@@ -20,18 +21,18 @@ export default class World<T> implements IWorld<T> {
 	public constructor(
 		name: string,
 		entityManager?: IEntityManager,
-		systemManager?: ISystemManager<T>
+		systemManager?: ISystemManager
 	) {
 		this.name = name;
 		this.registerEntityManager(entityManager);
 		this.registerSystemManager(systemManager);
 	}
 
-	public add(element: IEntity | ISystem<T>): this {
+	public add(element: IEntity | ISystem): this {
 		if ((element as IEntity).isEntity) {
 			return this.addEntity(element as IEntity);
 		} else {
-			return this.addSystem(element as ISystem<T>);
+			return this.addSystem(element as ISystem);
 		}
 	}
 
@@ -45,7 +46,7 @@ export default class World<T> implements IWorld<T> {
 		return this;
 	}
 
-	public addSystem(system: ISystem<T>): this {
+	public addSystem(system: ISystem): this {
 		if (this.systemManager) {
 			this.systemManager.add(system);
 		} else {
@@ -63,7 +64,7 @@ export default class World<T> implements IWorld<T> {
 		return false;
 	}
 
-	public hasSystem(system: ISystem<T> | string): boolean {
+	public hasSystem(system: ISystem | string): boolean {
 		if (this.systemManager) {
 			return this.systemManager.has(system);
 		}
@@ -81,7 +82,7 @@ export default class World<T> implements IWorld<T> {
 		return this;
 	}
 
-	public registerSystemManager(manager?: ISystemManager<T>): this {
+	public registerSystemManager(manager?: ISystemManager): this {
 		this.unregisterSystemManager();
 		this.systemManager = manager || new SystemManager(this);
 		if (!this.systemManager.usedBy.includes(this)) {
@@ -91,11 +92,11 @@ export default class World<T> implements IWorld<T> {
 		return this;
 	}
 
-	public remove(element: IEntity | ISystem<T>): this {
+	public remove(element: IEntity | ISystem): this {
 		if ((element as IEntity).isEntity) {
 			return this.removeEntity(element as IEntity);
 		} else {
-			return this.removeSystem(element as ISystem<T>);
+			return this.removeSystem(element as ISystem);
 		}
 	}
 
@@ -107,7 +108,7 @@ export default class World<T> implements IWorld<T> {
 		return this;
 	}
 
-	public removeSystem(system: ISystem<T> | string): this {
+	public removeSystem(system: ISystem | string): this {
 		if (this.systemManager) {
 			this.systemManager.remove(system);
 		}
@@ -115,9 +116,9 @@ export default class World<T> implements IWorld<T> {
 		return this;
 	}
 
-	public run(params?: T): this {
+	public run(): this {
 		if (this.systemManager) {
-			this.systemManager.run(this, params as any);
+			this.systemManager.run(this);
 		}
 
 		return this;
