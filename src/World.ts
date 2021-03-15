@@ -11,8 +11,8 @@ let arr: any[];
 
 export default class World implements IWorld {
 	public name: string;
-	public entityManager: IEntityManager | null;
-	public systemManager: ISystemManager | null;
+	public entityManager: IEntityManager | null = null;
+	public systemManager: ISystemManager | null = null;
 	public store: Map<string, any> = new Map();
 
 	public readonly id: number = IdGeneratorInstance.next();

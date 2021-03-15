@@ -199,6 +199,7 @@ class Entity extends EventDispatcher {
         super();
         this.id = IdGeneratorInstance.next();
         this.isEntity = true;
+        this.componentManager = null;
         this.name = "";
         this.usedBy = [];
         this.name = name;
@@ -436,6 +437,8 @@ SystemManager.eventObject = {
 let arr;
 class World {
     constructor(name, entityManager, systemManager) {
+        this.entityManager = null;
+        this.systemManager = null;
         this.store = new Map();
         this.id = IdGeneratorInstance.next();
         this.isWorld = true;

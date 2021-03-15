@@ -12,7 +12,7 @@ let arr: any[];
 export default class Entity extends EventDispatcher implements IEntity {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
-	public componentManager: IComponentManager | null;
+	public componentManager: IComponentManager | null = null;
 	public name = "";
 	public usedBy: IEntityManager[] = [];
 

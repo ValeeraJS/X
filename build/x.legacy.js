@@ -280,6 +280,7 @@
 	        var _this = _super.call(this) || this;
 	        _this.id = IdGeneratorInstance.next();
 	        _this.isEntity = true;
+	        _this.componentManager = null;
 	        _this.name = "";
 	        _this.usedBy = [];
 	        _this.name = name;
@@ -558,6 +559,8 @@
 	var arr;
 	var World = /** @class */ (function () {
 	    function World(name, entityManager, systemManager) {
+	        this.entityManager = null;
+	        this.systemManager = null;
 	        this.store = new Map();
 	        this.id = IdGeneratorInstance.next();
 	        this.isWorld = true;
