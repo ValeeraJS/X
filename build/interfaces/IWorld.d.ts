@@ -2,7 +2,7 @@ import IEntity from "./IEntity";
 import IEntityManager from "./IEntityManager";
 import ISystem from "./ISystem";
 import ISystemManager from "./ISystemManager";
-export declare type TWorldInjection = Map<string, IEntity | string | number>;
+export declare type TWorldInjection = Map<string, any>;
 export default interface IWorld {
     name: string;
     entityManager: IEntityManager | null;

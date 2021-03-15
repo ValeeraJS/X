@@ -13,7 +13,7 @@ export default class World implements IWorld {
 	public name: string;
 	public entityManager: IEntityManager | null;
 	public systemManager: ISystemManager | null;
-	public store: Map<string, IEntity | string | number> = new Map();
+	public store: Map<string, any> = new Map();
 
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isWorld = true;

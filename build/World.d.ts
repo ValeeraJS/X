@@ -7,7 +7,7 @@ export default class World implements IWorld {
     name: string;
     entityManager: IEntityManager | null;
     systemManager: ISystemManager | null;
-    store: Map<string, IEntity | string | number>;
+    store: Map<string, any>;
     readonly id: number;
     readonly isWorld = true;
     constructor(name: string, entityManager?: IEntityManager, systemManager?: ISystemManager);

@@ -11,11 +11,6 @@
 
 	var IdGeneratorInstance = new IdGenerator__default['default']();
 
-	var Global = /*#__PURE__*/Object.freeze({
-		__proto__: null,
-		IdGeneratorInstance: IdGeneratorInstance
-	});
-
 	var weakMapTmp;
 	var ASystem = /** @class */ (function () {
 	    function ASystem(name, fitRule) {
@@ -674,7 +669,7 @@
 	exports.ComponentManager = ComponentManager;
 	exports.Entity = Entity;
 	exports.Entitymanager = EntityManager;
-	exports.Global = Global;
+	exports.IdGeneratorInstance = IdGeneratorInstance;
 	exports.SystemManager = SystemManager;
 	exports.World = World;
 

@@ -3,7 +3,7 @@ import IEntityManager from "./IEntityManager";
 import ISystem from "./ISystem";
 import ISystemManager from "./ISystemManager";
 
-export type TWorldInjection = Map<string, IEntity | string | number>;
+export type TWorldInjection = Map<string, any>;
 
 export default interface IWorld {
 	name: string;

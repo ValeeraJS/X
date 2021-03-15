@@ -3,11 +3,6 @@ import EventDispatcher from '@valeera/eventdispatcher';
 
 const IdGeneratorInstance = new IdGenerator();
 
-var Global = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	IdGeneratorInstance: IdGeneratorInstance
-});
-
 let weakMapTmp;
 class ASystem {
     constructor(name, fitRule) {
@@ -546,5 +541,5 @@ class World {
     }
 }
 
-export { ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, Global, SystemManager, World };
+export { ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, IdGeneratorInstance, SystemManager, World };
 //# sourceMappingURL=x.module.js.map
