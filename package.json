@@ -6,7 +6,7 @@
 	"repository": "ValeeraJS/x",
 	"jsnext:main": "build/x.module.js",
 	"module": "build/x.module.js",
-	"types": "build/x.d.ts",
+	"types": "build/index.d.ts",
 	"files": [
 		"build",
 		"LICENSE",
