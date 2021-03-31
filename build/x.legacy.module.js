@@ -6,6 +6,7 @@ var IdGeneratorInstance = new IdGenerator();
 var weakMapTmp;
 var ASystem = /** @class */ (function () {
     function ASystem(name, fitRule) {
+        if (name === void 0) { name = ""; }
         this.id = IdGeneratorInstance.next();
         this.isSystem = true;
         this.name = "";
@@ -269,6 +270,7 @@ var arr$1;
 var Entity = /** @class */ (function (_super) {
     __extends(Entity, _super);
     function Entity(name, componentManager) {
+        if (name === void 0) { name = ""; }
         var _this = _super.call(this) || this;
         _this.id = IdGeneratorInstance.next();
         _this.isEntity = true;
@@ -551,6 +553,7 @@ var SystemManager = /** @class */ (function (_super) {
 var arr;
 var World = /** @class */ (function () {
     function World(name, entityManager, systemManager) {
+        if (name === void 0) { name = ""; }
         this.entityManager = null;
         this.systemManager = null;
         this.store = new Map();
@@ -583,6 +586,12 @@ var World = /** @class */ (function () {
         }
         else {
             throw new Error("The world doesn't have a systemManager yet.");
+        }
+        return this;
+    };
+    World.prototype.clearAllEntities = function () {
+        if (this.entityManager) {
+            this.entityManager.clear();
         }
         return this;
     };

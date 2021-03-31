@@ -10,10 +10,11 @@ export default class World implements IWorld {
     store: Map<string, any>;
     readonly id: number;
     readonly isWorld = true;
-    constructor(name: string, entityManager?: IEntityManager, systemManager?: ISystemManager);
+    constructor(name?: string, entityManager?: IEntityManager, systemManager?: ISystemManager);
     add(element: IEntity | ISystem): this;
     addEntity(entity: IEntity): this;
     addSystem(system: ISystem): this;
+    clearAllEntities(): this;
     hasEntity(entity: IEntity | string): boolean;
     hasSystem(system: ISystem | string): boolean;
     registerEntityManager(manager?: IEntityManager): this;

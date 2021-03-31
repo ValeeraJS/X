@@ -13,7 +13,7 @@ export default abstract class ASystem implements ISystem {
     entitySet: WeakMap<IEntityManager, Set<IEntity>>;
     usedBy: ISystemManager[];
     private queryRule;
-    constructor(name: string, fitRule: TQueryRule);
+    constructor(name: string | undefined, fitRule: TQueryRule);
     checkUpdatedEntities(manager: IEntityManager | null): this;
     checkEntityManager(manager: IEntityManager | null): this;
     query(entity: IEntity): boolean;

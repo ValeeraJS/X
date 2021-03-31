@@ -5,7 +5,7 @@ const IdGeneratorInstance = new IdGenerator();
 
 let weakMapTmp;
 class ASystem {
-    constructor(name, fitRule) {
+    constructor(name = "", fitRule) {
         this.id = IdGeneratorInstance.next();
         this.isSystem = true;
         this.name = "";
@@ -195,7 +195,7 @@ ComponentManager.eventObject = {
 
 let arr$1;
 class Entity extends EventDispatcher {
-    constructor(name, componentManager) {
+    constructor(name = "", componentManager) {
         super();
         this.id = IdGeneratorInstance.next();
         this.isEntity = true;
@@ -436,7 +436,7 @@ SystemManager.eventObject = {
 
 let arr;
 class World {
-    constructor(name, entityManager, systemManager) {
+    constructor(name = "", entityManager, systemManager) {
         this.entityManager = null;
         this.systemManager = null;
         this.store = new Map();
@@ -469,6 +469,12 @@ class World {
         }
         else {
             throw new Error("The world doesn't have a systemManager yet.");
+        }
+        return this;
+    }
+    clearAllEntities() {
+        if (this.entityManager) {
+            this.entityManager.clear();
         }
         return this;
     }

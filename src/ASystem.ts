@@ -18,7 +18,7 @@ export default abstract class ASystem implements ISystem {
 	public usedBy: ISystemManager[] = [];
 	private queryRule: TQueryRule;
 
-	public constructor(name: string, fitRule: TQueryRule) {
+	public constructor(name = "", fitRule: TQueryRule) {
 		this.name = name;
 		this.queryRule = fitRule;
 	}

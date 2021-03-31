@@ -16,7 +16,7 @@ export default class Entity extends EventDispatcher implements IEntity {
 	public name = "";
 	public usedBy: IEntityManager[] = [];
 
-	public constructor(name: string, componentManager?: IComponentManager) {
+	public constructor(name = "", componentManager?: IComponentManager) {
 		super();
 		this.name = name;
 		this.registerComponentManager(componentManager);

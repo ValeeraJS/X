@@ -18,11 +18,7 @@ export default class World implements IWorld {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isWorld = true;
 
-	public constructor(
-		name: string,
-		entityManager?: IEntityManager,
-		systemManager?: ISystemManager
-	) {
+	public constructor(name = "", entityManager?: IEntityManager, systemManager?: ISystemManager) {
 		this.name = name;
 		this.registerEntityManager(entityManager);
 		this.registerSystemManager(systemManager);
@@ -51,6 +47,14 @@ export default class World implements IWorld {
 			this.systemManager.add(system);
 		} else {
 			throw new Error("The world doesn't have a systemManager yet.");
+		}
+
+		return this;
+	}
+
+	public clearAllEntities(): this {
+		if (this.entityManager) {
+			this.entityManager.clear();
 		}
 
 		return this;
