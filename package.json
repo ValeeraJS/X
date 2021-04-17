@@ -1,6 +1,6 @@
 {
 	"name": "@valeera/x",
-	"version": "0.1.13",
+	"version": "0.1.14",
 	"description": "ECS framework written in TS for web application.",
 	"main": "build/x.js",
 	"repository": "ValeeraJS/x",
@@ -49,20 +49,20 @@
 		"@typescript-eslint/parser": "^4.15.2",
 		"chai": "^4.2.0",
 		"concurrently": "^6.0.0",
-		"eslint": "^7.20.0",
+		"eslint": "^7.24.0",
 		"eslint-config-valeera": "^0.1.1",
 		"eslint-plugin-html": "^6.0.0",
 		"eslint-plugin-prettier": "^3.3.1",
 		"esm": "^3.2.25",
-		"google-closure-compiler": "20210202.0.0",
-		"http-server": "^0.12.1",
-		"mocha": "6.2.2",
-		"nyc": "15.0.0",
-		"prettier": "^1.19.1",
-		"rollup": "^2.39.1",
+		"google-closure-compiler": "20210406.0.0",
+		"http-server": "^0.12.3",
+		"mocha": "^6.2.2",
+		"nyc": "^15.0.0",
+		"prettier": "^2.2.1",
+		"rollup": "^2.45.2",
 		"rollup-plugin-json": "^4.0.0",
 		"rollup-plugin-typescript2": "^0.30.0",
-		"typescript": "^4.2.3"
+		"typescript": "^4.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

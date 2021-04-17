@@ -669,4 +669,3 @@ var World = /** @class */ (function () {
 }());
 
 export { ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, IdGeneratorInstance, SystemManager, World };
-//# sourceMappingURL=x.legacy.module.js.map

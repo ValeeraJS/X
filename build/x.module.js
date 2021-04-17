@@ -551,4 +551,3 @@ class World {
 }
 
 export { ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, IdGeneratorInstance, SystemManager, World };
-//# sourceMappingURL=x.module.js.map

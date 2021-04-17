@@ -1,32 +1,32 @@
-import typescript from 'rollup-plugin-typescript2';
-import json from 'rollup-plugin-json';
+import json from "rollup-plugin-json";
+import typescript from "rollup-plugin-typescript2";
 
 export default {
-	input: 'src/index.ts',
+	external: ["@valeera/idgenerator", "@valeera/eventdispatcher"],
+	input: "src/index.ts",
+	output: [
+		{
+			file: "build/x.legacy.js",
+			format: "umd",
+			globals: {
+				"@valeera/eventdispatcher": "EventDispatcher",
+				"@valeera/idgenerator": "IdGenerator"
+			},
+			indent: "\t",
+			name: "X",
+			sourcemap: true
+		},
+		{
+			file: "build/x.legacy.module.js",
+			format: "es",
+			indent: "\t",
+			sourcemap: false
+		}
+	],
 	plugins: [
 		json(),
 		typescript({
-			tsconfig: './tsconfig.legacy.json'
+			tsconfig: "./tsconfig.legacy.json"
 		})
-	],
-	output: [
-		{
-			format: 'umd',
-			name: 'X',
-			file: 'build/x.legacy.js',
-			sourcemap: true,
-			indent: '\t',
-			globals: {
-				"@valeera/idgenerator": "IdGenerator",
-				"@valeera/eventdispatcher": "EventDispatcher"
-			}
-		},
-		{
-			format: 'es',
-			file: 'build/x.legacy.module.js',
-			sourcemap: true,
-			indent: '\t'
-		}
-	],
-	external: ["@valeera/idgenerator", "@valeera/eventdispatcher"]
+	]
 };
