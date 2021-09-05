@@ -40,13 +40,14 @@
 	"author": "hypnosnova",
 	"license": "MIT",
 	"dependencies": {
-		"@valeera/idgenerator": "^0.1.0",
-		"@valeera/eventdispatcher": "^2.1.0"
+		"@valeera/eventdispatcher": "^2.1.2",
+		"@valeera/idgenerator": "^1.0.0"
 	},
 	"devDependencies": {
-		"@rollup/plugin-node-resolve": "^11.2.0",
-		"@typescript-eslint/eslint-plugin": "^4.15.2",
-		"@typescript-eslint/parser": "^4.15.2",
+		"@rollup/plugin-json": "^4.1.0",
+		"@rollup/plugin-node-resolve": "^13.0.4",
+		"@typescript-eslint/eslint-plugin": "^4.30.0",
+		"@typescript-eslint/parser": "^4.30.0",
 		"chai": "^4.2.0",
 		"concurrently": "^6.0.0",
 		"eslint": "^7.24.0",
@@ -54,15 +55,14 @@
 		"eslint-plugin-html": "^6.0.0",
 		"eslint-plugin-prettier": "^3.3.1",
 		"esm": "^3.2.25",
-		"google-closure-compiler": "20210406.0.0",
+		"google-closure-compiler": "^20210808.0.0",
 		"http-server": "^0.12.3",
-		"mocha": "^6.2.2",
-		"nyc": "^15.0.0",
-		"prettier": "^2.2.1",
-		"rollup": "^2.45.2",
-		"rollup-plugin-json": "^4.0.0",
+		"mocha": "^9.1.1",
+		"nyc": "^15.1.0",
+		"prettier": "^2.3.2",
+		"rollup": "^2.56.3",
 		"rollup-plugin-typescript2": "^0.30.0",
-		"typescript": "^4.2.4"
+		"typescript": "^4.4.2"
 	},
 	"publishConfig": {
 		"access": "public"
