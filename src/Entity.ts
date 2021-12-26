@@ -1,15 +1,15 @@
 import ComponentManager from "./ComponentManager";
-import EventDispatcher from "@valeera/eventdispatcher";
 import IComponent from "./interfaces/IComponent";
 import IComponentManager from "./interfaces/IComponentManager";
 import { IdGeneratorInstance } from "./Global";
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import IWorld from "./interfaces/IWorld";
+import TreeNodeWithEvent from "./TreeNodeWithEvent";
 
 let arr: any[];
 
-export default class Entity extends EventDispatcher implements IEntity {
+export default class Entity extends TreeNodeWithEvent implements IEntity {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
 	public componentManager: IComponentManager | null = null;

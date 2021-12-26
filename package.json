@@ -41,28 +41,29 @@
 	"license": "MIT",
 	"dependencies": {
 		"@valeera/eventdispatcher": "^2.1.2",
+		"@valeera/tree": "^0.1.4",
 		"@valeera/idgenerator": "^1.0.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-json": "^4.1.0",
-		"@rollup/plugin-node-resolve": "^13.0.4",
-		"@typescript-eslint/eslint-plugin": "^4.30.0",
-		"@typescript-eslint/parser": "^4.30.0",
+		"@rollup/plugin-node-resolve": "^13.1.1",
+		"@typescript-eslint/eslint-plugin": "^5.8.0",
+		"@typescript-eslint/parser": "^5.8.0",
 		"chai": "^4.2.0",
 		"concurrently": "^6.0.0",
-		"eslint": "^7.24.0",
+		"eslint": "^8.5.0",
 		"eslint-config-valeera": "^0.1.1",
 		"eslint-plugin-html": "^6.0.0",
 		"eslint-plugin-prettier": "^3.3.1",
 		"esm": "^3.2.25",
-		"google-closure-compiler": "^20210808.0.0",
+		"google-closure-compiler": "^20211201.0.0",
 		"http-server": "^0.12.3",
 		"mocha": "^9.1.1",
 		"nyc": "^15.1.0",
-		"prettier": "^2.3.2",
-		"rollup": "^2.56.3",
-		"rollup-plugin-typescript2": "^0.30.0",
-		"typescript": "^4.4.2"
+		"prettier": "^2.5.1",
+		"rollup": "^2.62.0",
+		"rollup-plugin-typescript2": "^0.31.1",
+		"typescript": "^4.5.4"
 	},
 	"publishConfig": {
 		"access": "public"
