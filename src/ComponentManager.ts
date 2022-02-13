@@ -142,7 +142,7 @@ export default class ComponentManager implements IComponentManager {
 		eventObject: ComponentEventObject
 	) {
 		for (const entity of this.usedBy) {
-			entity.fire(type, eventObject);
+			(entity as any).fire?.(type, eventObject);
 			for (const manager of entity.usedBy) {
 				manager.updatedEntities.add(entity);
 			}

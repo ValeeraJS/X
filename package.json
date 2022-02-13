@@ -42,7 +42,8 @@
 	"dependencies": {
 		"@valeera/eventdispatcher": "^2.1.2",
 		"@valeera/tree": "^0.1.4",
-		"@valeera/idgenerator": "^1.0.0"
+		"@valeera/idgenerator": "^1.0.0",
+		"clone-deep": "^4.0.1"
 	},
 	"devDependencies": {
 		"@rollup/plugin-json": "^4.1.0",
@@ -62,8 +63,10 @@
 		"nyc": "^15.1.0",
 		"prettier": "^2.5.1",
 		"rollup": "^2.62.0",
+		"rollup-plugin-json": "^4.0.0",
 		"rollup-plugin-typescript2": "^0.31.1",
-		"typescript": "^4.5.4"
+		"typescript": "^4.5.4",
+		"@types/clone-deep": "^4.0.1"
 	},
 	"publishConfig": {
 		"access": "public"

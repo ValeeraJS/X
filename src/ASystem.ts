@@ -16,11 +16,12 @@ export default abstract class ASystem implements ISystem {
 	public loopTimes = 0;
 	public entitySet: WeakMap<IEntityManager, Set<IEntity>> = new WeakMap();
 	public usedBy: ISystemManager[] = [];
-	private queryRule: TQueryRule;
+	public cache: WeakMap<IEntity, any> = new WeakMap();
+	private rule: TQueryRule;
 
 	public constructor(name = "", fitRule: TQueryRule) {
 		this.name = name;
-		this.queryRule = fitRule;
+		this.rule = fitRule;
 	}
 
 	public checkUpdatedEntities(manager: IEntityManager | null): this {
@@ -64,7 +65,7 @@ export default abstract class ASystem implements ISystem {
 	}
 
 	public query(entity: IEntity): boolean {
-		return this.queryRule(entity);
+		return this.rule(entity);
 	}
 
 	public run(world: IWorld): this {

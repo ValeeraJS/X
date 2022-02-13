@@ -12,7 +12,8 @@ export default abstract class ASystem implements ISystem {
     loopTimes: number;
     entitySet: WeakMap<IEntityManager, Set<IEntity>>;
     usedBy: ISystemManager[];
-    private queryRule;
+    cache: WeakMap<IEntity, any>;
+    private rule;
     constructor(name: string | undefined, fitRule: TQueryRule);
     checkUpdatedEntities(manager: IEntityManager | null): this;
     checkEntityManager(manager: IEntityManager | null): this;

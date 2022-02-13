@@ -1,5 +1,12 @@
 import IComponent from "./interfaces/IComponent";
+import { ISerializedJson } from "./interfaces/ISerializable";
+export interface IComponentSerializedJson<T> extends ISerializedJson {
+    data: T;
+    name: string;
+    disabled: boolean;
+}
 export default class Component<T> implements IComponent<T> {
+    static unserialize<T>(json: IComponentSerializedJson<T>): Component<T>;
     readonly isComponent = true;
     data: T | null;
     disabled: boolean;
@@ -8,4 +15,5 @@ export default class Component<T> implements IComponent<T> {
     dirty: boolean;
     constructor(name: string, data?: T | null);
     clone(): IComponent<T>;
+    serialize(): any;
 }
