@@ -34,7 +34,7 @@ export default class World implements IWorld {
 
 	public addEntity(entity: IEntity): this {
 		if (this.entityManager) {
-			this.entityManager.add(entity);
+			this.entityManager.addElement(entity);
 		} else {
 			throw new Error("The world doesn't have an entityManager yet.");
 		}
@@ -44,7 +44,7 @@ export default class World implements IWorld {
 
 	public addSystem(system: ISystem): this {
 		if (this.systemManager) {
-			this.systemManager.add(system);
+			this.systemManager.addElement(system);
 		} else {
 			throw new Error("The world doesn't have a systemManager yet.");
 		}
@@ -106,7 +106,7 @@ export default class World implements IWorld {
 
 	public removeEntity(entity: IEntity): this {
 		if (this.entityManager) {
-			this.entityManager.remove(entity);
+			this.entityManager.removeElement(entity);
 		}
 
 		return this;
@@ -114,7 +114,7 @@ export default class World implements IWorld {
 
 	public removeSystem(system: ISystem | string): this {
 		if (this.systemManager) {
-			this.systemManager.remove(system);
+			this.systemManager.removeElement(system);
 		}
 
 		return this;

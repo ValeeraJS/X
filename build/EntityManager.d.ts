@@ -9,12 +9,12 @@ export default class EntityManager implements IEntityManager {
     readonly isEntityManager = true;
     usedBy: IWorld[];
     constructor(world?: IWorld);
-    add(entity: IEntity): this;
+    addElement(entity: IEntity): this;
     addComponentDirect(entity: IEntity): this;
     clear(): this;
     get(name: string): IEntity | null;
     has(entity: IEntity | string): boolean;
-    remove(entity: IEntity | string): this;
+    removeElement(entity: IEntity | string): this;
     removeByName(name: string): this;
     removeByInstance(entity: IEntity): this;
     private deleteEntityFromSystemSet;

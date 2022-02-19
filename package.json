@@ -40,7 +40,7 @@
 	"author": "hypnosnova",
 	"license": "MIT",
 	"dependencies": {
-		"@valeera/eventdispatcher": "^2.1.2",
+		"@valeera/eventdispatcher": "^2.2.0",
 		"@valeera/tree": "^0.1.4",
 		"@valeera/idgenerator": "^1.0.0",
 		"clone-deep": "^4.0.1"
@@ -57,7 +57,7 @@
 		"eslint-plugin-html": "^6.0.0",
 		"eslint-plugin-prettier": "^3.3.1",
 		"esm": "^3.2.25",
-		"google-closure-compiler": "^20211201.0.0",
+		"google-closure-compiler": "^20220202.0.0",
 		"http-server": "^0.12.3",
 		"mocha": "^9.1.1",
 		"nyc": "^15.1.0",
@@ -65,7 +65,7 @@
 		"rollup": "^2.62.0",
 		"rollup-plugin-json": "^4.0.0",
 		"rollup-plugin-typescript2": "^0.31.1",
-		"typescript": "^4.5.4",
+		"typescript": "^4.5.5",
 		"@types/clone-deep": "^4.0.1"
 	},
 	"publishConfig": {

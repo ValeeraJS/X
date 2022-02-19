@@ -1,7 +1,7 @@
+import EventFirer from "@valeera/eventdispatcher/src/EventFirer";
 import IComponent from "./interfaces/IComponent";
 import IComponentManager from "./interfaces/IComponentManager";
 import IECSObject from "./interfaces/IECSObject";
-import IEntity from "./interfaces/IEntity";
 import IManager from "./interfaces/IManager";
 export declare enum EElementChangeEvent {
     ADD = "add",
@@ -13,19 +13,19 @@ export interface EventObject {
     component: IComponent<any>;
     element: IComponent<any>;
 }
-export default class Manager<T extends IECSObject> implements IManager<T> {
+export default class Manager<T extends IECSObject> extends EventFirer implements IManager<T> {
     static readonly Events: typeof EElementChangeEvent;
     elements: Map<string, T>;
     disabled: boolean;
-    usedBy: IEntity[];
+    usedBy: any[];
     readonly isManager = true;
     addElement(component: T): this;
     addElementDirect(component: T): this;
     clear(): this;
     get(name: string): T | null;
     has(component: T | string): boolean;
-    remove(component: T | string): this;
-    removeByName(name: string): this;
-    removeByInstance(component: T): this;
+    removeElement(component: T | string): this;
+    removeElementByName(name: string): this;
+    removeElementByInstance(component: T): this;
     private elementChangeDispatch;
 }

@@ -53,7 +53,7 @@
 				}
 			}
 
-			class RotationSystem extends X.ASystem {
+			class RotationSystem extends X.System {
 				constructor() {
 					super("Rotation System", (entity) => {
 						return entity.hasComponent("rotationSpeed");
@@ -65,7 +65,7 @@
 				}
 			}
 
-			class RenderSystem extends X.ASystem {
+			class RenderSystem extends X.System {
 				constructor() {
 					super("Render System", (entity) => {
 						return true;
@@ -144,12 +144,7 @@
 			const rotationSystem = new RotationSystem();
 			const renderSystem = new RenderSystem();
 
-			world
-				.add(rotationSystem)
-				.add(renderSystem)
-				.add(entity)
-				.add(entity2)
-				.run(world.runParams);
+			world.add(rotationSystem).add(renderSystem).add(entity).add(entity2).run(world.runParams);
 
 			initControls();
 			function initControls() {

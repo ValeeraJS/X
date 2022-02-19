@@ -1,4 +1,5 @@
 import IComponent from "./interfaces/IComponent";
+import { IdGeneratorInstance } from "./Global";
 import { ISerializedJson } from "./interfaces/ISerializable";
 
 export interface IComponentSerializedJson<T> extends ISerializedJson {
@@ -17,6 +18,7 @@ export default class Component<T> implements IComponent<T> {
 	}
 
 	public readonly isComponent = true;
+	public readonly id = IdGeneratorInstance.next();
 	public data: T | null = null;
 	public disabled = false;
 	public name: string;

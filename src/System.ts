@@ -8,19 +8,28 @@ import ISystemManager from "./interfaces/ISystemManager";
 type TQueryRule = (entity: IEntity) => boolean;
 let weakMapTmp: Set<IEntity> | undefined;
 
-export default abstract class ASystem implements ISystem {
+export default abstract class System implements ISystem {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isSystem = true;
 	public name = "";
-	public disabled = false;
 	public loopTimes = 0;
 	public entitySet: WeakMap<IEntityManager, Set<IEntity>> = new WeakMap();
 	public usedBy: ISystemManager[] = [];
 	public cache: WeakMap<IEntity, any> = new WeakMap();
 	private rule: TQueryRule;
+	private _disabled: boolean;
+
+	public get disabled(): boolean {
+		return this._disabled;
+	}
+
+	public set disabled(value: boolean) {
+		this._disabled = value;
+	}
 
 	public constructor(name = "", fitRule: TQueryRule) {
 		this.name = name;
+		this.disabled = false;
 		this.rule = fitRule;
 	}
 
@@ -78,6 +87,13 @@ export default abstract class ASystem implements ISystem {
 		return this;
 	}
 
-	public abstract destroy(): void;
+	public destroy(): this {
+		for (let i = this.usedBy.length - 1; i > -1; i--) {
+			this.usedBy[i].removeElement(this);
+		}
+
+		return this;
+	}
+
 	public abstract handle(entity: IEntity, params: TWorldInjection): this;
 }

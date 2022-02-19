@@ -20,7 +20,7 @@ export default class EntityManager implements IEntityManager {
 		}
 	}
 
-	public add(entity: IEntity): this {
+	public addElement(entity: IEntity): this {
 		if (this.has(entity)) {
 			this.removeByInstance(entity);
 		}
@@ -56,7 +56,7 @@ export default class EntityManager implements IEntityManager {
 		}
 	}
 
-	public remove(entity: IEntity | string): this {
+	public removeElement(entity: IEntity | string): this {
 		return typeof entity === "string"
 			? this.removeByName(entity)
 			: this.removeByInstance(entity);

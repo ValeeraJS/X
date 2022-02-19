@@ -1,7 +1,7 @@
-import EventDispatcher from "@valeera/eventdispatcher";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
+import Manager from "./Manager";
 export declare enum ESystemEvent {
     BEFORE_RUN = "beforeRun",
     AFTER_RUN = "afterRun"
@@ -11,7 +11,7 @@ export interface ISystemEventObject {
     manager: ISystemManager;
     target: ISystem;
 }
-export default class SystemManager extends EventDispatcher implements ISystemManager {
+export default class SystemManager extends Manager<ISystem> implements ISystemManager {
     static readonly AFTER_RUN: ESystemEvent;
     static readonly BEFORE_RUN: ESystemEvent;
     private static eventObject;
@@ -20,11 +20,8 @@ export default class SystemManager extends EventDispatcher implements ISystemMan
     loopTimes: number;
     usedBy: IWorld[];
     constructor(world?: IWorld);
-    add(system: ISystem): this;
+    addElement(system: ISystem): this;
     clear(): this;
-    get(name: string): ISystem | null;
-    has(element: string | ISystem): boolean;
-    remove(system: ISystem | string): this;
     removeByName(name: string): this;
     removeByInstance(system: ISystem): this;
     run(world: IWorld): this;

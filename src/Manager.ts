@@ -1,26 +1,27 @@
+import EventFirer from "@valeera/eventdispatcher/src/EventFirer";
 import IComponent from "./interfaces/IComponent";
 import IComponentManager from "./interfaces/IComponentManager";
 import IECSObject from "./interfaces/IECSObject";
-import IEntity from "./interfaces/IEntity";
+// import IEntity from "./interfaces/IEntity";
 import IManager from "./interfaces/IManager";
 
 // 私有全局变量，外部无法访问
 let elementTmp: any;
 
-export enum EComponentEvent {
+export enum EElementChangeEvent {
 	ADD = "add",
 	REMOVE = "remove"
 }
 
 export interface EventObject {
-	eventKey: EComponentEvent;
+	eventKey: EElementChangeEvent;
 	manager: IComponentManager;
 	component: IComponent<any>;
 	element: IComponent<any>;
 }
 
-export default class Manager<T extends IECSObject> implements IManager<T> {
-	public static readonly Events = EComponentEvent;
+export default class Manager<T extends IECSObject> extends EventFirer implements IManager<T> {
+	public static readonly Events = EElementChangeEvent;
 	// private static eventObject: EventObject = {
 	// 	component: null as any,
 	// 	element: null as any,
@@ -30,27 +31,21 @@ export default class Manager<T extends IECSObject> implements IManager<T> {
 
 	public elements: Map<string, T> = new Map();
 	public disabled = false;
-	public usedBy: IEntity[] = [];
+	public usedBy: any[] = [];
 	public readonly isManager = true;
 
-	public add(component: T): this {
+	public addElement(component: T): this {
 		if (this.has(component)) {
-			this.removeByInstance(component);
+			this.removeElementByInstance(component);
 		}
 
-		return this.addComponentDirect(component);
+		return this.addElementDirect(component);
 	}
 
-	public addComponentDirect(component: T): this {
+	public addElementDirect(component: T): this {
 		this.elements.set(component.name, component);
 		component.usedBy.push(this);
-		// Manager.eventObject = {
-		// 	component,
-		// 	element: component,
-		// 	eventKey: Manager.Events.ADD,
-		// 	manager: this
-		// };
-		this.entityComponentChangeDispatch(Manager.Events.ADD, this);
+		this.elementChangeDispatch(Manager.Events.ADD, this);
 
 		return this;
 	}
@@ -75,47 +70,36 @@ export default class Manager<T extends IECSObject> implements IManager<T> {
 		}
 	}
 
-	public remove(component: T | string): this {
+	public removeElement(component: T | string): this {
 		return typeof component === "string"
-			? this.removeByName(component)
-			: this.removeByInstance(component);
+			? this.removeElementByName(component)
+			: this.removeElementByInstance(component);
 	}
 
-	public removeByName(name: string): this {
+	public removeElementByName(name: string): this {
 		elementTmp = this.elements.get(name);
 		if (elementTmp) {
 			this.elements.delete(name);
 			elementTmp.usedBy.splice(elementTmp.usedBy.indexOf(this), 1);
 
-			// Manager.eventObject = {
-			// 	component: elementTmp,
-			// 	element: elementTmp,
-			// 	eventKey: Manager.Events.REMOVE,
-			// 	manager: this
-			// };
-			this.entityComponentChangeDispatch(Manager.Events.REMOVE, this);
+			this.elementChangeDispatch(Manager.Events.REMOVE, this);
 		}
 
 		return this;
 	}
 
-	public removeByInstance(component: T): this {
+	public removeElementByInstance(component: T): this {
 		if (this.elements.has(component.name)) {
 			this.elements.delete(component.name);
 			component.usedBy.splice(component.usedBy.indexOf(this), 1);
-			// Manager.eventObject = {
-			// 	component,
-			// 	eventKey: Manager.Events.REMOVE,
-			// 	manager: this,
-			// 	element: component
-			// };
-			this.entityComponentChangeDispatch(Manager.Events.REMOVE, this);
+
+			this.elementChangeDispatch(Manager.Events.REMOVE, this);
 		}
 
 		return this;
 	}
 
-	private entityComponentChangeDispatch(type: EComponentEvent, eventObject: any) {
+	private elementChangeDispatch(type: EElementChangeEvent, eventObject: any) {
 		for (const entity of this.usedBy) {
 			(entity as any).fire?.(type, eventObject);
 			for (const manager of entity.usedBy) {

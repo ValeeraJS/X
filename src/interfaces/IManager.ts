@@ -1,9 +1,10 @@
 export default interface IManager<T> {
 	elements: Map<string, T>;
+	usedBy: any[];
 
-	add: (element: T) => this;
+	addElement: (element: T) => this;
 	clear: () => this;
 	get: (name: string) => T | null;
 	has: (element: T | string) => boolean;
-	remove: (element: T | string) => this;
+	removeElement: (element: T | string) => this;
 }

@@ -8,6 +8,7 @@ export interface IComponentSerializedJson<T> extends ISerializedJson {
 export default class Component<T> implements IComponent<T> {
     static unserialize<T>(json: IComponentSerializedJson<T>): Component<T>;
     readonly isComponent = true;
+    readonly id: number;
     data: T | null;
     disabled: boolean;
     name: string;

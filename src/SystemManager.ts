@@ -1,7 +1,9 @@
-import EventDispatcher from "@valeera/eventdispatcher";
+// import EventDispatcher from "@valeera/eventdispatcher";
+// import { mixin } from "@valeera/eventdispatcher/src/EventFirer";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
+import Manager from "./Manager";
 
 let systemTmp: ISystem | undefined;
 
@@ -16,7 +18,7 @@ export interface ISystemEventObject {
 	target: ISystem;
 }
 
-export default class SystemManager extends EventDispatcher implements ISystemManager {
+export default class SystemManager extends Manager<ISystem> implements ISystemManager {
 	public static readonly AFTER_RUN: ESystemEvent = ESystemEvent.AFTER_RUN;
 	public static readonly BEFORE_RUN: ESystemEvent = ESystemEvent.BEFORE_RUN;
 	private static eventObject: ISystemEventObject = {
@@ -37,7 +39,7 @@ export default class SystemManager extends EventDispatcher implements ISystemMan
 		}
 	}
 
-	public add(system: ISystem): this {
+	public addElement(system: ISystem): this {
 		if (this.elements.has(system.name)) {
 			return this;
 		}
@@ -51,26 +53,6 @@ export default class SystemManager extends EventDispatcher implements ISystemMan
 		this.elements.clear();
 
 		return this;
-	}
-
-	public get(name: string): ISystem | null {
-		systemTmp = this.elements.get(name);
-
-		return systemTmp ? systemTmp : null;
-	}
-
-	public has(element: string | ISystem): boolean {
-		if (typeof element === "string") {
-			return this.elements.has(element);
-		} else {
-			return this.elements.has(element.name);
-		}
-	}
-
-	public remove(system: ISystem | string): this {
-		return typeof system === "string"
-			? this.removeByName(system)
-			: this.removeByInstance(system);
 	}
 
 	public removeByName(name: string): this {

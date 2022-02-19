@@ -24,7 +24,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 
 	public addComponent(component: IComponent<any>): this {
 		if (this.componentManager) {
-			this.componentManager.add(component);
+			this.componentManager.addElement(component);
 		} else {
 			throw new Error("Current entity hasn't registered a component manager yet.");
 		}
@@ -33,14 +33,14 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 	}
 
 	public addTo(manager: IEntityManager): this {
-		manager.add(this);
+		manager.addElement(this);
 
 		return this;
 	}
 
 	public addToWorld(world: IWorld): this {
 		if (world.entityManager) {
-			world.entityManager.add(this);
+			world.entityManager.addElement(this);
 		}
 
 		return this;
@@ -66,7 +66,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 
 	public removeComponent(component: IComponent<any> | string): this {
 		if (this.componentManager) {
-			this.componentManager.remove(component);
+			this.componentManager.removeElement(component);
 		}
 
 		return this;
