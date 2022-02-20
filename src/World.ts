@@ -60,6 +60,10 @@ export default class World implements IWorld {
 		return this;
 	}
 
+	public createEntity(name: string): IEntity | null {
+		return this.entityManager?.createEntity(name) || null;
+	}
+
 	public hasEntity(entity: IEntity | string): boolean {
 		if (this.entityManager) {
 			return this.entityManager.has(entity);

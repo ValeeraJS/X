@@ -15,6 +15,7 @@ export default class World implements IWorld {
     addEntity(entity: IEntity): this;
     addSystem(system: ISystem): this;
     clearAllEntities(): this;
+    createEntity(name: string): IEntity | null;
     hasEntity(entity: IEntity | string): boolean;
     hasSystem(system: ISystem | string): boolean;
     registerEntityManager(manager?: IEntityManager): this;

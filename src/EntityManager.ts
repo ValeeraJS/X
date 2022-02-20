@@ -1,3 +1,4 @@
+import Entity from "./Entity";
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import ISystem from "./interfaces/ISystem";
@@ -40,6 +41,14 @@ export default class EntityManager implements IEntityManager {
 		this.elements.clear();
 
 		return this;
+	}
+
+	public createEntity(name: string): IEntity {
+		const entity = new Entity(name);
+
+		this.addElement(entity);
+
+		return entity;
 	}
 
 	public get(name: string): IEntity | null {

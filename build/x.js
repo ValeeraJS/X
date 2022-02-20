@@ -532,6 +532,11 @@
 	        this.elements.clear();
 	        return this;
 	    }
+	    createEntity(name) {
+	        const entity = new Entity(name);
+	        this.addElement(entity);
+	        return entity;
+	    }
 	    get(name) {
 	        entityTmp = this.elements.get(name);
 	        return entityTmp ? entityTmp : null;
@@ -709,6 +714,9 @@
 	            this.entityManager.clear();
 	        }
 	        return this;
+	    }
+	    createEntity(name) {
+	        return this.entityManager?.createEntity(name) || null;
 	    }
 	    hasEntity(entity) {
 	        if (this.entityManager) {

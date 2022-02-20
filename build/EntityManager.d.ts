@@ -12,6 +12,7 @@ export default class EntityManager implements IEntityManager {
     addElement(entity: IEntity): this;
     addComponentDirect(entity: IEntity): this;
     clear(): this;
+    createEntity(name: string): IEntity;
     get(name: string): IEntity | null;
     has(entity: IEntity | string): boolean;
     removeElement(entity: IEntity | string): this;

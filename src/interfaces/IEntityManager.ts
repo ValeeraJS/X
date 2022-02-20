@@ -6,4 +6,6 @@ export default interface IEntityManager extends IManager<IEntity> {
 	readonly isEntityManager: true;
 	updatedEntities: Set<IEntity>;
 	usedBy: IWorld[];
+
+	createEntity: (name: string) => IEntity;
 }
