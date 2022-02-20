@@ -12,8 +12,8 @@ export default abstract class System implements ISystem {
     entitySet: WeakMap<IEntityManager, Set<IEntity>>;
     usedBy: ISystemManager[];
     cache: WeakMap<IEntity, any>;
-    private rule;
-    private _disabled;
+    protected rule: TQueryRule;
+    protected _disabled: boolean;
     get disabled(): boolean;
     set disabled(value: boolean);
     constructor(name: string | undefined, fitRule: TQueryRule);

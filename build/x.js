@@ -90,6 +90,18 @@
 	    }
 	}
 
+	class PureSystem extends System {
+	    handler;
+	    constructor(name = "", fitRule, handler) {
+	        super(name, fitRule);
+	        this.handler = handler;
+	    }
+	    handle(entity, params) {
+	        this.handler(entity, params);
+	        return this;
+	    }
+	}
+
 	class Component {
 	    static unserialize(json) {
 	        const component = new Component(json.name, json.data);
@@ -795,6 +807,8 @@
 	exports.Entity = Entity;
 	exports.Entitymanager = EntityManager;
 	exports.IdGeneratorInstance = IdGeneratorInstance;
+	exports.Manager = Manager;
+	exports.PureSystem = PureSystem;
 	exports.System = System;
 	exports.SystemManager = SystemManager;
 	exports.World = World;

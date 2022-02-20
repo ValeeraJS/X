@@ -82,6 +82,18 @@ class System {
     }
 }
 
+class PureSystem extends System {
+    handler;
+    constructor(name = "", fitRule, handler) {
+        super(name, fitRule);
+        this.handler = handler;
+    }
+    handle(entity, params) {
+        this.handler(entity, params);
+        return this;
+    }
+}
+
 class Component {
     static unserialize(json) {
         const component = new Component(json.name, json.data);
@@ -782,4 +794,4 @@ class World {
     }
 }
 
-export { Component, ComponentManager, Entity, EntityManager as Entitymanager, IdGeneratorInstance, System, SystemManager, World };
+export { Component, ComponentManager, Entity, EntityManager as Entitymanager, IdGeneratorInstance, Manager, PureSystem, System, SystemManager, World };
