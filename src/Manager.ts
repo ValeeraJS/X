@@ -1,4 +1,4 @@
-import EventFirer from "@valeera/eventdispatcher/src/EventFirer";
+import EventFirer from "@valeera/eventdispatcher";
 import IComponent from "./interfaces/IComponent";
 import IComponentManager from "./interfaces/IComponentManager";
 import IECSObject from "./interfaces/IECSObject";

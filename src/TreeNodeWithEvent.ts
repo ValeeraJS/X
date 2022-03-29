@@ -1,5 +1,5 @@
-import { mixin } from "@valeera/eventdispatcher/src/EventFirer";
-import TreeNode from "@valeera/tree/src/TreeNode";
+import { mixin } from "@valeera/eventdispatcher";
+import { TreeNode } from "@valeera/tree";
 
 const TreeNodeWithEvent = mixin(TreeNode);
 
