@@ -423,10 +423,10 @@
   resolved "https://registry.npm.taobao.org/@ungap/promise-all-settled/download/@ungap/promise-all-settled-1.1.2.tgz#aa58042711d6e3275dd37dc597e5d31e8c290a44"
   integrity sha1-qlgEJxHW4ydd033Fl+XTHowpCkQ=
 
-"@valeera/eventdispatcher@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.npmmirror.com/@valeera/eventdispatcher/-/eventdispatcher-2.2.2.tgz#9f008e1e5e63c830fd655875f9780c6fa21e36b5"
-  integrity sha512-LgS2NTbWrth/naXTrjfYFr32eZh5i8jLrFzECls+RIm/iLetJjnOox1Ya0JAW0uWijPTxjubCrFOiifFX0UEog==
+"@valeera/eventdispatcher@2.2.4":
+  version "2.2.4"
+  resolved "https://registry.npmmirror.com/@valeera/eventdispatcher/-/eventdispatcher-2.2.4.tgz#8a1fb79de91eb60e8ca18e77f34149497e41571f"
+  integrity sha512-rN3+cGRECUtvz4Mc95h579GPIhjbgbgP8TnGcrJOY/OMrYoM7pRix20nVwYVZqJBfIWcqLQUzYuokBWT8YJpDw==
 
 "@valeera/idgenerator@1.1.0":
   version "1.1.0"

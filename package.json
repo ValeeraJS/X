@@ -40,7 +40,7 @@
 	"author": "hypnosnova",
 	"license": "MIT",
 	"dependencies": {
-		"@valeera/eventdispatcher": "2.2.2",
+		"@valeera/eventdispatcher": "2.2.4",
 		"@valeera/tree": "0.1.5",
 		"@valeera/idgenerator": "1.1.0",
 		"clone-deep": "^4.0.1"

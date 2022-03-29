@@ -2,7 +2,7 @@ import IComponent from "./IComponent";
 import IComponentManager from "./IComponentManager";
 import IECSObject from "./IECSObject";
 import IEntityManager from "./IEntityManager";
-import IEventFirer from "@valeera/eventdispatcher/src/interfaces/IEventFirer";
+import { IEventFirer } from "@valeera/eventdispatcher";
 
 export default interface IEntity extends IEventFirer<any>, IECSObject {
 	readonly isEntity: boolean;
