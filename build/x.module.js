@@ -343,8 +343,6 @@ const ARRAY_VISITOR = {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const mixin = (Base = Object) => {
     return class TreeNode extends Base {
-        parent = null;
-        children = [];
         static mixin = mixin;
         static addNode(node, child) {
             if (TreeNode.hasAncestor(node, child)) {
@@ -407,14 +405,16 @@ const mixin = (Base = Object) => {
             return result;
         }
         static traverse(node, visitor, rest) {
-            visitor.enter && visitor.enter(node, rest);
-            visitor.visit && visitor.visit(node, rest);
+            visitor.enter?.(node, rest);
+            visitor.visit?.(node, rest);
             for (const item of node.children) {
                 item && TreeNode.traverse(item, visitor, rest);
             }
-            visitor.leave && visitor.leave(node, rest);
+            visitor.leave?.(node, rest);
             return node;
         }
+        parent = null;
+        children = [];
         addNode(node) {
             return TreeNode.addNode(this, node);
         }

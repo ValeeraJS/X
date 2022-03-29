@@ -423,20 +423,20 @@
   resolved "https://registry.npm.taobao.org/@ungap/promise-all-settled/download/@ungap/promise-all-settled-1.1.2.tgz#aa58042711d6e3275dd37dc597e5d31e8c290a44"
   integrity sha1-qlgEJxHW4ydd033Fl+XTHowpCkQ=
 
-"@valeera/eventdispatcher@^2.2.2":
+"@valeera/eventdispatcher@2.2.2":
   version "2.2.2"
   resolved "https://registry.npmmirror.com/@valeera/eventdispatcher/-/eventdispatcher-2.2.2.tgz#9f008e1e5e63c830fd655875f9780c6fa21e36b5"
   integrity sha512-LgS2NTbWrth/naXTrjfYFr32eZh5i8jLrFzECls+RIm/iLetJjnOox1Ya0JAW0uWijPTxjubCrFOiifFX0UEog==
 
-"@valeera/idgenerator@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.nlark.com/@valeera/idgenerator/download/@valeera/idgenerator-1.0.0.tgz#5e8f2337a83738a6e7c91738d7be4c9ae49618cc"
-  integrity sha1-Xo8jN6g3OKbnyRc4175MmuSWGMw=
+"@valeera/idgenerator@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.npmmirror.com/@valeera/idgenerator/-/idgenerator-1.1.0.tgz#8dafebdcbb3f3ac951f34bb1df28db8d60391316"
+  integrity sha512-R8xmtuUPdwLzewZLV6/C/AFXVlpbLl0N2htBqxWR4RsxP7EL3w71GxVdJbrAHpsRzZ90w6PmGSMkYOJSmIBC7g==
 
-"@valeera/tree@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.npmmirror.com/@valeera/tree/download/@valeera/tree-0.1.4.tgz#0dd4152a7ade0db95fd7877dba3efcfa3959d53e"
-  integrity sha512-dKxafzTI4lTuXejzu3+M+nAztGEDEUYVkglFpmO9PjtkducSpo1A5e6QTLfKOuVJYgxRQFkRg/wZZnud4WaxUA==
+"@valeera/tree@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.npmmirror.com/@valeera/tree/-/tree-0.1.5.tgz#993fe77a92e76c667ecfea0e54401734b2aa0002"
+  integrity sha512-797reUTeol9/d0o0iyWyQXZDco3zCClT6o36JAGXpWmy4L6y26jiRuCi1QzHGunyGJcccnfpLr1URLiypyz/Ug==
 
 "@yarn-tool/resolve-package@^1.0.36":
   version "1.0.40"

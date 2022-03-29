@@ -556,22 +556,23 @@ var mixin = function (Base) {
             };
             TreeNode.traverse = function (node, visitor, rest) {
                 var e_3, _a;
-                visitor.enter && visitor.enter(node, rest);
-                visitor.visit && visitor.visit(node, rest);
+                var _b, _c, _d;
+                (_b = visitor.enter) === null || _b === void 0 ? void 0 : _b.call(visitor, node, rest);
+                (_c = visitor.visit) === null || _c === void 0 ? void 0 : _c.call(visitor, node, rest);
                 try {
-                    for (var _b = __values(node.children), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var item = _c.value;
+                    for (var _e = __values(node.children), _f = _e.next(); !_f.done; _f = _e.next()) {
+                        var item = _f.value;
                         item && TreeNode.traverse(item, visitor, rest);
                     }
                 }
                 catch (e_3_1) { e_3 = { error: e_3_1 }; }
                 finally {
                     try {
-                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                        if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
                     }
                     finally { if (e_3) throw e_3.error; }
                 }
-                visitor.leave && visitor.leave(node, rest);
+                (_d = visitor.leave) === null || _d === void 0 ? void 0 : _d.call(visitor, node, rest);
                 return node;
             };
             TreeNode.prototype.addNode = function (node) {
