@@ -20,7 +20,7 @@
 	    usedBy = [];
 	    cache = new WeakMap();
 	    rule;
-	    _disabled;
+	    _disabled = false;
 	    get disabled() {
 	        return this._disabled;
 	    }
@@ -332,7 +332,7 @@
 	    EComponentEvent["REMOVE_COMPONENT"] = "removeComponent";
 	})(EComponentEvent || (EComponentEvent = {}));
 	class ComponentManager extends Manager {
-	    isComponentManager;
+	    isComponentManager = true;
 	    usedBy = [];
 	}
 

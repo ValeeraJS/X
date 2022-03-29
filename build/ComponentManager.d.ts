@@ -13,6 +13,6 @@ export interface ComponentEventObject {
     target: IComponent<any>;
 }
 export default class ComponentManager extends Manager<IComponent<any>> implements IComponentManager {
-    isComponentManager: true;
+    isComponentManager: boolean;
     usedBy: IEntity[];
 }

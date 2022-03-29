@@ -3,7 +3,7 @@ import IManager from "./IManager";
 import IWorld from "./IWorld";
 
 export default interface IEntityManager extends IManager<IEntity> {
-	readonly isEntityManager: true;
+	readonly isEntityManager: boolean;
 	updatedEntities: Set<IEntity>;
 	usedBy: IWorld[];
 

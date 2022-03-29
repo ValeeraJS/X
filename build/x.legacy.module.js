@@ -1,23 +1,34 @@
 import IdGenerator from '@valeera/idgenerator';
-import EventDispatcher from '@valeera/eventdispatcher';
 
 var IdGeneratorInstance = new IdGenerator();
 
 var weakMapTmp;
-var ASystem = /** @class */ (function () {
-    function ASystem(name, fitRule) {
+var System = /** @class */ (function () {
+    function System(name, fitRule) {
         if (name === void 0) { name = ""; }
         this.id = IdGeneratorInstance.next();
         this.isSystem = true;
         this.name = "";
-        this.disabled = false;
         this.loopTimes = 0;
         this.entitySet = new WeakMap();
         this.usedBy = [];
+        this.cache = new WeakMap();
+        this._disabled = false;
         this.name = name;
-        this.queryRule = fitRule;
+        this.disabled = false;
+        this.rule = fitRule;
     }
-    ASystem.prototype.checkUpdatedEntities = function (manager) {
+    Object.defineProperty(System.prototype, "disabled", {
+        get: function () {
+            return this._disabled;
+        },
+        set: function (value) {
+            this._disabled = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    System.prototype.checkUpdatedEntities = function (manager) {
         var _this = this;
         if (manager) {
             weakMapTmp = this.entitySet.get(manager);
@@ -36,7 +47,7 @@ var ASystem = /** @class */ (function () {
         }
         return this;
     };
-    ASystem.prototype.checkEntityManager = function (manager) {
+    System.prototype.checkEntityManager = function (manager) {
         var _this = this;
         if (manager) {
             weakMapTmp = this.entitySet.get(manager);
@@ -58,10 +69,10 @@ var ASystem = /** @class */ (function () {
         }
         return this;
     };
-    ASystem.prototype.query = function (entity) {
-        return this.queryRule(entity);
+    System.prototype.query = function (entity) {
+        return this.rule(entity);
     };
-    ASystem.prototype.run = function (world) {
+    System.prototype.run = function (world) {
         var _this = this;
         var _a;
         if (world.entityManager) {
@@ -71,24 +82,13 @@ var ASystem = /** @class */ (function () {
         }
         return this;
     };
-    return ASystem;
-}());
-
-var Component = /** @class */ (function () {
-    function Component(name, data) {
-        if (data === void 0) { data = null; }
-        this.isComponent = true;
-        this.data = null;
-        this.disabled = false;
-        this.usedBy = [];
-        this.dirty = false;
-        this.name = name;
-        this.data = data;
-    }
-    Component.prototype.clone = function () {
-        return new Component(this.name, this.data);
+    System.prototype.destroy = function () {
+        for (var i = this.usedBy.length - 1; i > -1; i--) {
+            this.usedBy[i].removeElement(this);
+        }
+        return this;
     };
-    return Component;
+    return System;
 }());
 
 /*! *****************************************************************************
@@ -134,47 +134,240 @@ function __values(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 }
 
-// 私有全局变量，外部无法访问
-var componentTmp;
-var EComponentEvent;
-(function (EComponentEvent) {
-    EComponentEvent["ADD_COMPONENT"] = "addComponent";
-    EComponentEvent["REMOVE_COMPONENT"] = "removeComponent";
-})(EComponentEvent || (EComponentEvent = {}));
-var ComponentManager = /** @class */ (function () {
-    function ComponentManager() {
-        this.elements = new Map();
-        this.disabled = false;
-        this.usedBy = [];
-        this.isComponentManager = true;
+var PureSystem = /** @class */ (function (_super) {
+    __extends(PureSystem, _super);
+    function PureSystem(name, fitRule, handler) {
+        if (name === void 0) { name = ""; }
+        var _this = _super.call(this, name, fitRule) || this;
+        _this.handler = handler;
+        return _this;
     }
-    ComponentManager.prototype.add = function (component) {
-        if (this.has(component)) {
-            this.removeByInstance(component);
-        }
-        return this.addComponentDirect(component);
-    };
-    ComponentManager.prototype.addComponentDirect = function (component) {
-        this.elements.set(component.name, component);
-        component.usedBy.push(this);
-        ComponentManager.eventObject = {
-            component: component,
-            eventKey: ComponentManager.ADD_COMPONENT,
-            manager: this,
-            target: component
-        };
-        this.entityComponentChangeDispatch(ComponentManager.ADD_COMPONENT, ComponentManager.eventObject);
+    PureSystem.prototype.handle = function (entity, params) {
+        this.handler(entity, params);
         return this;
     };
-    ComponentManager.prototype.clear = function () {
+    return PureSystem;
+}(System));
+
+var Component = /** @class */ (function () {
+    function Component(name, data) {
+        if (data === void 0) { data = null; }
+        this.isComponent = true;
+        this.id = IdGeneratorInstance.next();
+        this.data = null;
+        this.disabled = false;
+        this.usedBy = [];
+        this.dirty = false;
+        this.name = name;
+        this.data = data;
+    }
+    Component.unserialize = function (json) {
+        var component = new Component(json.name, json.data);
+        component.disabled = json.disabled;
+        return component;
+    };
+    Component.prototype.clone = function () {
+        return new Component(this.name, this.data);
+    };
+    Component.prototype.serialize = function () {
+        return {
+            data: this.data,
+            disabled: this.disabled,
+            name: this.name,
+            type: "component"
+        };
+    };
+    return Component;
+}());
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+var mixin$1 = function (Base, eventKeyList) {
+    var _a;
+    if (Base === void 0) { Base = Object; }
+    if (eventKeyList === void 0) { eventKeyList = []; }
+    return _a = /** @class */ (function (_super) {
+            __extends(EventFirer, _super);
+            function EventFirer() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.eventKeyList = eventKeyList;
+                /**
+                 * store all the filters
+                 */
+                _this.filters = [];
+                /**
+                 * store all the listeners by key
+                 */
+                _this.listeners = new Map();
+                return _this;
+            }
+            EventFirer.prototype.all = function (listener) {
+                return this.filt(function () { return true; }, listener);
+            };
+            EventFirer.prototype.clearListenersByKey = function (eventKey) {
+                this.listeners.delete(eventKey);
+                return this;
+            };
+            EventFirer.prototype.clearAllListeners = function () {
+                var e_1, _a;
+                var keys = this.listeners.keys();
+                try {
+                    for (var keys_1 = __values(keys), keys_1_1 = keys_1.next(); !keys_1_1.done; keys_1_1 = keys_1.next()) {
+                        var key = keys_1_1.value;
+                        this.listeners.delete(key);
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (keys_1_1 && !keys_1_1.done && (_a = keys_1.return)) _a.call(keys_1);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+                return this;
+            };
+            EventFirer.prototype.filt = function (rule, listener) {
+                this.filters.push({
+                    listener: listener,
+                    rule: rule
+                });
+                return this;
+            };
+            EventFirer.prototype.fire = function (eventKey, target) {
+                if (!this.checkEventKeyAvailable(eventKey)) {
+                    console.error("EventDispatcher couldn't dispatch the event since EventKeyList doesn't contains key: ", eventKey);
+                    return this;
+                }
+                var array = this.listeners.get(eventKey) || [];
+                var len = array.length;
+                var item;
+                for (var i = 0; i < len; i++) {
+                    item = array[i];
+                    item.listener(target);
+                    item.times--;
+                    if (item.times <= 0) {
+                        array.splice(i--, 1);
+                        --len;
+                    }
+                }
+                return this.checkFilt(eventKey, target);
+            };
+            EventFirer.prototype.off = function (eventKey, listener) {
+                var array = this.listeners.get(eventKey);
+                if (!array) {
+                    return this;
+                }
+                var len = array.length;
+                for (var i = 0; i < len; i++) {
+                    if (array[i].listener === listener) {
+                        array.splice(i, 1);
+                        break;
+                    }
+                }
+                return this;
+            };
+            EventFirer.prototype.on = function (eventKey, listener) {
+                if (eventKey instanceof Array) {
+                    for (var i = 0, j = eventKey.length; i < j; i++) {
+                        this.times(eventKey[i], Infinity, listener);
+                    }
+                    return this;
+                }
+                return this.times(eventKey, Infinity, listener);
+            };
+            EventFirer.prototype.once = function (eventKey, listener) {
+                return this.times(eventKey, 1, listener);
+            };
+            EventFirer.prototype.times = function (eventKey, times, listener) {
+                if (!this.checkEventKeyAvailable(eventKey)) {
+                    console.error("EventDispatcher couldn't add the listener: ", listener, "since EventKeyList doesn't contains key: ", eventKey);
+                    return this;
+                }
+                var array = this.listeners.get(eventKey) || [];
+                if (!this.listeners.has(eventKey)) {
+                    this.listeners.set(eventKey, array);
+                }
+                array.push({
+                    listener: listener,
+                    times: times
+                });
+                return this;
+            };
+            EventFirer.prototype.checkFilt = function (eventKey, target) {
+                var e_2, _a;
+                try {
+                    for (var _b = __values(this.filters), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var item = _c.value;
+                        if (item.rule(eventKey, target)) {
+                            item.listener(target, eventKey);
+                        }
+                    }
+                }
+                catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_2) throw e_2.error; }
+                }
+                return this;
+            };
+            EventFirer.prototype.checkEventKeyAvailable = function (eventKey) {
+                if (this.eventKeyList.length) {
+                    return this.eventKeyList.includes(eventKey);
+                }
+                return true;
+            };
+            return EventFirer;
+        }(Base)),
+        _a.mixin = mixin$1,
+        _a;
+};
+var EventFirer = mixin$1(Object);
+
+// 私有全局变量，外部无法访问
+var elementTmp;
+var EElementChangeEvent;
+(function (EElementChangeEvent) {
+    EElementChangeEvent["ADD"] = "add";
+    EElementChangeEvent["REMOVE"] = "remove";
+})(EElementChangeEvent || (EElementChangeEvent = {}));
+var Manager = /** @class */ (function (_super) {
+    __extends(Manager, _super);
+    function Manager() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        // private static eventObject: EventObject = {
+        // 	component: null as any,
+        // 	element: null as any,
+        // 	eventKey: null as any,
+        // 	manager: null as any
+        // };
+        _this.elements = new Map();
+        _this.disabled = false;
+        _this.usedBy = [];
+        _this.isManager = true;
+        return _this;
+    }
+    Manager.prototype.addElement = function (component) {
+        if (this.has(component)) {
+            this.removeElementByInstance(component);
+        }
+        return this.addElementDirect(component);
+    };
+    Manager.prototype.addElementDirect = function (component) {
+        this.elements.set(component.name, component);
+        component.usedBy.push(this);
+        this.elementChangeDispatch(Manager.Events.ADD, this);
+        return this;
+    };
+    Manager.prototype.clear = function () {
         this.elements.clear();
         return this;
     };
-    ComponentManager.prototype.get = function (name) {
-        componentTmp = this.elements.get(name);
-        return componentTmp ? componentTmp : null;
+    Manager.prototype.get = function (name) {
+        elementTmp = this.elements.get(name);
+        return elementTmp ? elementTmp : null;
     };
-    ComponentManager.prototype.has = function (component) {
+    Manager.prototype.has = function (component) {
         if (typeof component === "string") {
             return this.elements.has(component);
         }
@@ -182,66 +375,45 @@ var ComponentManager = /** @class */ (function () {
             return this.elements.has(component.name);
         }
     };
-    // TODO
-    ComponentManager.prototype.isMixedFrom = function (componentManager) {
-        console.log(componentManager);
-        return false;
-    };
-    // TODO
-    ComponentManager.prototype.mixFrom = function (componentManager) {
-        console.log(componentManager);
-        return this;
-    };
-    ComponentManager.prototype.remove = function (component) {
+    Manager.prototype.removeElement = function (component) {
         return typeof component === "string"
-            ? this.removeByName(component)
-            : this.removeByInstance(component);
+            ? this.removeElementByName(component)
+            : this.removeElementByInstance(component);
     };
-    ComponentManager.prototype.removeByName = function (name) {
-        componentTmp = this.elements.get(name);
-        if (componentTmp) {
+    Manager.prototype.removeElementByName = function (name) {
+        elementTmp = this.elements.get(name);
+        if (elementTmp) {
             this.elements.delete(name);
-            componentTmp.usedBy.splice(componentTmp.usedBy.indexOf(this), 1);
-            ComponentManager.eventObject = {
-                component: componentTmp,
-                eventKey: ComponentManager.REMOVE_COMPONENT,
-                manager: this,
-                target: componentTmp
-            };
-            this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
+            elementTmp.usedBy.splice(elementTmp.usedBy.indexOf(this), 1);
+            this.elementChangeDispatch(Manager.Events.REMOVE, this);
         }
         return this;
     };
-    ComponentManager.prototype.removeByInstance = function (component) {
+    Manager.prototype.removeElementByInstance = function (component) {
         if (this.elements.has(component.name)) {
             this.elements.delete(component.name);
             component.usedBy.splice(component.usedBy.indexOf(this), 1);
-            ComponentManager.eventObject = {
-                component: component,
-                eventKey: ComponentManager.REMOVE_COMPONENT,
-                manager: this,
-                target: component
-            };
-            this.entityComponentChangeDispatch(ComponentManager.REMOVE_COMPONENT, ComponentManager.eventObject);
+            this.elementChangeDispatch(Manager.Events.REMOVE, this);
         }
         return this;
     };
-    ComponentManager.prototype.entityComponentChangeDispatch = function (type, eventObject) {
+    Manager.prototype.elementChangeDispatch = function (type, eventObject) {
         var e_1, _a, e_2, _b;
+        var _c, _d;
         try {
-            for (var _c = __values(this.usedBy), _d = _c.next(); !_d.done; _d = _c.next()) {
-                var entity = _d.value;
-                entity.fire(type, eventObject);
+            for (var _e = __values(this.usedBy), _f = _e.next(); !_f.done; _f = _e.next()) {
+                var entity = _f.value;
+                (_d = (_c = entity).fire) === null || _d === void 0 ? void 0 : _d.call(_c, type, eventObject);
                 try {
-                    for (var _e = (e_2 = void 0, __values(entity.usedBy)), _f = _e.next(); !_f.done; _f = _e.next()) {
-                        var manager = _f.value;
+                    for (var _g = (e_2 = void 0, __values(entity.usedBy)), _h = _g.next(); !_h.done; _h = _g.next()) {
+                        var manager = _h.value;
                         manager.updatedEntities.add(entity);
                     }
                 }
                 catch (e_2_1) { e_2 = { error: e_2_1 }; }
                 finally {
                     try {
-                        if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+                        if (_h && !_h.done && (_b = _g.return)) _b.call(_g);
                     }
                     finally { if (e_2) throw e_2.error; }
                 }
@@ -250,21 +422,190 @@ var ComponentManager = /** @class */ (function () {
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
             try {
-                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+                if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
             }
             finally { if (e_1) throw e_1.error; }
         }
     };
-    ComponentManager.ADD_COMPONENT = EComponentEvent.ADD_COMPONENT;
-    ComponentManager.REMOVE_COMPONENT = EComponentEvent.REMOVE_COMPONENT;
-    ComponentManager.eventObject = {
-        component: null,
-        eventKey: null,
-        manager: null,
-        target: null
-    };
+    Manager.Events = EElementChangeEvent;
+    return Manager;
+}(EventFirer));
+
+// 私有全局变量，外部无法访问
+// let componentTmp: IComponent<any> | undefined;
+var EComponentEvent;
+(function (EComponentEvent) {
+    EComponentEvent["ADD_COMPONENT"] = "addComponent";
+    EComponentEvent["REMOVE_COMPONENT"] = "removeComponent";
+})(EComponentEvent || (EComponentEvent = {}));
+var ComponentManager = /** @class */ (function (_super) {
+    __extends(ComponentManager, _super);
+    function ComponentManager() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.isComponentManager = true;
+        _this.usedBy = [];
+        return _this;
+    }
     return ComponentManager;
-}());
+}(Manager));
+
+var FIND_LEAVES_VISITOR = {
+    enter: function (node, result) {
+        if (!node.children.length) {
+            result.push(node);
+        }
+    }
+};
+var ARRAY_VISITOR = {
+    enter: function (node, result) {
+        result.push(node);
+    }
+};
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+var mixin = function (Base) {
+    var _a;
+    if (Base === void 0) { Base = Object; }
+    return _a = /** @class */ (function (_super) {
+            __extends(TreeNode, _super);
+            function TreeNode() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.parent = null;
+                _this.children = [];
+                return _this;
+            }
+            TreeNode.addNode = function (node, child) {
+                if (TreeNode.hasAncestor(node, child)) {
+                    throw new Error("The node added is one of the ancestors of current one.");
+                }
+                node.children.push(child);
+                child.parent = node;
+                return node;
+            };
+            TreeNode.depth = function (node) {
+                var e_1, _a, e_2, _b;
+                if (!node.children.length) {
+                    return 1;
+                }
+                else {
+                    var childrenDepth = [];
+                    try {
+                        for (var _c = __values(node.children), _d = _c.next(); !_d.done; _d = _c.next()) {
+                            var item = _d.value;
+                            item && childrenDepth.push(this.depth(item));
+                        }
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+                        }
+                        finally { if (e_1) throw e_1.error; }
+                    }
+                    var max = 0;
+                    try {
+                        for (var childrenDepth_1 = __values(childrenDepth), childrenDepth_1_1 = childrenDepth_1.next(); !childrenDepth_1_1.done; childrenDepth_1_1 = childrenDepth_1.next()) {
+                            var item = childrenDepth_1_1.value;
+                            max = Math.max(max, item);
+                        }
+                    }
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (childrenDepth_1_1 && !childrenDepth_1_1.done && (_b = childrenDepth_1.return)) _b.call(childrenDepth_1);
+                        }
+                        finally { if (e_2) throw e_2.error; }
+                    }
+                    return 1 + max;
+                }
+            };
+            TreeNode.findLeaves = function (node) {
+                var result = [];
+                TreeNode.traverse(node, FIND_LEAVES_VISITOR, result);
+                return result;
+            };
+            TreeNode.findRoot = function (node) {
+                if (node.parent) {
+                    return this.findRoot(node.parent);
+                }
+                return node;
+            };
+            TreeNode.hasAncestor = function (node, ancestor) {
+                if (!node.parent) {
+                    return false;
+                }
+                else {
+                    if (node.parent === ancestor) {
+                        return true;
+                    }
+                    else {
+                        return TreeNode.hasAncestor(node.parent, ancestor);
+                    }
+                }
+            };
+            TreeNode.removeNode = function (node, child) {
+                if (node.children.includes(child)) {
+                    node.children.splice(node.children.indexOf(child), 1);
+                    child.parent = null;
+                }
+                return node;
+            };
+            TreeNode.toArray = function (node) {
+                var result = [];
+                TreeNode.traverse(node, ARRAY_VISITOR, result);
+                return result;
+            };
+            TreeNode.traverse = function (node, visitor, rest) {
+                var e_3, _a;
+                visitor.enter && visitor.enter(node, rest);
+                visitor.visit && visitor.visit(node, rest);
+                try {
+                    for (var _b = __values(node.children), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var item = _c.value;
+                        item && TreeNode.traverse(item, visitor, rest);
+                    }
+                }
+                catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_3) throw e_3.error; }
+                }
+                visitor.leave && visitor.leave(node, rest);
+                return node;
+            };
+            TreeNode.prototype.addNode = function (node) {
+                return TreeNode.addNode(this, node);
+            };
+            TreeNode.prototype.depth = function () {
+                return TreeNode.depth(this);
+            };
+            TreeNode.prototype.findLeaves = function () {
+                return TreeNode.findLeaves(this);
+            };
+            TreeNode.prototype.findRoot = function () {
+                return TreeNode.findRoot(this);
+            };
+            TreeNode.prototype.hasAncestor = function (ancestor) {
+                return TreeNode.hasAncestor(this, ancestor);
+            };
+            TreeNode.prototype.removeNode = function (child) {
+                return TreeNode.removeNode(this, child);
+            };
+            TreeNode.prototype.toArray = function () {
+                return TreeNode.toArray(this);
+            };
+            TreeNode.prototype.traverse = function (visitor, rest) {
+                return TreeNode.traverse(this, visitor, rest);
+            };
+            return TreeNode;
+        }(Base)),
+        _a.mixin = mixin,
+        _a;
+};
+var TreeNode = mixin(Object);
+
+var TreeNodeWithEvent = mixin$1(TreeNode);
 
 var arr$1;
 var Entity = /** @class */ (function (_super) {
@@ -283,7 +624,7 @@ var Entity = /** @class */ (function (_super) {
     }
     Entity.prototype.addComponent = function (component) {
         if (this.componentManager) {
-            this.componentManager.add(component);
+            this.componentManager.addElement(component);
         }
         else {
             throw new Error("Current entity hasn't registered a component manager yet.");
@@ -291,12 +632,12 @@ var Entity = /** @class */ (function (_super) {
         return this;
     };
     Entity.prototype.addTo = function (manager) {
-        manager.add(this);
+        manager.addElement(this);
         return this;
     };
     Entity.prototype.addToWorld = function (world) {
         if (world.entityManager) {
-            world.entityManager.add(this);
+            world.entityManager.addElement(this);
         }
         return this;
     };
@@ -317,7 +658,7 @@ var Entity = /** @class */ (function (_super) {
     };
     Entity.prototype.removeComponent = function (component) {
         if (this.componentManager) {
-            this.componentManager.remove(component);
+            this.componentManager.removeElement(component);
         }
         return this;
     };
@@ -330,7 +671,7 @@ var Entity = /** @class */ (function (_super) {
         return this;
     };
     return Entity;
-}(EventDispatcher));
+}(TreeNodeWithEvent));
 
 // 私有全局变量，外部无法访问
 var entityTmp;
@@ -346,7 +687,7 @@ var EntityManager = /** @class */ (function () {
             this.usedBy.push(world);
         }
     }
-    EntityManager.prototype.add = function (entity) {
+    EntityManager.prototype.addElement = function (entity) {
         if (this.has(entity)) {
             this.removeByInstance(entity);
         }
@@ -362,6 +703,11 @@ var EntityManager = /** @class */ (function () {
         this.elements.clear();
         return this;
     };
+    EntityManager.prototype.createEntity = function (name) {
+        var entity = new Entity(name);
+        this.addElement(entity);
+        return entity;
+    };
     EntityManager.prototype.get = function (name) {
         entityTmp = this.elements.get(name);
         return entityTmp ? entityTmp : null;
@@ -374,7 +720,7 @@ var EntityManager = /** @class */ (function () {
             return this.elements.has(entity.name);
         }
     };
-    EntityManager.prototype.remove = function (entity) {
+    EntityManager.prototype.removeElement = function (entity) {
         return typeof entity === "string"
             ? this.removeByName(entity)
             : this.removeByInstance(entity);
@@ -440,7 +786,7 @@ var SystemManager = /** @class */ (function (_super) {
         }
         return _this;
     }
-    SystemManager.prototype.add = function (system) {
+    SystemManager.prototype.addElement = function (system) {
         if (this.elements.has(system.name)) {
             return this;
         }
@@ -451,23 +797,6 @@ var SystemManager = /** @class */ (function (_super) {
     SystemManager.prototype.clear = function () {
         this.elements.clear();
         return this;
-    };
-    SystemManager.prototype.get = function (name) {
-        systemTmp = this.elements.get(name);
-        return systemTmp ? systemTmp : null;
-    };
-    SystemManager.prototype.has = function (element) {
-        if (typeof element === "string") {
-            return this.elements.has(element);
-        }
-        else {
-            return this.elements.has(element.name);
-        }
-    };
-    SystemManager.prototype.remove = function (system) {
-        return typeof system === "string"
-            ? this.removeByName(system)
-            : this.removeByInstance(system);
     };
     SystemManager.prototype.removeByName = function (name) {
         systemTmp = this.elements.get(name);
@@ -548,7 +877,7 @@ var SystemManager = /** @class */ (function (_super) {
         target: null
     };
     return SystemManager;
-}(EventDispatcher));
+}(Manager));
 
 var arr;
 var World = /** @class */ (function () {
@@ -573,7 +902,7 @@ var World = /** @class */ (function () {
     };
     World.prototype.addEntity = function (entity) {
         if (this.entityManager) {
-            this.entityManager.add(entity);
+            this.entityManager.addElement(entity);
         }
         else {
             throw new Error("The world doesn't have an entityManager yet.");
@@ -582,7 +911,7 @@ var World = /** @class */ (function () {
     };
     World.prototype.addSystem = function (system) {
         if (this.systemManager) {
-            this.systemManager.add(system);
+            this.systemManager.addElement(system);
         }
         else {
             throw new Error("The world doesn't have a systemManager yet.");
@@ -594,6 +923,10 @@ var World = /** @class */ (function () {
             this.entityManager.clear();
         }
         return this;
+    };
+    World.prototype.createEntity = function (name) {
+        var _a;
+        return ((_a = this.entityManager) === null || _a === void 0 ? void 0 : _a.createEntity(name)) || null;
     };
     World.prototype.hasEntity = function (entity) {
         if (this.entityManager) {
@@ -633,13 +966,13 @@ var World = /** @class */ (function () {
     };
     World.prototype.removeEntity = function (entity) {
         if (this.entityManager) {
-            this.entityManager.remove(entity);
+            this.entityManager.removeElement(entity);
         }
         return this;
     };
     World.prototype.removeSystem = function (system) {
         if (this.systemManager) {
-            this.systemManager.remove(system);
+            this.systemManager.removeElement(system);
         }
         return this;
     };
@@ -668,4 +1001,4 @@ var World = /** @class */ (function () {
     return World;
 }());
 
-export { ASystem, Component, ComponentManager, Entity, EntityManager as Entitymanager, IdGeneratorInstance, SystemManager, World };
+export { Component, ComponentManager, Entity, EntityManager as Entitymanager, IdGeneratorInstance, Manager, PureSystem, System, SystemManager, World };

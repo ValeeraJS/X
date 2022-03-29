@@ -24,6 +24,6 @@ export default class ComponentManager
 	extends Manager<IComponent<any>>
 	implements IComponentManager
 {
-	public isComponentManager: true;
+	public isComponentManager = true;
 	public usedBy: IEntity[] = [];
 }

@@ -12,7 +12,7 @@ class System {
     usedBy = [];
     cache = new WeakMap();
     rule;
-    _disabled;
+    _disabled = false;
     get disabled() {
         return this._disabled;
     }
@@ -324,7 +324,7 @@ var EComponentEvent;
     EComponentEvent["REMOVE_COMPONENT"] = "removeComponent";
 })(EComponentEvent || (EComponentEvent = {}));
 class ComponentManager extends Manager {
-    isComponentManager;
+    isComponentManager = true;
     usedBy = [];
 }
 
