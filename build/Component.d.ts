@@ -9,12 +9,12 @@ export default class Component<T> implements IComponent<T> {
     static unserialize<T>(json: IComponentSerializedJson<T>): Component<T>;
     readonly isComponent = true;
     readonly id: number;
-    data: T | null;
+    data: T;
     disabled: boolean;
     name: string;
     usedBy: never[];
     dirty: boolean;
-    constructor(name: string, data?: T | null);
+    constructor(name: string, data: T);
     clone(): IComponent<T>;
     serialize(): any;
 }

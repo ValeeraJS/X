@@ -19,13 +19,13 @@ export default class Component<T> implements IComponent<T> {
 
 	public readonly isComponent = true;
 	public readonly id = IdGeneratorInstance.next();
-	public data: T | null = null;
+	public data: T;
 	public disabled = false;
 	public name: string;
 	public usedBy = [];
 	public dirty = false;
 
-	public constructor(name: string, data: T | null = null) {
+	public constructor(name: string, data: T) {
 		this.name = name;
 		this.data = data;
 	}

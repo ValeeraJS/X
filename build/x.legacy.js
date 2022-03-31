@@ -160,10 +160,8 @@
 
 	var Component = /** @class */ (function () {
 	    function Component(name, data) {
-	        if (data === void 0) { data = null; }
 	        this.isComponent = true;
 	        this.id = IdGeneratorInstance.next();
-	        this.data = null;
 	        this.disabled = false;
 	        this.usedBy = [];
 	        this.dirty = false;

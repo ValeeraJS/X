@@ -111,12 +111,12 @@
 	    }
 	    isComponent = true;
 	    id = IdGeneratorInstance.next();
-	    data = null;
+	    data;
 	    disabled = false;
 	    name;
 	    usedBy = [];
 	    dirty = false;
-	    constructor(name, data = null) {
+	    constructor(name, data) {
 	        this.name = name;
 	        this.data = data;
 	    }
