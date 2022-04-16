@@ -34,6 +34,7 @@
 			<div>Entity 2</div>
 			<button id="entity2Btn">切换顺时针旋转</button>
 		</div>
+		<script src="./Tree.js"></script>
 		<script src="./IdGenerator.js"></script>
 		<script src="./EventDispatcher.js"></script>
 		<script src="./three.min.js"></script>
@@ -137,6 +138,15 @@
 				new THREE.BoxGeometry(0.2, 0.2, 0.2),
 				new THREE.MeshNormalMaterial()
 			);
+
+			// const entity3 = new MeshEntity(
+			// 	"test3",
+			// 	new THREE.BoxGeometry(0.2, 0.2, 0.2),
+			// 	new THREE.MeshNormalMaterial()
+			// );
+
+			// entity3.mesh.position.y = 0.3;
+			// entity2.addNode(entity3);
 
 			entity2.addComponent(r2);
 			entity2.mesh.position.x = -0.5;

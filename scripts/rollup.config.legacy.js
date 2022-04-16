@@ -10,7 +10,8 @@ export default {
 			format: "umd",
 			globals: {
 				"@valeera/eventdispatcher": "EventDispatcher",
-				"@valeera/idgenerator": "IdGenerator"
+				"@valeera/idgenerator": "IdGenerator",
+				"@valeera/tree": "Tree"
 			},
 			indent: "\t",
 			name: "X",

@@ -145,15 +145,15 @@ class Manager extends EventFirer {
     disabled = false;
     usedBy = [];
     isManager = true;
-    addElement(component) {
-        if (this.has(component)) {
-            this.removeElementByInstance(component);
+    addElement(element) {
+        if (this.has(element)) {
+            this.removeElementByInstance(element);
         }
-        return this.addElementDirect(component);
+        return this.addElementDirect(element);
     }
-    addElementDirect(component) {
-        this.elements.set(component.name, component);
-        component.usedBy.push(this);
+    addElementDirect(element) {
+        this.elements.set(element.name, element);
+        element.usedBy.push(this);
         this.elementChangeDispatch(Manager.Events.ADD, this);
         return this;
     }
@@ -165,18 +165,18 @@ class Manager extends EventFirer {
         elementTmp = this.elements.get(name);
         return elementTmp ? elementTmp : null;
     }
-    has(component) {
-        if (typeof component === "string") {
-            return this.elements.has(component);
+    has(element) {
+        if (typeof element === "string") {
+            return this.elements.has(element);
         }
         else {
-            return this.elements.has(component.name);
+            return this.elements.has(element.name);
         }
     }
-    removeElement(component) {
-        return typeof component === "string"
-            ? this.removeElementByName(component)
-            : this.removeElementByInstance(component);
+    removeElement(element) {
+        return typeof element === "string"
+            ? this.removeElementByName(element)
+            : this.removeElementByInstance(element);
     }
     removeElementByName(name) {
         elementTmp = this.elements.get(name);
@@ -187,10 +187,10 @@ class Manager extends EventFirer {
         }
         return this;
     }
-    removeElementByInstance(component) {
-        if (this.elements.has(component.name)) {
-            this.elements.delete(component.name);
-            component.usedBy.splice(component.usedBy.indexOf(this), 1);
+    removeElementByInstance(element) {
+        if (this.elements.has(element.name)) {
+            this.elements.delete(element.name);
+            element.usedBy.splice(element.usedBy.indexOf(this), 1);
             this.elementChangeDispatch(Manager.Events.REMOVE, this);
         }
         return this;
@@ -198,8 +198,10 @@ class Manager extends EventFirer {
     elementChangeDispatch(type, eventObject) {
         for (const entity of this.usedBy) {
             entity.fire?.(type, eventObject);
-            for (const manager of entity.usedBy) {
-                manager.updatedEntities.add(entity);
+            if (entity.usedBy) {
+                for (const manager of entity.usedBy) {
+                    manager.updatedEntities.add(entity);
+                }
             }
         }
     }
@@ -241,6 +243,15 @@ class Entity extends TreeNodeWithEvent {
         }
         return this;
     }
+    addChild(entity) {
+        super.addChild(entity);
+        if (this.usedBy) {
+            for (const manager of this.usedBy) {
+                manager.addElement(entity);
+            }
+        }
+        return this;
+    }
     addTo(manager) {
         manager.addElement(this);
         return this;
@@ -265,6 +276,15 @@ class Entity extends TreeNodeWithEvent {
         }
         return this;
     }
+    removeChild(entity) {
+        super.removeChild(entity);
+        if (this.usedBy) {
+            for (const manager of this.usedBy) {
+                manager.removeElement(entity);
+            }
+        }
+        return this;
+    }
     removeComponent(component) {
         if (this.componentManager) {
             this.componentManager.removeElement(component);
@@ -283,32 +303,25 @@ class Entity extends TreeNodeWithEvent {
 
 // 私有全局变量，外部无法访问
 let entityTmp;
-class EntityManager {
-    elements = new Map();
+class EntityManager extends Manager {
+    // public elements: Map<string, IEntity> = new Map();
     data = null;
-    disabled = false;
     updatedEntities = new Set();
     isEntityManager = true;
-    usedBy = [];
     constructor(world) {
+        super();
         if (world) {
             this.usedBy.push(world);
         }
     }
-    addElement(entity) {
-        if (this.has(entity)) {
-            this.removeByInstance(entity);
-        }
-        return this.addComponentDirect(entity);
-    }
-    addComponentDirect(entity) {
-        this.elements.set(entity.name, entity);
-        entity.usedBy.push(this);
+    addElementDirect(entity) {
+        super.addElementDirect(entity);
         this.updatedEntities.add(entity);
-        return this;
-    }
-    clear() {
-        this.elements.clear();
+        for (const child of entity.children) {
+            if (child) {
+                this.addElement(child);
+            }
+        }
         return this;
     }
     createEntity(name) {
@@ -316,35 +329,28 @@ class EntityManager {
         this.addElement(entity);
         return entity;
     }
-    get(name) {
-        entityTmp = this.elements.get(name);
-        return entityTmp ? entityTmp : null;
-    }
-    has(entity) {
-        if (typeof entity === "string") {
-            return this.elements.has(entity);
-        }
-        else {
-            return this.elements.has(entity.name);
-        }
-    }
-    removeElement(entity) {
-        return typeof entity === "string"
-            ? this.removeByName(entity)
-            : this.removeByInstance(entity);
-    }
-    removeByName(name) {
+    removeElementByName(name) {
         entityTmp = this.elements.get(name);
         if (entityTmp) {
-            this.elements.delete(name);
+            super.removeElementByName(name);
             this.deleteEntityFromSystemSet(entityTmp);
+            for (const child of entityTmp?.children) {
+                if (child) {
+                    this.removeElementByInstance(child);
+                }
+            }
         }
         return this;
     }
-    removeByInstance(entity) {
+    removeElementByInstance(entity) {
         if (this.elements.has(entity.name)) {
-            this.elements.delete(entity.name);
+            super.removeElementByInstance(entity);
             this.deleteEntityFromSystemSet(entity);
+            for (const child of entity.children) {
+                if (child) {
+                    this.removeElementByInstance(child);
+                }
+            }
         }
         return this;
     }
@@ -387,10 +393,7 @@ class SystemManager extends Manager {
         }
     }
     addElement(system) {
-        if (this.elements.has(system.name)) {
-            return this;
-        }
-        this.elements.set(system.name, system);
+        super.addElement(system);
         this.updateSystemEntitySetByAddFromManager(system);
         return this;
     }

@@ -32,6 +32,18 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 		return this;
 	}
 
+	public addChild(entity: IEntity): this {
+		super.addChild(entity);
+
+		if (this.usedBy) {
+			for (const manager of this.usedBy) {
+				manager.addElement(entity);
+			}
+		}
+
+		return this;
+	}
+
 	public addTo(manager: IEntityManager): this {
 		manager.addElement(this);
 
@@ -59,6 +71,18 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 		this.componentManager = manager;
 		if (!this.componentManager.usedBy.includes(this)) {
 			this.componentManager.usedBy.push(this);
+		}
+
+		return this;
+	}
+
+	public removeChild(entity: IEntity): this {
+		super.removeChild(entity);
+
+		if (this.usedBy) {
+			for (const manager of this.usedBy) {
+				manager.removeElement(entity);
+			}
 		}
 
 		return this;

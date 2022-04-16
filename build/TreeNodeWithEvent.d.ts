@@ -1,19 +1,19 @@
 declare const TreeNodeWithEvent: {
     new (...a: any[]): {
-        eventKeyList: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey[];
-        filters: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TFilter<any>[];
-        listeners: Map<import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey, import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TListenersValue<any>>;
-        all: (listener: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TListener<any>) => any;
-        clearListenersByKey: (eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey) => any;
-        clearAllListeners: () => any;
-        filt: (rule: Function, listener: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TListener<any>) => any;
-        fire: (eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey, target: any) => any;
-        off: (eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey, listener: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TListener<any>) => any;
-        on: (eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey, listener: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TListener<any>) => any;
-        once: (eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey, listener: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TListener<any>) => any;
-        times: (eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey, times: number, listener: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TListener<any>) => any;
-        checkFilt: (eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey, target: any) => any;
-        checkEventKeyAvailable: (eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventDispatcher").TEventKey) => boolean;
+        eventKeyList: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey[];
+        filters: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TFilter<any>[];
+        listeners: Map<import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey, import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TListenersValue<any>>;
+        all(listener: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TListener<any>): any;
+        clearListenersByKey(eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey): any;
+        clearAllListeners(): any;
+        filt(rule: Function, listener: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TListener<any>): any;
+        fire(eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey, target: any): any;
+        off(eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey, listener: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TListener<any>): any;
+        on(eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey | import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey[], listener: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TListener<any>): any;
+        once(eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey, listener: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TListener<any>): any;
+        times(eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey, times: number, listener: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TListener<any>): any;
+        checkFilt(eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey, target: any): any;
+        checkEventKeyAvailable(eventKey: import("@valeera/eventdispatcher/build/interfaces/IEventFirer").TEventKey): boolean;
     };
     mixin: any;
 } & {

@@ -203,15 +203,15 @@ var Manager = /** @class */ (function (_super) {
         _this.isManager = true;
         return _this;
     }
-    Manager.prototype.addElement = function (component) {
-        if (this.has(component)) {
-            this.removeElementByInstance(component);
+    Manager.prototype.addElement = function (element) {
+        if (this.has(element)) {
+            this.removeElementByInstance(element);
         }
-        return this.addElementDirect(component);
+        return this.addElementDirect(element);
     };
-    Manager.prototype.addElementDirect = function (component) {
-        this.elements.set(component.name, component);
-        component.usedBy.push(this);
+    Manager.prototype.addElementDirect = function (element) {
+        this.elements.set(element.name, element);
+        element.usedBy.push(this);
         this.elementChangeDispatch(Manager.Events.ADD, this);
         return this;
     };
@@ -223,18 +223,18 @@ var Manager = /** @class */ (function (_super) {
         elementTmp = this.elements.get(name);
         return elementTmp ? elementTmp : null;
     };
-    Manager.prototype.has = function (component) {
-        if (typeof component === "string") {
-            return this.elements.has(component);
+    Manager.prototype.has = function (element) {
+        if (typeof element === "string") {
+            return this.elements.has(element);
         }
         else {
-            return this.elements.has(component.name);
+            return this.elements.has(element.name);
         }
     };
-    Manager.prototype.removeElement = function (component) {
-        return typeof component === "string"
-            ? this.removeElementByName(component)
-            : this.removeElementByInstance(component);
+    Manager.prototype.removeElement = function (element) {
+        return typeof element === "string"
+            ? this.removeElementByName(element)
+            : this.removeElementByInstance(element);
     };
     Manager.prototype.removeElementByName = function (name) {
         elementTmp = this.elements.get(name);
@@ -245,10 +245,10 @@ var Manager = /** @class */ (function (_super) {
         }
         return this;
     };
-    Manager.prototype.removeElementByInstance = function (component) {
-        if (this.elements.has(component.name)) {
-            this.elements.delete(component.name);
-            component.usedBy.splice(component.usedBy.indexOf(this), 1);
+    Manager.prototype.removeElementByInstance = function (element) {
+        if (this.elements.has(element.name)) {
+            this.elements.delete(element.name);
+            element.usedBy.splice(element.usedBy.indexOf(this), 1);
             this.elementChangeDispatch(Manager.Events.REMOVE, this);
         }
         return this;
@@ -260,18 +260,20 @@ var Manager = /** @class */ (function (_super) {
             for (var _e = __values(this.usedBy), _f = _e.next(); !_f.done; _f = _e.next()) {
                 var entity = _f.value;
                 (_d = (_c = entity).fire) === null || _d === void 0 ? void 0 : _d.call(_c, type, eventObject);
-                try {
-                    for (var _g = (e_2 = void 0, __values(entity.usedBy)), _h = _g.next(); !_h.done; _h = _g.next()) {
-                        var manager = _h.value;
-                        manager.updatedEntities.add(entity);
-                    }
-                }
-                catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                finally {
+                if (entity.usedBy) {
                     try {
-                        if (_h && !_h.done && (_b = _g.return)) _b.call(_g);
+                        for (var _g = (e_2 = void 0, __values(entity.usedBy)), _h = _g.next(); !_h.done; _h = _g.next()) {
+                            var manager = _h.value;
+                            manager.updatedEntities.add(entity);
+                        }
                     }
-                    finally { if (e_2) throw e_2.error; }
+                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                    finally {
+                        try {
+                            if (_h && !_h.done && (_b = _g.return)) _b.call(_g);
+                        }
+                        finally { if (e_2) throw e_2.error; }
+                    }
                 }
             }
         }
@@ -375,32 +377,38 @@ var Entity = /** @class */ (function (_super) {
 
 // 私有全局变量，外部无法访问
 var entityTmp;
-var EntityManager = /** @class */ (function () {
+var EntityManager = /** @class */ (function (_super) {
+    __extends(EntityManager, _super);
     function EntityManager(world) {
-        this.elements = new Map();
-        this.data = null;
-        this.disabled = false;
-        this.updatedEntities = new Set();
-        this.isEntityManager = true;
-        this.usedBy = [];
+        var _this = _super.call(this) || this;
+        // public elements: Map<string, IEntity> = new Map();
+        _this.data = null;
+        _this.updatedEntities = new Set();
+        _this.isEntityManager = true;
         if (world) {
-            this.usedBy.push(world);
+            _this.usedBy.push(world);
         }
+        return _this;
     }
-    EntityManager.prototype.addElement = function (entity) {
-        if (this.has(entity)) {
-            this.removeByInstance(entity);
-        }
-        return this.addComponentDirect(entity);
-    };
-    EntityManager.prototype.addComponentDirect = function (entity) {
-        this.elements.set(entity.name, entity);
-        entity.usedBy.push(this);
+    EntityManager.prototype.addElementDirect = function (entity) {
+        var e_1, _a;
+        _super.prototype.addElementDirect.call(this, entity);
         this.updatedEntities.add(entity);
-        return this;
-    };
-    EntityManager.prototype.clear = function () {
-        this.elements.clear();
+        try {
+            for (var _b = __values(entity.children), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var child = _c.value;
+                if (child) {
+                    this.addElement(child);
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
         return this;
     };
     EntityManager.prototype.createEntity = function (name) {
@@ -408,40 +416,55 @@ var EntityManager = /** @class */ (function () {
         this.addElement(entity);
         return entity;
     };
-    EntityManager.prototype.get = function (name) {
-        entityTmp = this.elements.get(name);
-        return entityTmp ? entityTmp : null;
-    };
-    EntityManager.prototype.has = function (entity) {
-        if (typeof entity === "string") {
-            return this.elements.has(entity);
-        }
-        else {
-            return this.elements.has(entity.name);
-        }
-    };
-    EntityManager.prototype.removeElement = function (entity) {
-        return typeof entity === "string"
-            ? this.removeByName(entity)
-            : this.removeByInstance(entity);
-    };
-    EntityManager.prototype.removeByName = function (name) {
+    EntityManager.prototype.removeElementByName = function (name) {
+        var e_2, _a;
         entityTmp = this.elements.get(name);
         if (entityTmp) {
-            this.elements.delete(name);
+            _super.prototype.removeElementByName.call(this, name);
             this.deleteEntityFromSystemSet(entityTmp);
+            try {
+                for (var _b = __values(entityTmp === null || entityTmp === void 0 ? void 0 : entityTmp.children), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var child = _c.value;
+                    if (child) {
+                        this.removeElementByInstance(child);
+                    }
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
         }
         return this;
     };
-    EntityManager.prototype.removeByInstance = function (entity) {
+    EntityManager.prototype.removeElementByInstance = function (entity) {
+        var e_3, _a;
         if (this.elements.has(entity.name)) {
-            this.elements.delete(entity.name);
+            _super.prototype.removeElementByInstance.call(this, entity);
             this.deleteEntityFromSystemSet(entity);
+            try {
+                for (var _b = __values(entity.children), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var child = _c.value;
+                    if (child) {
+                        this.removeElementByInstance(child);
+                    }
+                }
+            }
+            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_3) throw e_3.error; }
+            }
         }
         return this;
     };
     EntityManager.prototype.deleteEntityFromSystemSet = function (entity) {
-        var e_1, _a;
+        var e_4, _a;
         var _this = this;
         entity.usedBy.splice(entity.usedBy.indexOf(this), 1);
         try {
@@ -456,16 +479,16 @@ var EntityManager = /** @class */ (function () {
                 }
             }
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        catch (e_4_1) { e_4 = { error: e_4_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_1) throw e_1.error; }
+            finally { if (e_4) throw e_4.error; }
         }
     };
     return EntityManager;
-}());
+}(Manager));
 
 var systemTmp;
 var ESystemEvent;
@@ -487,10 +510,7 @@ var SystemManager = /** @class */ (function (_super) {
         return _this;
     }
     SystemManager.prototype.addElement = function (system) {
-        if (this.elements.has(system.name)) {
-            return this;
-        }
-        this.elements.set(system.name, system);
+        _super.prototype.addElement.call(this, system);
         this.updateSystemEntitySetByAddFromManager(system);
         return this;
     };

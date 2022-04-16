@@ -34,17 +34,17 @@ export default class Manager<T extends IECSObject> extends EventFirer implements
 	public usedBy: any[] = [];
 	public readonly isManager = true;
 
-	public addElement(component: T): this {
-		if (this.has(component)) {
-			this.removeElementByInstance(component);
+	public addElement(element: T): this {
+		if (this.has(element)) {
+			this.removeElementByInstance(element);
 		}
 
-		return this.addElementDirect(component);
+		return this.addElementDirect(element);
 	}
 
-	public addElementDirect(component: T): this {
-		this.elements.set(component.name, component);
-		component.usedBy.push(this);
+	public addElementDirect(element: T): this {
+		this.elements.set(element.name, element);
+		element.usedBy.push(this);
 		this.elementChangeDispatch(Manager.Events.ADD, this);
 
 		return this;
@@ -62,18 +62,18 @@ export default class Manager<T extends IECSObject> extends EventFirer implements
 		return elementTmp ? elementTmp : null;
 	}
 
-	public has(component: T | string): boolean {
-		if (typeof component === "string") {
-			return this.elements.has(component);
+	public has(element: T | string): boolean {
+		if (typeof element === "string") {
+			return this.elements.has(element);
 		} else {
-			return this.elements.has(component.name);
+			return this.elements.has(element.name);
 		}
 	}
 
-	public removeElement(component: T | string): this {
-		return typeof component === "string"
-			? this.removeElementByName(component)
-			: this.removeElementByInstance(component);
+	public removeElement(element: T | string): this {
+		return typeof element === "string"
+			? this.removeElementByName(element)
+			: this.removeElementByInstance(element);
 	}
 
 	public removeElementByName(name: string): this {
@@ -88,10 +88,10 @@ export default class Manager<T extends IECSObject> extends EventFirer implements
 		return this;
 	}
 
-	public removeElementByInstance(component: T): this {
-		if (this.elements.has(component.name)) {
-			this.elements.delete(component.name);
-			component.usedBy.splice(component.usedBy.indexOf(this), 1);
+	public removeElementByInstance(element: T): this {
+		if (this.elements.has(element.name)) {
+			this.elements.delete(element.name);
+			element.usedBy.splice(element.usedBy.indexOf(this), 1);
 
 			this.elementChangeDispatch(Manager.Events.REMOVE, this);
 		}
@@ -102,8 +102,10 @@ export default class Manager<T extends IECSObject> extends EventFirer implements
 	private elementChangeDispatch(type: EElementChangeEvent, eventObject: any) {
 		for (const entity of this.usedBy) {
 			(entity as any).fire?.(type, eventObject);
-			for (const manager of entity.usedBy) {
-				manager.updatedEntities.add(entity);
+			if (entity.usedBy) {
+				for (const manager of entity.usedBy) {
+					manager.updatedEntities.add(entity);
+				}
 			}
 		}
 	}

@@ -19,13 +19,13 @@ export default class Manager<T extends IECSObject> extends EventFirer implements
     disabled: boolean;
     usedBy: any[];
     readonly isManager = true;
-    addElement(component: T): this;
-    addElementDirect(component: T): this;
+    addElement(element: T): this;
+    addElementDirect(element: T): this;
     clear(): this;
     get(name: string): T | null;
-    has(component: T | string): boolean;
-    removeElement(component: T | string): this;
+    has(element: T | string): boolean;
+    removeElement(element: T | string): this;
     removeElementByName(name: string): this;
-    removeElementByInstance(component: T): this;
+    removeElementByInstance(element: T): this;
     private elementChangeDispatch;
 }

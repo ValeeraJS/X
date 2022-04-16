@@ -40,10 +40,7 @@ export default class SystemManager extends Manager<ISystem> implements ISystemMa
 	}
 
 	public addElement(system: ISystem): this {
-		if (this.elements.has(system.name)) {
-			return this;
-		}
-		this.elements.set(system.name, system);
+		super.addElement(system);
 		this.updateSystemEntitySetByAddFromManager(system);
 
 		return this;

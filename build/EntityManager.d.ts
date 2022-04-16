@@ -1,22 +1,15 @@
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import IWorld from "./interfaces/IWorld";
-export default class EntityManager implements IEntityManager {
-    elements: Map<string, IEntity>;
+import Manager from "./Manager";
+export default class EntityManager extends Manager<IEntity> implements IEntityManager {
     data: any;
-    disabled: boolean;
     updatedEntities: Set<IEntity>;
     readonly isEntityManager = true;
-    usedBy: IWorld[];
     constructor(world?: IWorld);
-    addElement(entity: IEntity): this;
-    addComponentDirect(entity: IEntity): this;
-    clear(): this;
+    addElementDirect(entity: IEntity): this;
     createEntity(name: string): IEntity;
-    get(name: string): IEntity | null;
-    has(entity: IEntity | string): boolean;
-    removeElement(entity: IEntity | string): this;
-    removeByName(name: string): this;
-    removeByInstance(entity: IEntity): this;
+    removeElementByName(name: string): this;
+    removeElementByInstance(entity: IEntity): this;
     private deleteEntityFromSystemSet;
 }

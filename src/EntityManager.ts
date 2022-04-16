@@ -3,42 +3,33 @@ import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import ISystem from "./interfaces/ISystem";
 import IWorld from "./interfaces/IWorld";
+import Manager from "./Manager";
 
 // 私有全局变量，外部无法访问
 let entityTmp: IEntity | undefined;
 
-export default class EntityManager implements IEntityManager {
-	public elements: Map<string, IEntity> = new Map();
+export default class EntityManager extends Manager<IEntity> implements IEntityManager {
+	// public elements: Map<string, IEntity> = new Map();
 	public data: any = null;
-	public disabled = false;
 	public updatedEntities: Set<IEntity> = new Set();
 	public readonly isEntityManager = true;
-	public usedBy: IWorld[] = [];
 
 	public constructor(world?: IWorld) {
+		super();
 		if (world) {
 			this.usedBy.push(world);
 		}
 	}
 
-	public addElement(entity: IEntity): this {
-		if (this.has(entity)) {
-			this.removeByInstance(entity);
-		}
-
-		return this.addComponentDirect(entity);
-	}
-
-	public addComponentDirect(entity: IEntity): this {
-		this.elements.set(entity.name, entity);
-		entity.usedBy.push(this);
+	public addElementDirect(entity: IEntity): this {
+		super.addElementDirect(entity);
 		this.updatedEntities.add(entity);
 
-		return this;
-	}
-
-	public clear(): this {
-		this.elements.clear();
+		for (const child of entity.children) {
+			if (child) {
+				this.addElement(child as IEntity);
+			}
+		}
 
 		return this;
 	}
@@ -51,40 +42,32 @@ export default class EntityManager implements IEntityManager {
 		return entity;
 	}
 
-	public get(name: string): IEntity | null {
-		entityTmp = this.elements.get(name);
-
-		return entityTmp ? entityTmp : null;
-	}
-
-	public has(entity: IEntity | string): boolean {
-		if (typeof entity === "string") {
-			return this.elements.has(entity);
-		} else {
-			return this.elements.has(entity.name);
-		}
-	}
-
-	public removeElement(entity: IEntity | string): this {
-		return typeof entity === "string"
-			? this.removeByName(entity)
-			: this.removeByInstance(entity);
-	}
-
-	public removeByName(name: string): this {
+	public removeElementByName(name: string): this {
 		entityTmp = this.elements.get(name);
 		if (entityTmp) {
-			this.elements.delete(name);
+			super.removeElementByName(name);
 			this.deleteEntityFromSystemSet(entityTmp);
+
+			for (const child of entityTmp?.children) {
+				if (child) {
+					this.removeElementByInstance(child as IEntity);
+				}
+			}
 		}
 
 		return this;
 	}
 
-	public removeByInstance(entity: IEntity): this {
+	public removeElementByInstance(entity: IEntity): this {
 		if (this.elements.has(entity.name)) {
-			this.elements.delete(entity.name);
+			super.removeElementByInstance(entity);
 			this.deleteEntityFromSystemSet(entity);
+
+			for (const child of entity.children) {
+				if (child) {
+					this.removeElementByInstance(child as IEntity);
+				}
+			}
 		}
 
 		return this;
