@@ -7,4 +7,14 @@ export { default as Manager } from "./Manager";
 export { default as Entitymanager } from "./EntityManager";
 export { default as SystemManager } from "./SystemManager";
 export { default as World } from "./World";
+export { default as IComponent } from "./interfaces/IComponent";
+export { default as IComponentManager } from "./interfaces/IComponentManager";
+export { default as IECSObject } from "./interfaces/IECSObject";
+export { default as IEntity } from "./interfaces/IEntity";
+export { default as IEntityManager } from "./interfaces/IEntityManager";
+export { default as ISerializable } from "./interfaces/ISerializable";
+export { default as ISystem } from "./interfaces/ISystem";
+export { default as ISystemManager } from "./interfaces/ISystemManager";
+export { default as IWorld } from "./interfaces/IWorld";
+
 export * from "./Global";

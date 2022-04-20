@@ -333,6 +333,26 @@ var Entity = /** @class */ (function (_super) {
         }
         return this;
     };
+    Entity.prototype.addChild = function (entity) {
+        var e_1, _a;
+        _super.prototype.addChild.call(this, entity);
+        if (this.usedBy) {
+            try {
+                for (var _b = __values(this.usedBy), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var manager = _c.value;
+                    manager.addElement(entity);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+        }
+        return this;
+    };
     Entity.prototype.addTo = function (manager) {
         manager.addElement(this);
         return this;
@@ -355,6 +375,26 @@ var Entity = /** @class */ (function (_super) {
         this.componentManager = manager;
         if (!this.componentManager.usedBy.includes(this)) {
             this.componentManager.usedBy.push(this);
+        }
+        return this;
+    };
+    Entity.prototype.removeChild = function (entity) {
+        var e_2, _a;
+        _super.prototype.removeChild.call(this, entity);
+        if (this.usedBy) {
+            try {
+                for (var _b = __values(this.usedBy), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var manager = _c.value;
+                    manager.removeElement(entity);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
         }
         return this;
     };
