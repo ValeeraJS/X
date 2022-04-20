@@ -80,7 +80,9 @@ export default class SystemManager extends Manager<ISystem> implements ISystemMa
 
 		this.elements.forEach((item) => {
 			item.checkUpdatedEntities(world.entityManager);
-			item.run(world);
+			if (!item.disabled) {
+				item.run(world);
+			}
 		});
 		if (world.entityManager) {
 			world.entityManager.updatedEntities.clear();

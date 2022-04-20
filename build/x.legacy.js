@@ -86,7 +86,9 @@
 	        var _a;
 	        if (world.entityManager) {
 	            (_a = this.entitySet.get(world.entityManager)) === null || _a === void 0 ? void 0 : _a.forEach(function (item) {
-	                _this.handle(item, world.store);
+	                if (!item.disabled) {
+	                    _this.handle(item, world.store);
+	                }
 	            });
 	        }
 	        return this;
@@ -325,6 +327,7 @@
 	        _this.id = IdGeneratorInstance.next();
 	        _this.isEntity = true;
 	        _this.componentManager = null;
+	        _this.disabled = false;
 	        _this.name = "";
 	        _this.usedBy = [];
 	        _this.name = name;
@@ -588,7 +591,9 @@
 	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
 	        this.elements.forEach(function (item) {
 	            item.checkUpdatedEntities(world.entityManager);
-	            item.run(world);
+	            if (!item.disabled) {
+	                item.run(world);
+	            }
 	        });
 	        if (world.entityManager) {
 	            world.entityManager.updatedEntities.clear();

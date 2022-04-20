@@ -80,7 +80,9 @@ export default abstract class System implements ISystem {
 	public run(world: IWorld): this {
 		if (world.entityManager) {
 			this.entitySet.get(world.entityManager)?.forEach((item: IEntity) => {
-				this.handle(item, world.store);
+				if (!item.disabled) {
+					this.handle(item, world.store);
+				}
 			});
 		}
 

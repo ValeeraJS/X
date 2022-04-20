@@ -71,7 +71,9 @@ class System {
     run(world) {
         if (world.entityManager) {
             this.entitySet.get(world.entityManager)?.forEach((item) => {
-                this.handle(item, world.store);
+                if (!item.disabled) {
+                    this.handle(item, world.store);
+                }
             });
         }
         return this;
@@ -227,6 +229,7 @@ class Entity extends TreeNodeWithEvent {
     id = IdGeneratorInstance.next();
     isEntity = true;
     componentManager = null;
+    disabled = false;
     name = "";
     usedBy = [];
     constructor(name = "", componentManager) {
@@ -424,7 +427,9 @@ class SystemManager extends Manager {
         this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
         this.elements.forEach((item) => {
             item.checkUpdatedEntities(world.entityManager);
-            item.run(world);
+            if (!item.disabled) {
+                item.run(world);
+            }
         });
         if (world.entityManager) {
             world.entityManager.updatedEntities.clear();

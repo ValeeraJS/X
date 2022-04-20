@@ -8,6 +8,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
     readonly id: number;
     readonly isEntity = true;
     componentManager: IComponentManager | null;
+    disabled: boolean;
     name: string;
     usedBy: IEntityManager[];
     constructor(name?: string, componentManager?: IComponentManager);

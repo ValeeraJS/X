@@ -13,6 +13,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
 	public componentManager: IComponentManager | null = null;
+	public disabled = false;
 	public name = "";
 	public usedBy: IEntityManager[] = [];
 
