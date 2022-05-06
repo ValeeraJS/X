@@ -59,6 +59,13 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 		return this;
 	}
 
+	public destroy(): void {
+		for (const manager of this.usedBy) {
+			manager.removeElement(this);
+		}
+		this.unregisterComponentManager();
+	}
+
 	public getComponent(name: string): IComponent<any> | null {
 		return this.componentManager ? this.componentManager.get(name) : null;
 	}

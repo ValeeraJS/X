@@ -1,4 +1,4 @@
-import IComponent from "./interfaces/IComponent";
+import IComponent, { ComponentTag } from "./interfaces/IComponent";
 import { IdGeneratorInstance } from "./Global";
 import { ISerializedJson } from "./interfaces/ISerializable";
 
@@ -24,10 +24,12 @@ export default class Component<T> implements IComponent<T> {
 	public name: string;
 	public usedBy = [];
 	public dirty = false;
+	public tags: ComponentTag[];
 
-	public constructor(name: string, data: T) {
+	public constructor(name: string, data: T, tags: ComponentTag[] = []) {
 		this.name = name;
 		this.data = data;
+		this.tags = tags;
 	}
 
 	public clone(): IComponent<T> {
@@ -38,7 +40,9 @@ export default class Component<T> implements IComponent<T> {
 		return {
 			data: this.data,
 			disabled: this.disabled,
+			id: this.id,
 			name: this.name,
+			tags: this.tags,
 			type: "component"
 		};
 	}

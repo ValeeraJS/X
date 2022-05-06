@@ -22,14 +22,8 @@ export interface EventObject {
 
 export default class Manager<T extends IECSObject> extends EventFirer implements IManager<T> {
 	public static readonly Events = EElementChangeEvent;
-	// private static eventObject: EventObject = {
-	// 	component: null as any,
-	// 	element: null as any,
-	// 	eventKey: null as any,
-	// 	manager: null as any
-	// };
 
-	public elements: Map<string, T> = new Map();
+	public elements: Map<number, T> = new Map();
 	public disabled = false;
 	public usedBy: any[] = [];
 	public readonly isManager = true;
@@ -43,7 +37,7 @@ export default class Manager<T extends IECSObject> extends EventFirer implements
 	}
 
 	public addElementDirect(element: T): this {
-		this.elements.set(element.name, element);
+		this.elements.set(element.id, element);
 		element.usedBy.push(this);
 		this.elementChangeDispatch(Manager.Events.ADD, this);
 
@@ -56,45 +50,84 @@ export default class Manager<T extends IECSObject> extends EventFirer implements
 		return this;
 	}
 
-	public get(name: string): T | null {
-		elementTmp = this.elements.get(name);
+	public get(name: string | number): T | null {
+		if (typeof name === "number") {
+			return this.elements.get(name) || null;
+		}
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		for (const [_, item] of this.elements) {
+			if (item.name === name) {
+				return item;
+			}
+		}
 
-		return elementTmp ? elementTmp : null;
+		return null;
 	}
 
-	public has(element: T | string): boolean {
-		if (typeof element === "string") {
+	public has(element: T | string | number): boolean {
+		if (typeof element === "number") {
 			return this.elements.has(element);
+		} else if (typeof element === "string") {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			for (const [_, item] of this.elements) {
+				if (item.name === element) {
+					return true;
+				}
+			}
+
+			return false;
 		} else {
-			return this.elements.has(element.name);
+			return this.elements.has(element.id);
 		}
 	}
 
-	public removeElement(element: T | string): this {
-		return typeof element === "string"
-			? this.removeElementByName(element)
-			: this.removeElementByInstance(element);
+	public removeElement(element: T | string | number): this {
+		if (typeof element === "number" || typeof element === "string") {
+			elementTmp = this.get(element);
+			if (elementTmp) {
+				this.removeInstanceDirectly(elementTmp);
+			}
+
+			return this;
+		}
+
+		return this.removeElementByInstance(element);
+	}
+
+	public removeElementById(id: number): this {
+		elementTmp = this.elements.get(id);
+		if (elementTmp) {
+			this.removeInstanceDirectly(elementTmp);
+		}
+
+		return this;
 	}
 
 	public removeElementByName(name: string): this {
-		elementTmp = this.elements.get(name);
-		if (elementTmp) {
-			this.elements.delete(name);
-			elementTmp.usedBy.splice(elementTmp.usedBy.indexOf(this), 1);
-
-			this.elementChangeDispatch(Manager.Events.REMOVE, this);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		for (const [_, item] of this.elements) {
+			if (item.name === name) {
+				return this.removeInstanceDirectly(item);
+			}
 		}
 
 		return this;
 	}
 
 	public removeElementByInstance(element: T): this {
-		if (this.elements.has(element.name)) {
-			this.elements.delete(element.name);
-			element.usedBy.splice(element.usedBy.indexOf(this), 1);
-
-			this.elementChangeDispatch(Manager.Events.REMOVE, this);
+		if (this.elements.has(element.id)) {
+			return this.removeInstanceDirectly(element);
 		}
+
+		return this;
+	}
+
+	// 必定有element情况
+	private removeInstanceDirectly(element: T): this {
+		this.elements.delete(element.id);
+		element.usedBy.splice(element.usedBy.indexOf(this), 1);
+
+		this.elementChangeDispatch(Manager.Events.REMOVE, this);
 
 		return this;
 	}
