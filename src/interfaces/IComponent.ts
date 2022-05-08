@@ -1,20 +1,18 @@
 import IComponentManager from "./IComponentManager";
-import ISerializable from "./ISerializable";
+import IECSObject from "./IECSObject";
 
 export interface ComponentTag {
-	label: string;
-	unique: boolean;
+	readonly label: string;
+	readonly unique: boolean;
 }
 
-export default interface IComponent<T> extends ISerializable {
+export default interface IComponent<T> extends IECSObject<IComponent<any>> {
 	readonly isComponent: boolean;
-	id: number;
 	data: T;
-	disabled: boolean;
-	name: string;
 	usedBy: IComponentManager[];
 	dirty: boolean;
 	tags: ComponentTag[];
 
 	clone(): IComponent<T>;
+	hasTagLabel(label: string): boolean;
 }

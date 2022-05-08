@@ -21,6 +21,7 @@ export default abstract class System implements ISystem {
     checkEntityManager(manager: IEntityManager | null): this;
     query(entity: IEntity): boolean;
     run(world: IWorld): this;
+    serialize(): any;
     destroy(): this;
     abstract handle(entity: IEntity, params: TWorldInjection): this;
 }

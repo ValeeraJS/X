@@ -16,10 +16,12 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
     addChild(entity: IEntity): this;
     addTo(manager: IEntityManager): this;
     addToWorld(world: IWorld): this;
+    destroy(): void;
     getComponent(name: string): IComponent<any> | null;
     hasComponent(component: IComponent<any> | string): boolean;
     registerComponentManager(manager?: IComponentManager): this;
     removeChild(entity: IEntity): this;
     removeComponent(component: IComponent<any> | string): this;
+    serialize(): any;
     unregisterComponentManager(): this;
 }

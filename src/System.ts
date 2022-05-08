@@ -89,9 +89,13 @@ export default abstract class System implements ISystem {
 		return this;
 	}
 
+	public serialize(): any {
+		return {};
+	}
+
 	public destroy(): this {
 		for (let i = this.usedBy.length - 1; i > -1; i--) {
-			this.usedBy[i].removeElement(this);
+			this.usedBy[i].remove(this);
 		}
 
 		return this;

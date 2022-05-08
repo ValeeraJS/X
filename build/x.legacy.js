@@ -93,9 +93,12 @@
 	        }
 	        return this;
 	    };
+	    System.prototype.serialize = function () {
+	        return {};
+	    };
 	    System.prototype.destroy = function () {
 	        for (var i = this.usedBy.length - 1; i > -1; i--) {
-	            this.usedBy[i].removeElement(this);
+	            this.usedBy[i].remove(this);
 	        }
 	        return this;
 	    };
@@ -145,6 +148,23 @@
 	    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 	}
 
+	function __read(o, n) {
+	    var m = typeof Symbol === "function" && o[Symbol.iterator];
+	    if (!m) return o;
+	    var i = m.call(o), r, ar = [], e;
+	    try {
+	        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+	    }
+	    catch (error) { e = { error: error }; }
+	    finally {
+	        try {
+	            if (r && !r.done && (m = i["return"])) m.call(i);
+	        }
+	        finally { if (e) throw e.error; }
+	    }
+	    return ar;
+	}
+
 	var PureSystem = /** @class */ (function (_super) {
 	    __extends(PureSystem, _super);
 	    function PureSystem(name, fitRule, handler) {
@@ -161,7 +181,8 @@
 	}(System));
 
 	var Component = /** @class */ (function () {
-	    function Component(name, data) {
+	    function Component(name, data, tags) {
+	        if (tags === void 0) { tags = []; }
 	        this.isComponent = true;
 	        this.id = IdGeneratorInstance.next();
 	        this.disabled = false;
@@ -169,6 +190,7 @@
 	        this.dirty = false;
 	        this.name = name;
 	        this.data = data;
+	        this.tags = tags;
 	    }
 	    Component.unserialize = function (json) {
 	        var component = new Component(json.name, json.data);
@@ -176,13 +198,24 @@
 	        return component;
 	    };
 	    Component.prototype.clone = function () {
-	        return new Component(this.name, this.data);
+	        return new Component(this.name, this.data, this.tags);
+	    };
+	    // 此处为只要tag标签相同就是同一类
+	    Component.prototype.hasTagLabel = function (label) {
+	        for (var i = this.tags.length - 1; i > -1; i--) {
+	            if (this.tags[i].label === label) {
+	                return true;
+	            }
+	        }
+	        return false;
 	    };
 	    Component.prototype.serialize = function () {
 	        return {
 	            data: this.data,
 	            disabled: this.disabled,
+	            id: this.id,
 	            name: this.name,
+	            tags: this.tags,
 	            type: "component"
 	        };
 	    };
@@ -191,79 +224,109 @@
 
 	// 私有全局变量，外部无法访问
 	var elementTmp;
-	var EElementChangeEvent;
-	(function (EElementChangeEvent) {
-	    EElementChangeEvent["ADD"] = "add";
-	    EElementChangeEvent["REMOVE"] = "remove";
-	})(EElementChangeEvent || (EElementChangeEvent = {}));
+	var ElementChangeEvent = {
+	    ADD: "add",
+	    REMOVE: "remove"
+	};
 	var Manager = /** @class */ (function (_super) {
 	    __extends(Manager, _super);
 	    function Manager() {
 	        var _this = _super !== null && _super.apply(this, arguments) || this;
-	        // private static eventObject: EventObject = {
-	        // 	component: null as any,
-	        // 	element: null as any,
-	        // 	eventKey: null as any,
-	        // 	manager: null as any
-	        // };
 	        _this.elements = new Map();
 	        _this.disabled = false;
 	        _this.usedBy = [];
 	        _this.isManager = true;
 	        return _this;
 	    }
-	    Manager.prototype.addElement = function (element) {
+	    Manager.prototype.add = function (element) {
 	        if (this.has(element)) {
-	            this.removeElementByInstance(element);
+	            return this;
 	        }
-	        return this.addElementDirect(element);
-	    };
-	    Manager.prototype.addElementDirect = function (element) {
-	        this.elements.set(element.name, element);
-	        element.usedBy.push(this);
-	        this.elementChangeDispatch(Manager.Events.ADD, this);
-	        return this;
+	        return this.addElementDirectly(element);
 	    };
 	    Manager.prototype.clear = function () {
 	        this.elements.clear();
 	        return this;
 	    };
 	    Manager.prototype.get = function (name) {
-	        elementTmp = this.elements.get(name);
-	        return elementTmp ? elementTmp : null;
+	        var e_1, _a;
+	        if (typeof name === "number") {
+	            return this.elements.get(name) || null;
+	        }
+	        try {
+	            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+	            for (var _b = __values(this.elements), _c = _b.next(); !_c.done; _c = _b.next()) {
+	                var _d = __read(_c.value, 2), _ = _d[0], item = _d[1];
+	                if (item.name === name) {
+	                    return item;
+	                }
+	            }
+	        }
+	        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+	        finally {
+	            try {
+	                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+	            }
+	            finally { if (e_1) throw e_1.error; }
+	        }
+	        return null;
 	    };
 	    Manager.prototype.has = function (element) {
-	        if (typeof element === "string") {
+	        var e_2, _a;
+	        if (typeof element === "number") {
 	            return this.elements.has(element);
 	        }
+	        else if (typeof element === "string") {
+	            try {
+	                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+	                for (var _b = __values(this.elements), _c = _b.next(); !_c.done; _c = _b.next()) {
+	                    var _d = __read(_c.value, 2), _ = _d[0], item = _d[1];
+	                    if (item.name === element) {
+	                        return true;
+	                    }
+	                }
+	            }
+	            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+	            finally {
+	                try {
+	                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+	                }
+	                finally { if (e_2) throw e_2.error; }
+	            }
+	            return false;
+	        }
 	        else {
-	            return this.elements.has(element.name);
+	            return this.elements.has(element.id);
 	        }
 	    };
-	    Manager.prototype.removeElement = function (element) {
-	        return typeof element === "string"
-	            ? this.removeElementByName(element)
-	            : this.removeElementByInstance(element);
-	    };
-	    Manager.prototype.removeElementByName = function (name) {
-	        elementTmp = this.elements.get(name);
-	        if (elementTmp) {
-	            this.elements.delete(name);
-	            elementTmp.usedBy.splice(elementTmp.usedBy.indexOf(this), 1);
-	            this.elementChangeDispatch(Manager.Events.REMOVE, this);
+	    Manager.prototype.remove = function (element) {
+	        if (typeof element === "number" || typeof element === "string") {
+	            elementTmp = this.get(element);
+	            if (elementTmp) {
+	                this.removeInstanceDirectly(elementTmp);
+	            }
+	            return this;
 	        }
-	        return this;
-	    };
-	    Manager.prototype.removeElementByInstance = function (element) {
-	        if (this.elements.has(element.name)) {
-	            this.elements.delete(element.name);
-	            element.usedBy.splice(element.usedBy.indexOf(this), 1);
-	            this.elementChangeDispatch(Manager.Events.REMOVE, this);
+	        if (this.elements.has(element.id)) {
+	            return this.removeInstanceDirectly(element);
 	        }
 	        return this;
 	    };
-	    Manager.prototype.elementChangeDispatch = function (type, eventObject) {
-	        var e_1, _a, e_2, _b;
+	    Manager.prototype.addElementDirectly = function (element) {
+	        this.elements.set(element.id, element);
+	        element.usedBy.push(this);
+	        this.elementChangedFireEvent(Manager.Events.ADD, this);
+	        return this;
+	    };
+	    // 必定有element情况
+	    Manager.prototype.removeInstanceDirectly = function (element) {
+	        this.elements.delete(element.id);
+	        element.usedBy.splice(element.usedBy.indexOf(this), 1);
+	        this.elementChangedFireEvent(Manager.Events.REMOVE, this);
+	        return this;
+	    };
+	    Manager.prototype.elementChangedFireEvent = function (type, eventObject) {
+	        var e_3, _a, e_4, _b;
 	        var _c, _d;
 	        try {
 	            for (var _e = __values(this.usedBy), _f = _e.next(); !_f.done; _f = _e.next()) {
@@ -271,30 +334,30 @@
 	                (_d = (_c = entity).fire) === null || _d === void 0 ? void 0 : _d.call(_c, type, eventObject);
 	                if (entity.usedBy) {
 	                    try {
-	                        for (var _g = (e_2 = void 0, __values(entity.usedBy)), _h = _g.next(); !_h.done; _h = _g.next()) {
+	                        for (var _g = (e_4 = void 0, __values(entity.usedBy)), _h = _g.next(); !_h.done; _h = _g.next()) {
 	                            var manager = _h.value;
 	                            manager.updatedEntities.add(entity);
 	                        }
 	                    }
-	                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+	                    catch (e_4_1) { e_4 = { error: e_4_1 }; }
 	                    finally {
 	                        try {
 	                            if (_h && !_h.done && (_b = _g.return)) _b.call(_g);
 	                        }
-	                        finally { if (e_2) throw e_2.error; }
+	                        finally { if (e_4) throw e_4.error; }
 	                    }
 	                }
 	            }
 	        }
-	        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+	        catch (e_3_1) { e_3 = { error: e_3_1 }; }
 	        finally {
 	            try {
 	                if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
 	            }
-	            finally { if (e_1) throw e_1.error; }
+	            finally { if (e_3) throw e_3.error; }
 	        }
 	    };
-	    Manager.Events = EElementChangeEvent;
+	    Manager.Events = ElementChangeEvent;
 	    return Manager;
 	}(EventFirer__default["default"]));
 
@@ -310,9 +373,65 @@
 	    function ComponentManager() {
 	        var _this = _super !== null && _super.apply(this, arguments) || this;
 	        _this.isComponentManager = true;
-	        _this.usedBy = [];
 	        return _this;
 	    }
+	    ComponentManager.prototype.add = function (element) {
+	        var e_1, _a;
+	        if (this.has(element)) {
+	            return this;
+	        }
+	        var componentSet = this.checkedComponentsWithTargetTags(element);
+	        try {
+	            for (var componentSet_1 = __values(componentSet), componentSet_1_1 = componentSet_1.next(); !componentSet_1_1.done; componentSet_1_1 = componentSet_1.next()) {
+	                var item = componentSet_1_1.value;
+	                this.removeInstanceDirectly(item);
+	            }
+	        }
+	        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+	        finally {
+	            try {
+	                if (componentSet_1_1 && !componentSet_1_1.done && (_a = componentSet_1.return)) _a.call(componentSet_1);
+	            }
+	            finally { if (e_1) throw e_1.error; }
+	        }
+	        return this.addElementDirectly(element);
+	    };
+	    ComponentManager.prototype.getComponentsByTagLabel = function (label) {
+	        var e_2, _a;
+	        var result = [];
+	        try {
+	            for (var _b = __values(this.elements), _c = _b.next(); !_c.done; _c = _b.next()) {
+	                var _d = __read(_c.value, 2), _ = _d[0], component = _d[1];
+	                if (component.hasTagLabel(label)) {
+	                    result.push(component);
+	                }
+	            }
+	        }
+	        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+	        finally {
+	            try {
+	                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+	            }
+	            finally { if (e_2) throw e_2.error; }
+	        }
+	        return result;
+	    };
+	    // 找到所有含目标组件唯一标签一致的组件。只要有任意1个标签符合就行。此处规定名称一致的tag，unique也必须是一致的。且不可修改
+	    ComponentManager.prototype.checkedComponentsWithTargetTags = function (component) {
+	        var result = new Set();
+	        var arr;
+	        for (var i = component.tags.length - 1; i > -1; i--) {
+	            if (component.tags[i].unique) {
+	                arr = this.getComponentsByTagLabel(component.tags[i].label);
+	                if (arr.length) {
+	                    for (var j = arr.length - 1; j > -1; j--) {
+	                        result.add(arr[j]);
+	                    }
+	                }
+	            }
+	        }
+	        return result;
+	    };
 	    return ComponentManager;
 	}(Manager));
 
@@ -336,7 +455,7 @@
 	    }
 	    Entity.prototype.addComponent = function (component) {
 	        if (this.componentManager) {
-	            this.componentManager.addElement(component);
+	            this.componentManager.add(component);
 	        }
 	        else {
 	            throw new Error("Current entity hasn't registered a component manager yet.");
@@ -350,7 +469,7 @@
 	            try {
 	                for (var _b = __values(this.usedBy), _c = _b.next(); !_c.done; _c = _b.next()) {
 	                    var manager = _c.value;
-	                    manager.addElement(entity);
+	                    manager.add(entity);
 	                }
 	            }
 	            catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -364,14 +483,31 @@
 	        return this;
 	    };
 	    Entity.prototype.addTo = function (manager) {
-	        manager.addElement(this);
+	        manager.add(this);
 	        return this;
 	    };
 	    Entity.prototype.addToWorld = function (world) {
 	        if (world.entityManager) {
-	            world.entityManager.addElement(this);
+	            world.entityManager.add(this);
 	        }
 	        return this;
+	    };
+	    Entity.prototype.destroy = function () {
+	        var e_2, _a;
+	        try {
+	            for (var _b = __values(this.usedBy), _c = _b.next(); !_c.done; _c = _b.next()) {
+	                var manager = _c.value;
+	                manager.remove(this);
+	            }
+	        }
+	        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+	        finally {
+	            try {
+	                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+	            }
+	            finally { if (e_2) throw e_2.error; }
+	        }
+	        this.unregisterComponentManager();
 	    };
 	    Entity.prototype.getComponent = function (name) {
 	        return this.componentManager ? this.componentManager.get(name) : null;
@@ -389,30 +525,33 @@
 	        return this;
 	    };
 	    Entity.prototype.removeChild = function (entity) {
-	        var e_2, _a;
+	        var e_3, _a;
 	        _super.prototype.removeChild.call(this, entity);
 	        if (this.usedBy) {
 	            try {
 	                for (var _b = __values(this.usedBy), _c = _b.next(); !_c.done; _c = _b.next()) {
 	                    var manager = _c.value;
-	                    manager.removeElement(entity);
+	                    manager.remove(entity);
 	                }
 	            }
-	            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+	            catch (e_3_1) { e_3 = { error: e_3_1 }; }
 	            finally {
 	                try {
 	                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
 	                }
-	                finally { if (e_2) throw e_2.error; }
+	                finally { if (e_3) throw e_3.error; }
 	            }
 	        }
 	        return this;
 	    };
 	    Entity.prototype.removeComponent = function (component) {
 	        if (this.componentManager) {
-	            this.componentManager.removeElement(component);
+	            this.componentManager.remove(component);
 	        }
 	        return this;
+	    };
+	    Entity.prototype.serialize = function () {
+	        return {};
 	    };
 	    Entity.prototype.unregisterComponentManager = function () {
 	        if (this.componentManager) {
@@ -425,8 +564,6 @@
 	    return Entity;
 	}(TreeNodeWithEvent));
 
-	// 私有全局变量，外部无法访问
-	var entityTmp;
 	var EntityManager = /** @class */ (function (_super) {
 	    __extends(EntityManager, _super);
 	    function EntityManager(world) {
@@ -440,15 +577,20 @@
 	        }
 	        return _this;
 	    }
-	    EntityManager.prototype.addElementDirect = function (entity) {
+	    EntityManager.prototype.createEntity = function (name) {
+	        var entity = new Entity(name);
+	        this.add(entity);
+	        return entity;
+	    };
+	    EntityManager.prototype.addElementDirectly = function (entity) {
 	        var e_1, _a;
-	        _super.prototype.addElementDirect.call(this, entity);
+	        _super.prototype.addElementDirectly.call(this, entity);
 	        this.updatedEntities.add(entity);
 	        try {
 	            for (var _b = __values(entity.children), _c = _b.next(); !_c.done; _c = _b.next()) {
 	                var child = _c.value;
 	                if (child) {
-	                    this.addElement(child);
+	                    this.add(child);
 	                }
 	            }
 	        }
@@ -461,60 +603,29 @@
 	        }
 	        return this;
 	    };
-	    EntityManager.prototype.createEntity = function (name) {
-	        var entity = new Entity(name);
-	        this.addElement(entity);
-	        return entity;
-	    };
-	    EntityManager.prototype.removeElementByName = function (name) {
+	    EntityManager.prototype.removeInstanceDirectly = function (entity) {
 	        var e_2, _a;
-	        entityTmp = this.elements.get(name);
-	        if (entityTmp) {
-	            _super.prototype.removeElementByName.call(this, name);
-	            this.deleteEntityFromSystemSet(entityTmp);
-	            try {
-	                for (var _b = __values(entityTmp === null || entityTmp === void 0 ? void 0 : entityTmp.children), _c = _b.next(); !_c.done; _c = _b.next()) {
-	                    var child = _c.value;
-	                    if (child) {
-	                        this.removeElementByInstance(child);
-	                    }
+	        _super.prototype.removeInstanceDirectly.call(this, entity);
+	        this.deleteEntityFromSystemSet(entity);
+	        try {
+	            for (var _b = __values(entity.children), _c = _b.next(); !_c.done; _c = _b.next()) {
+	                var child = _c.value;
+	                if (child) {
+	                    this.remove(child);
 	                }
-	            }
-	            catch (e_2_1) { e_2 = { error: e_2_1 }; }
-	            finally {
-	                try {
-	                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-	                }
-	                finally { if (e_2) throw e_2.error; }
 	            }
 	        }
-	        return this;
-	    };
-	    EntityManager.prototype.removeElementByInstance = function (entity) {
-	        var e_3, _a;
-	        if (this.elements.has(entity.name)) {
-	            _super.prototype.removeElementByInstance.call(this, entity);
-	            this.deleteEntityFromSystemSet(entity);
+	        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+	        finally {
 	            try {
-	                for (var _b = __values(entity.children), _c = _b.next(); !_c.done; _c = _b.next()) {
-	                    var child = _c.value;
-	                    if (child) {
-	                        this.removeElementByInstance(child);
-	                    }
-	                }
+	                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
 	            }
-	            catch (e_3_1) { e_3 = { error: e_3_1 }; }
-	            finally {
-	                try {
-	                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-	                }
-	                finally { if (e_3) throw e_3.error; }
-	            }
+	            finally { if (e_2) throw e_2.error; }
 	        }
 	        return this;
 	    };
 	    EntityManager.prototype.deleteEntityFromSystemSet = function (entity) {
-	        var e_4, _a;
+	        var e_3, _a;
 	        var _this = this;
 	        entity.usedBy.splice(entity.usedBy.indexOf(this), 1);
 	        try {
@@ -529,23 +640,24 @@
 	                }
 	            }
 	        }
-	        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+	        catch (e_3_1) { e_3 = { error: e_3_1 }; }
 	        finally {
 	            try {
 	                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
 	            }
-	            finally { if (e_4) throw e_4.error; }
+	            finally { if (e_3) throw e_3.error; }
 	        }
 	    };
 	    return EntityManager;
 	}(Manager));
 
 	var systemTmp;
-	var ESystemEvent;
-	(function (ESystemEvent) {
-	    ESystemEvent["BEFORE_RUN"] = "beforeRun";
-	    ESystemEvent["AFTER_RUN"] = "afterRun";
-	})(ESystemEvent || (ESystemEvent = {}));
+	var SystemEvent = {
+	    ADD: "add",
+	    AFTER_RUN: "afterRun",
+	    BEFORE_RUN: "beforeRun",
+	    REMOVE: "remove"
+	};
 	var SystemManager = /** @class */ (function (_super) {
 	    __extends(SystemManager, _super);
 	    function SystemManager(world) {
@@ -559,8 +671,8 @@
 	        }
 	        return _this;
 	    }
-	    SystemManager.prototype.addElement = function (system) {
-	        _super.prototype.addElement.call(this, system);
+	    SystemManager.prototype.add = function (system) {
+	        _super.prototype.add.call(this, system);
 	        this.updateSystemEntitySetByAddFromManager(system);
 	        return this;
 	    };
@@ -568,27 +680,25 @@
 	        this.elements.clear();
 	        return this;
 	    };
-	    SystemManager.prototype.removeByName = function (name) {
-	        systemTmp = this.elements.get(name);
-	        if (systemTmp) {
-	            this.elements.delete(name);
-	            this.updateSystemEntitySetByRemovedFromManager(systemTmp);
-	            systemTmp.usedBy.splice(systemTmp.usedBy.indexOf(this), 1);
+	    SystemManager.prototype.remove = function (element) {
+	        if (typeof element === "number" || typeof element === "string") {
+	            systemTmp = this.get(element);
+	            if (systemTmp) {
+	                this.removeInstanceDirectly(systemTmp);
+	                this.updateSystemEntitySetByRemovedFromManager(systemTmp);
+	                systemTmp.usedBy.splice(systemTmp.usedBy.indexOf(this), 1);
+	            }
+	            return this;
 	        }
-	        return this;
-	    };
-	    SystemManager.prototype.removeByInstance = function (system) {
-	        if (this.elements.has(system.name)) {
-	            this.elements.delete(system.name);
-	            this.updateSystemEntitySetByRemovedFromManager(system);
-	            system.usedBy.splice(system.usedBy.indexOf(this), 1);
+	        if (this.elements.has(element.id)) {
+	            this.removeInstanceDirectly(element);
+	            this.updateSystemEntitySetByRemovedFromManager(element);
+	            element.usedBy.splice(element.usedBy.indexOf(this), 1);
 	        }
 	        return this;
 	    };
 	    SystemManager.prototype.run = function (world) {
-	        SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
-	        SystemManager.eventObject.manager = this;
-	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+	        this.fire(SystemManager.Events.BEFORE_RUN, this);
 	        this.elements.forEach(function (item) {
 	            item.checkUpdatedEntities(world.entityManager);
 	            if (!item.disabled) {
@@ -599,8 +709,7 @@
 	            world.entityManager.updatedEntities.clear();
 	        }
 	        this.loopTimes++;
-	        SystemManager.eventObject.eventKey = SystemManager.AFTER_RUN;
-	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+	        this.fire(SystemManager.Events.BEFORE_RUN, this);
 	        return this;
 	    };
 	    SystemManager.prototype.updateSystemEntitySetByRemovedFromManager = function (system) {
@@ -641,13 +750,7 @@
 	        }
 	        return this;
 	    };
-	    SystemManager.AFTER_RUN = ESystemEvent.AFTER_RUN;
-	    SystemManager.BEFORE_RUN = ESystemEvent.BEFORE_RUN;
-	    SystemManager.eventObject = {
-	        eventKey: null,
-	        manager: null,
-	        target: null
-	    };
+	    SystemManager.Events = SystemEvent;
 	    return SystemManager;
 	}(Manager));
 
@@ -655,9 +758,11 @@
 	var World = /** @class */ (function () {
 	    function World(name, entityManager, systemManager) {
 	        if (name === void 0) { name = ""; }
+	        this.disabled = false;
 	        this.entityManager = null;
 	        this.systemManager = null;
 	        this.store = new Map();
+	        this.usedBy = [];
 	        this.id = IdGeneratorInstance.next();
 	        this.isWorld = true;
 	        this.name = name;
@@ -674,7 +779,7 @@
 	    };
 	    World.prototype.addEntity = function (entity) {
 	        if (this.entityManager) {
-	            this.entityManager.addElement(entity);
+	            this.entityManager.add(entity);
 	        }
 	        else {
 	            throw new Error("The world doesn't have an entityManager yet.");
@@ -683,7 +788,7 @@
 	    };
 	    World.prototype.addSystem = function (system) {
 	        if (this.systemManager) {
-	            this.systemManager.addElement(system);
+	            this.systemManager.add(system);
 	        }
 	        else {
 	            throw new Error("The world doesn't have a systemManager yet.");
@@ -738,21 +843,31 @@
 	    };
 	    World.prototype.removeEntity = function (entity) {
 	        if (this.entityManager) {
-	            this.entityManager.removeElement(entity);
+	            this.entityManager.remove(entity);
 	        }
 	        return this;
 	    };
 	    World.prototype.removeSystem = function (system) {
 	        if (this.systemManager) {
-	            this.systemManager.removeElement(system);
+	            this.systemManager.remove(system);
 	        }
 	        return this;
 	    };
 	    World.prototype.run = function () {
+	        if (this.disabled) {
+	            return this;
+	        }
 	        if (this.systemManager) {
 	            this.systemManager.run(this);
 	        }
 	        return this;
+	    };
+	    World.prototype.serialize = function () {
+	        return {
+	            id: this.id,
+	            name: this.name,
+	            type: "world"
+	        };
 	    };
 	    World.prototype.unregisterEntityManager = function () {
 	        if (this.entityManager) {

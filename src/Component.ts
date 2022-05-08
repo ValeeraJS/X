@@ -33,7 +33,18 @@ export default class Component<T> implements IComponent<T> {
 	}
 
 	public clone(): IComponent<T> {
-		return new Component(this.name, this.data);
+		return new Component(this.name, this.data, this.tags);
+	}
+
+	// 此处为只要tag标签相同就是同一类
+	public hasTagLabel(label: string): boolean {
+		for (let i = this.tags.length - 1; i > -1; i--) {
+			if (this.tags[i].label === label) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public serialize(): any {

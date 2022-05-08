@@ -1,4 +1,4 @@
-import IComponent from "./interfaces/IComponent";
+import IComponent, { ComponentTag } from "./interfaces/IComponent";
 import { ISerializedJson } from "./interfaces/ISerializable";
 export interface IComponentSerializedJson<T> extends ISerializedJson {
     data: T;
@@ -14,7 +14,9 @@ export default class Component<T> implements IComponent<T> {
     name: string;
     usedBy: never[];
     dirty: boolean;
-    constructor(name: string, data: T);
+    tags: ComponentTag[];
+    constructor(name: string, data: T, tags?: ComponentTag[]);
     clone(): IComponent<T>;
+    hasTagLabel(label: string): boolean;
     serialize(): any;
 }

@@ -25,7 +25,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 
 	public addComponent(component: IComponent<any>): this {
 		if (this.componentManager) {
-			this.componentManager.addElement(component);
+			this.componentManager.add(component);
 		} else {
 			throw new Error("Current entity hasn't registered a component manager yet.");
 		}
@@ -38,7 +38,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 
 		if (this.usedBy) {
 			for (const manager of this.usedBy) {
-				manager.addElement(entity);
+				manager.add(entity);
 			}
 		}
 
@@ -46,14 +46,14 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 	}
 
 	public addTo(manager: IEntityManager): this {
-		manager.addElement(this);
+		manager.add(this);
 
 		return this;
 	}
 
 	public addToWorld(world: IWorld): this {
 		if (world.entityManager) {
-			world.entityManager.addElement(this);
+			world.entityManager.add(this);
 		}
 
 		return this;
@@ -61,7 +61,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 
 	public destroy(): void {
 		for (const manager of this.usedBy) {
-			manager.removeElement(this);
+			manager.remove(this);
 		}
 		this.unregisterComponentManager();
 	}
@@ -89,7 +89,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 
 		if (this.usedBy) {
 			for (const manager of this.usedBy) {
-				manager.removeElement(entity);
+				manager.remove(entity);
 			}
 		}
 
@@ -98,10 +98,14 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 
 	public removeComponent(component: IComponent<any> | string): this {
 		if (this.componentManager) {
-			this.componentManager.removeElement(component);
+			this.componentManager.remove(component);
 		}
 
 		return this;
+	}
+
+	public serialize(): any {
+		return {};
 	}
 
 	public unregisterComponentManager(): this {

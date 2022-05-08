@@ -1,8 +1,5 @@
 import IComponent from "./interfaces/IComponent";
 import IComponentManager from "./interfaces/IComponentManager";
-import IEntity from "./interfaces/IEntity";
-// import { IdGeneratorInstance } from "./Global";
-// import IEntity from "./interfaces/IEntity";
 import Manager from "./Manager";
 
 // 私有全局变量，外部无法访问
@@ -25,5 +22,50 @@ export default class ComponentManager
 	implements IComponentManager
 {
 	public isComponentManager = true;
-	public usedBy: IEntity[] = [];
+
+	public add(element: IComponent<any>): this {
+		if (this.has(element)) {
+			return this;
+		}
+
+		const componentSet = this.checkedComponentsWithTargetTags(element);
+
+		for (const item of componentSet) {
+			this.removeInstanceDirectly(item);
+		}
+
+		return this.addElementDirectly(element);
+	}
+
+	public getComponentsByTagLabel(label: string): IComponent<any>[] {
+		const result: IComponent<any>[] = [];
+
+		for (const [_, component] of this.elements) {
+			if (component.hasTagLabel(label)) {
+				result.push(component);
+			}
+		}
+
+		return result;
+	}
+
+	// 找到所有含目标组件唯一标签一致的组件。只要有任意1个标签符合就行。此处规定名称一致的tag，unique也必须是一致的。且不可修改
+	private checkedComponentsWithTargetTags(component: IComponent<any>): Set<IComponent<any>> {
+		const result: Set<IComponent<any>> = new Set();
+		let arr: IComponent<any>[];
+
+		for (let i = component.tags.length - 1; i > -1; i--) {
+			if (component.tags[i].unique) {
+				arr = this.getComponentsByTagLabel(component.tags[i].label);
+
+				if (arr.length) {
+					for (let j = arr.length - 1; j > -1; j--) {
+						result.add(arr[j]);
+					}
+				}
+			}
+		}
+
+		return result;
+	}
 }

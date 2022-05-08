@@ -1,34 +1,22 @@
-// import EventDispatcher from "@valeera/eventdispatcher";
-// import { mixin } from "@valeera/eventdispatcher/src/EventFirer";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
 import Manager from "./Manager";
 
-let systemTmp: ISystem | undefined;
+let systemTmp: ISystem | undefined | null;
 
-export enum ESystemEvent {
-	BEFORE_RUN = "beforeRun",
-	AFTER_RUN = "afterRun"
-}
-
-export interface ISystemEventObject {
-	eventKey: ESystemEvent;
-	manager: ISystemManager;
-	target: ISystem;
-}
+export const SystemEvent = {
+	ADD: "add",
+	AFTER_RUN: "afterRun",
+	BEFORE_RUN: "beforeRun",
+	REMOVE: "remove"
+};
 
 export default class SystemManager extends Manager<ISystem> implements ISystemManager {
-	public static readonly AFTER_RUN: ESystemEvent = ESystemEvent.AFTER_RUN;
-	public static readonly BEFORE_RUN: ESystemEvent = ESystemEvent.BEFORE_RUN;
-	private static eventObject: ISystemEventObject = {
-		eventKey: null as any,
-		manager: null as any,
-		target: null as any
-	};
+	public static readonly Events = SystemEvent;
 
 	public disabled = false;
-	public elements: Map<string, ISystem> = new Map();
+	public elements: Map<number, ISystem> = new Map();
 	public loopTimes = 0;
 	public usedBy: IWorld[] = [];
 
@@ -39,8 +27,8 @@ export default class SystemManager extends Manager<ISystem> implements ISystemMa
 		}
 	}
 
-	public addElement(system: ISystem): this {
-		super.addElement(system);
+	public add(system: ISystem): this {
+		super.add(system);
 		this.updateSystemEntitySetByAddFromManager(system);
 
 		return this;
@@ -52,31 +40,29 @@ export default class SystemManager extends Manager<ISystem> implements ISystemMa
 		return this;
 	}
 
-	public removeByName(name: string): this {
-		systemTmp = this.elements.get(name);
-		if (systemTmp) {
-			this.elements.delete(name);
-			this.updateSystemEntitySetByRemovedFromManager(systemTmp);
-			systemTmp.usedBy.splice(systemTmp.usedBy.indexOf(this), 1);
+	public remove(element: ISystem | string | number): this {
+		if (typeof element === "number" || typeof element === "string") {
+			systemTmp = this.get(element);
+			if (systemTmp) {
+				this.removeInstanceDirectly(systemTmp);
+				this.updateSystemEntitySetByRemovedFromManager(systemTmp);
+				systemTmp.usedBy.splice(systemTmp.usedBy.indexOf(this), 1);
+			}
+
+			return this;
 		}
 
-		return this;
-	}
-
-	public removeByInstance(system: ISystem): this {
-		if (this.elements.has(system.name)) {
-			this.elements.delete(system.name);
-			this.updateSystemEntitySetByRemovedFromManager(system);
-			system.usedBy.splice(system.usedBy.indexOf(this), 1);
+		if (this.elements.has(element.id)) {
+			this.removeInstanceDirectly(element);
+			this.updateSystemEntitySetByRemovedFromManager(element);
+			element.usedBy.splice(element.usedBy.indexOf(this), 1);
 		}
 
 		return this;
 	}
 
 	public run(world: IWorld): this {
-		SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
-		SystemManager.eventObject.manager = this;
-		this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+		this.fire(SystemManager.Events.BEFORE_RUN, this);
 
 		this.elements.forEach((item) => {
 			item.checkUpdatedEntities(world.entityManager);
@@ -89,8 +75,7 @@ export default class SystemManager extends Manager<ISystem> implements ISystemMa
 		}
 		this.loopTimes++;
 
-		SystemManager.eventObject.eventKey = SystemManager.AFTER_RUN;
-		this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+		this.fire(SystemManager.Events.BEFORE_RUN, this);
 
 		return this;
 	}

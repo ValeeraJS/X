@@ -1,6 +1,5 @@
 import IComponent from "./interfaces/IComponent";
 import IComponentManager from "./interfaces/IComponentManager";
-import IEntity from "./interfaces/IEntity";
 import Manager from "./Manager";
 export declare enum EComponentEvent {
     ADD_COMPONENT = "addComponent",
@@ -14,5 +13,7 @@ export interface ComponentEventObject {
 }
 export default class ComponentManager extends Manager<IComponent<any>> implements IComponentManager {
     isComponentManager: boolean;
-    usedBy: IEntity[];
+    add(element: IComponent<any>): this;
+    getComponentsByTagLabel(label: string): IComponent<any>[];
+    private checkedComponentsWithTargetTags;
 }

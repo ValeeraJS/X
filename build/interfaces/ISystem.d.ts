@@ -3,7 +3,7 @@ import IECSObject from "./IECSObject";
 import IEntity from "./IEntity";
 import IEntityManager from "./IEntityManager";
 import ISystemManager from "./ISystemManager";
-export default interface ISystem extends IECSObject {
+export default interface ISystem extends IECSObject<ISystem> {
     entitySet: WeakMap<IEntityManager, Set<IEntity>>;
     loopTimes: number;
     usedBy: ISystemManager[];

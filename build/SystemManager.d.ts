@@ -2,28 +2,27 @@ import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
 import Manager from "./Manager";
-export declare enum ESystemEvent {
-    BEFORE_RUN = "beforeRun",
-    AFTER_RUN = "afterRun"
-}
-export interface ISystemEventObject {
-    eventKey: ESystemEvent;
-    manager: ISystemManager;
-    target: ISystem;
-}
+export declare const SystemEvent: {
+    ADD: string;
+    AFTER_RUN: string;
+    BEFORE_RUN: string;
+    REMOVE: string;
+};
 export default class SystemManager extends Manager<ISystem> implements ISystemManager {
-    static readonly AFTER_RUN: ESystemEvent;
-    static readonly BEFORE_RUN: ESystemEvent;
-    private static eventObject;
+    static readonly Events: {
+        ADD: string;
+        AFTER_RUN: string;
+        BEFORE_RUN: string;
+        REMOVE: string;
+    };
     disabled: boolean;
-    elements: Map<string, ISystem>;
+    elements: Map<number, ISystem>;
     loopTimes: number;
     usedBy: IWorld[];
     constructor(world?: IWorld);
-    addElement(system: ISystem): this;
+    add(system: ISystem): this;
     clear(): this;
-    removeByName(name: string): this;
-    removeByInstance(system: ISystem): this;
+    remove(element: ISystem | string | number): this;
     run(world: IWorld): this;
     private updateSystemEntitySetByRemovedFromManager;
     private updateSystemEntitySetByAddFromManager;

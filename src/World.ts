@@ -10,10 +10,12 @@ import SystemManager from "./SystemManager";
 let arr: any[];
 
 export default class World implements IWorld {
+	public disabled = false;
 	public name: string;
 	public entityManager: IEntityManager | null = null;
 	public systemManager: ISystemManager | null = null;
 	public store: Map<string, any> = new Map();
+	public usedBy = [];
 
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isWorld = true;
@@ -34,7 +36,7 @@ export default class World implements IWorld {
 
 	public addEntity(entity: IEntity): this {
 		if (this.entityManager) {
-			this.entityManager.addElement(entity);
+			this.entityManager.add(entity);
 		} else {
 			throw new Error("The world doesn't have an entityManager yet.");
 		}
@@ -44,7 +46,7 @@ export default class World implements IWorld {
 
 	public addSystem(system: ISystem): this {
 		if (this.systemManager) {
-			this.systemManager.addElement(system);
+			this.systemManager.add(system);
 		} else {
 			throw new Error("The world doesn't have a systemManager yet.");
 		}
@@ -110,7 +112,7 @@ export default class World implements IWorld {
 
 	public removeEntity(entity: IEntity): this {
 		if (this.entityManager) {
-			this.entityManager.removeElement(entity);
+			this.entityManager.remove(entity);
 		}
 
 		return this;
@@ -118,18 +120,29 @@ export default class World implements IWorld {
 
 	public removeSystem(system: ISystem | string): this {
 		if (this.systemManager) {
-			this.systemManager.removeElement(system);
+			this.systemManager.remove(system);
 		}
 
 		return this;
 	}
 
 	public run(): this {
+		if (this.disabled) {
+			return this;
+		}
 		if (this.systemManager) {
 			this.systemManager.run(this);
 		}
 
 		return this;
+	}
+
+	public serialize(): any {
+		return {
+			id: this.id,
+			name: this.name,
+			type: "world"
+		};
 	}
 
 	public unregisterEntityManager(): this {

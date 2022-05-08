@@ -1,5 +1,8 @@
 export default interface ISerializable {
-    serialize(): any;
+    readonly id: number;
+    serialize: () => {
+        [key: string]: any;
+    };
 }
 export interface ISerializedJson {
     type: any;

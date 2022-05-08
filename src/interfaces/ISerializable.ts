@@ -1,5 +1,5 @@
 export default interface ISerializable {
-	id: number;
+	readonly id: number;
 	serialize: () => { [key: string]: any };
 }
 

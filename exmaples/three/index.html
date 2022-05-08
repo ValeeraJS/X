@@ -42,7 +42,7 @@
 		<script>
 			class RotationComponent extends X.Component {
 				constructor(speed) {
-					super("rotationSpeed", speed);
+					super("rotationSpeed", speed, [{ label: "rotation", unique: true }]);
 				}
 			}
 

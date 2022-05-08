@@ -85,9 +85,12 @@
 	        }
 	        return this;
 	    }
+	    serialize() {
+	        return {};
+	    }
 	    destroy() {
 	        for (let i = this.usedBy.length - 1; i > -1; i--) {
-	            this.usedBy[i].removeElement(this);
+	            this.usedBy[i].remove(this);
 	        }
 	        return this;
 	    }
@@ -118,18 +121,31 @@
 	    name;
 	    usedBy = [];
 	    dirty = false;
-	    constructor(name, data) {
+	    tags;
+	    constructor(name, data, tags = []) {
 	        this.name = name;
 	        this.data = data;
+	        this.tags = tags;
 	    }
 	    clone() {
-	        return new Component(this.name, this.data);
+	        return new Component(this.name, this.data, this.tags);
+	    }
+	    // 此处为只要tag标签相同就是同一类
+	    hasTagLabel(label) {
+	        for (let i = this.tags.length - 1; i > -1; i--) {
+	            if (this.tags[i].label === label) {
+	                return true;
+	            }
+	        }
+	        return false;
 	    }
 	    serialize() {
 	        return {
 	            data: this.data,
 	            disabled: this.disabled,
+	            id: this.id,
 	            name: this.name,
+	            tags: this.tags,
 	            type: "component"
 	        };
 	    }
@@ -137,74 +153,82 @@
 
 	// 私有全局变量，外部无法访问
 	let elementTmp;
-	var EElementChangeEvent;
-	(function (EElementChangeEvent) {
-	    EElementChangeEvent["ADD"] = "add";
-	    EElementChangeEvent["REMOVE"] = "remove";
-	})(EElementChangeEvent || (EElementChangeEvent = {}));
+	const ElementChangeEvent = {
+	    ADD: "add",
+	    REMOVE: "remove"
+	};
 	class Manager extends EventFirer__default["default"] {
-	    static Events = EElementChangeEvent;
-	    // private static eventObject: EventObject = {
-	    // 	component: null as any,
-	    // 	element: null as any,
-	    // 	eventKey: null as any,
-	    // 	manager: null as any
-	    // };
+	    static Events = ElementChangeEvent;
 	    elements = new Map();
 	    disabled = false;
 	    usedBy = [];
 	    isManager = true;
-	    addElement(element) {
+	    add(element) {
 	        if (this.has(element)) {
-	            this.removeElementByInstance(element);
+	            return this;
 	        }
-	        return this.addElementDirect(element);
-	    }
-	    addElementDirect(element) {
-	        this.elements.set(element.name, element);
-	        element.usedBy.push(this);
-	        this.elementChangeDispatch(Manager.Events.ADD, this);
-	        return this;
+	        return this.addElementDirectly(element);
 	    }
 	    clear() {
 	        this.elements.clear();
 	        return this;
 	    }
 	    get(name) {
-	        elementTmp = this.elements.get(name);
-	        return elementTmp ? elementTmp : null;
+	        if (typeof name === "number") {
+	            return this.elements.get(name) || null;
+	        }
+	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+	        for (const [_, item] of this.elements) {
+	            if (item.name === name) {
+	                return item;
+	            }
+	        }
+	        return null;
 	    }
 	    has(element) {
-	        if (typeof element === "string") {
+	        if (typeof element === "number") {
 	            return this.elements.has(element);
 	        }
+	        else if (typeof element === "string") {
+	            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+	            for (const [_, item] of this.elements) {
+	                if (item.name === element) {
+	                    return true;
+	                }
+	            }
+	            return false;
+	        }
 	        else {
-	            return this.elements.has(element.name);
+	            return this.elements.has(element.id);
 	        }
 	    }
-	    removeElement(element) {
-	        return typeof element === "string"
-	            ? this.removeElementByName(element)
-	            : this.removeElementByInstance(element);
-	    }
-	    removeElementByName(name) {
-	        elementTmp = this.elements.get(name);
-	        if (elementTmp) {
-	            this.elements.delete(name);
-	            elementTmp.usedBy.splice(elementTmp.usedBy.indexOf(this), 1);
-	            this.elementChangeDispatch(Manager.Events.REMOVE, this);
+	    remove(element) {
+	        if (typeof element === "number" || typeof element === "string") {
+	            elementTmp = this.get(element);
+	            if (elementTmp) {
+	                this.removeInstanceDirectly(elementTmp);
+	            }
+	            return this;
 	        }
-	        return this;
-	    }
-	    removeElementByInstance(element) {
-	        if (this.elements.has(element.name)) {
-	            this.elements.delete(element.name);
-	            element.usedBy.splice(element.usedBy.indexOf(this), 1);
-	            this.elementChangeDispatch(Manager.Events.REMOVE, this);
+	        if (this.elements.has(element.id)) {
+	            return this.removeInstanceDirectly(element);
 	        }
 	        return this;
 	    }
-	    elementChangeDispatch(type, eventObject) {
+	    addElementDirectly(element) {
+	        this.elements.set(element.id, element);
+	        element.usedBy.push(this);
+	        this.elementChangedFireEvent(Manager.Events.ADD, this);
+	        return this;
+	    }
+	    // 必定有element情况
+	    removeInstanceDirectly(element) {
+	        this.elements.delete(element.id);
+	        element.usedBy.splice(element.usedBy.indexOf(this), 1);
+	        this.elementChangedFireEvent(Manager.Events.REMOVE, this);
+	        return this;
+	    }
+	    elementChangedFireEvent(type, eventObject) {
 	        for (const entity of this.usedBy) {
 	            entity.fire?.(type, eventObject);
 	            if (entity.usedBy) {
@@ -216,7 +240,6 @@
 	    }
 	}
 
-	// import { IdGeneratorInstance } from "./Global";
 	// 私有全局变量，外部无法访问
 	// let componentTmp: IComponent<any> | undefined;
 	var EComponentEvent;
@@ -226,7 +249,41 @@
 	})(EComponentEvent || (EComponentEvent = {}));
 	class ComponentManager extends Manager {
 	    isComponentManager = true;
-	    usedBy = [];
+	    add(element) {
+	        if (this.has(element)) {
+	            return this;
+	        }
+	        const componentSet = this.checkedComponentsWithTargetTags(element);
+	        for (const item of componentSet) {
+	            this.removeInstanceDirectly(item);
+	        }
+	        return this.addElementDirectly(element);
+	    }
+	    getComponentsByTagLabel(label) {
+	        const result = [];
+	        for (const [_, component] of this.elements) {
+	            if (component.hasTagLabel(label)) {
+	                result.push(component);
+	            }
+	        }
+	        return result;
+	    }
+	    // 找到所有含目标组件唯一标签一致的组件。只要有任意1个标签符合就行。此处规定名称一致的tag，unique也必须是一致的。且不可修改
+	    checkedComponentsWithTargetTags(component) {
+	        const result = new Set();
+	        let arr;
+	        for (let i = component.tags.length - 1; i > -1; i--) {
+	            if (component.tags[i].unique) {
+	                arr = this.getComponentsByTagLabel(component.tags[i].label);
+	                if (arr.length) {
+	                    for (let j = arr.length - 1; j > -1; j--) {
+	                        result.add(arr[j]);
+	                    }
+	                }
+	            }
+	        }
+	        return result;
+	    }
 	}
 
 	const TreeNodeWithEvent = EventFirer.mixin(tree.TreeNode);
@@ -246,7 +303,7 @@
 	    }
 	    addComponent(component) {
 	        if (this.componentManager) {
-	            this.componentManager.addElement(component);
+	            this.componentManager.add(component);
 	        }
 	        else {
 	            throw new Error("Current entity hasn't registered a component manager yet.");
@@ -257,20 +314,26 @@
 	        super.addChild(entity);
 	        if (this.usedBy) {
 	            for (const manager of this.usedBy) {
-	                manager.addElement(entity);
+	                manager.add(entity);
 	            }
 	        }
 	        return this;
 	    }
 	    addTo(manager) {
-	        manager.addElement(this);
+	        manager.add(this);
 	        return this;
 	    }
 	    addToWorld(world) {
 	        if (world.entityManager) {
-	            world.entityManager.addElement(this);
+	            world.entityManager.add(this);
 	        }
 	        return this;
+	    }
+	    destroy() {
+	        for (const manager of this.usedBy) {
+	            manager.remove(this);
+	        }
+	        this.unregisterComponentManager();
 	    }
 	    getComponent(name) {
 	        return this.componentManager ? this.componentManager.get(name) : null;
@@ -290,16 +353,19 @@
 	        super.removeChild(entity);
 	        if (this.usedBy) {
 	            for (const manager of this.usedBy) {
-	                manager.removeElement(entity);
+	                manager.remove(entity);
 	            }
 	        }
 	        return this;
 	    }
 	    removeComponent(component) {
 	        if (this.componentManager) {
-	            this.componentManager.removeElement(component);
+	            this.componentManager.remove(component);
 	        }
 	        return this;
+	    }
+	    serialize() {
+	        return {};
 	    }
 	    unregisterComponentManager() {
 	        if (this.componentManager) {
@@ -311,8 +377,6 @@
 	    }
 	}
 
-	// 私有全局变量，外部无法访问
-	let entityTmp;
 	class EntityManager extends Manager {
 	    // public elements: Map<string, IEntity> = new Map();
 	    data = null;
@@ -324,42 +388,27 @@
 	            this.usedBy.push(world);
 	        }
 	    }
-	    addElementDirect(entity) {
-	        super.addElementDirect(entity);
+	    createEntity(name) {
+	        const entity = new Entity(name);
+	        this.add(entity);
+	        return entity;
+	    }
+	    addElementDirectly(entity) {
+	        super.addElementDirectly(entity);
 	        this.updatedEntities.add(entity);
 	        for (const child of entity.children) {
 	            if (child) {
-	                this.addElement(child);
+	                this.add(child);
 	            }
 	        }
 	        return this;
 	    }
-	    createEntity(name) {
-	        const entity = new Entity(name);
-	        this.addElement(entity);
-	        return entity;
-	    }
-	    removeElementByName(name) {
-	        entityTmp = this.elements.get(name);
-	        if (entityTmp) {
-	            super.removeElementByName(name);
-	            this.deleteEntityFromSystemSet(entityTmp);
-	            for (const child of entityTmp?.children) {
-	                if (child) {
-	                    this.removeElementByInstance(child);
-	                }
-	            }
-	        }
-	        return this;
-	    }
-	    removeElementByInstance(entity) {
-	        if (this.elements.has(entity.name)) {
-	            super.removeElementByInstance(entity);
-	            this.deleteEntityFromSystemSet(entity);
-	            for (const child of entity.children) {
-	                if (child) {
-	                    this.removeElementByInstance(child);
-	                }
+	    removeInstanceDirectly(entity) {
+	        super.removeInstanceDirectly(entity);
+	        this.deleteEntityFromSystemSet(entity);
+	        for (const child of entity.children) {
+	            if (child) {
+	                this.remove(child);
 	            }
 	        }
 	        return this;
@@ -379,19 +428,14 @@
 	}
 
 	let systemTmp;
-	var ESystemEvent;
-	(function (ESystemEvent) {
-	    ESystemEvent["BEFORE_RUN"] = "beforeRun";
-	    ESystemEvent["AFTER_RUN"] = "afterRun";
-	})(ESystemEvent || (ESystemEvent = {}));
+	const SystemEvent = {
+	    ADD: "add",
+	    AFTER_RUN: "afterRun",
+	    BEFORE_RUN: "beforeRun",
+	    REMOVE: "remove"
+	};
 	class SystemManager extends Manager {
-	    static AFTER_RUN = ESystemEvent.AFTER_RUN;
-	    static BEFORE_RUN = ESystemEvent.BEFORE_RUN;
-	    static eventObject = {
-	        eventKey: null,
-	        manager: null,
-	        target: null
-	    };
+	    static Events = SystemEvent;
 	    disabled = false;
 	    elements = new Map();
 	    loopTimes = 0;
@@ -402,8 +446,8 @@
 	            this.usedBy.push(world);
 	        }
 	    }
-	    addElement(system) {
-	        super.addElement(system);
+	    add(system) {
+	        super.add(system);
 	        this.updateSystemEntitySetByAddFromManager(system);
 	        return this;
 	    }
@@ -411,27 +455,25 @@
 	        this.elements.clear();
 	        return this;
 	    }
-	    removeByName(name) {
-	        systemTmp = this.elements.get(name);
-	        if (systemTmp) {
-	            this.elements.delete(name);
-	            this.updateSystemEntitySetByRemovedFromManager(systemTmp);
-	            systemTmp.usedBy.splice(systemTmp.usedBy.indexOf(this), 1);
+	    remove(element) {
+	        if (typeof element === "number" || typeof element === "string") {
+	            systemTmp = this.get(element);
+	            if (systemTmp) {
+	                this.removeInstanceDirectly(systemTmp);
+	                this.updateSystemEntitySetByRemovedFromManager(systemTmp);
+	                systemTmp.usedBy.splice(systemTmp.usedBy.indexOf(this), 1);
+	            }
+	            return this;
 	        }
-	        return this;
-	    }
-	    removeByInstance(system) {
-	        if (this.elements.has(system.name)) {
-	            this.elements.delete(system.name);
-	            this.updateSystemEntitySetByRemovedFromManager(system);
-	            system.usedBy.splice(system.usedBy.indexOf(this), 1);
+	        if (this.elements.has(element.id)) {
+	            this.removeInstanceDirectly(element);
+	            this.updateSystemEntitySetByRemovedFromManager(element);
+	            element.usedBy.splice(element.usedBy.indexOf(this), 1);
 	        }
 	        return this;
 	    }
 	    run(world) {
-	        SystemManager.eventObject.eventKey = SystemManager.BEFORE_RUN;
-	        SystemManager.eventObject.manager = this;
-	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+	        this.fire(SystemManager.Events.BEFORE_RUN, this);
 	        this.elements.forEach((item) => {
 	            item.checkUpdatedEntities(world.entityManager);
 	            if (!item.disabled) {
@@ -442,8 +484,7 @@
 	            world.entityManager.updatedEntities.clear();
 	        }
 	        this.loopTimes++;
-	        SystemManager.eventObject.eventKey = SystemManager.AFTER_RUN;
-	        this.fire(SystemManager.BEFORE_RUN, SystemManager.eventObject);
+	        this.fire(SystemManager.Events.BEFORE_RUN, this);
 	        return this;
 	    }
 	    updateSystemEntitySetByRemovedFromManager(system) {
@@ -466,10 +507,12 @@
 
 	let arr;
 	class World {
+	    disabled = false;
 	    name;
 	    entityManager = null;
 	    systemManager = null;
 	    store = new Map();
+	    usedBy = [];
 	    id = IdGeneratorInstance.next();
 	    isWorld = true;
 	    constructor(name = "", entityManager, systemManager) {
@@ -487,7 +530,7 @@
 	    }
 	    addEntity(entity) {
 	        if (this.entityManager) {
-	            this.entityManager.addElement(entity);
+	            this.entityManager.add(entity);
 	        }
 	        else {
 	            throw new Error("The world doesn't have an entityManager yet.");
@@ -496,7 +539,7 @@
 	    }
 	    addSystem(system) {
 	        if (this.systemManager) {
-	            this.systemManager.addElement(system);
+	            this.systemManager.add(system);
 	        }
 	        else {
 	            throw new Error("The world doesn't have a systemManager yet.");
@@ -550,21 +593,31 @@
 	    }
 	    removeEntity(entity) {
 	        if (this.entityManager) {
-	            this.entityManager.removeElement(entity);
+	            this.entityManager.remove(entity);
 	        }
 	        return this;
 	    }
 	    removeSystem(system) {
 	        if (this.systemManager) {
-	            this.systemManager.removeElement(system);
+	            this.systemManager.remove(system);
 	        }
 	        return this;
 	    }
 	    run() {
+	        if (this.disabled) {
+	            return this;
+	        }
 	        if (this.systemManager) {
 	            this.systemManager.run(this);
 	        }
 	        return this;
+	    }
+	    serialize() {
+	        return {
+	            id: this.id,
+	            name: this.name,
+	            type: "world"
+	        };
 	    }
 	    unregisterEntityManager() {
 	        if (this.entityManager) {

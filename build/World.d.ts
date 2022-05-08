@@ -4,10 +4,12 @@ import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
 import IWorld from "./interfaces/IWorld";
 export default class World implements IWorld {
+    disabled: boolean;
     name: string;
     entityManager: IEntityManager | null;
     systemManager: ISystemManager | null;
     store: Map<string, any>;
+    usedBy: never[];
     readonly id: number;
     readonly isWorld = true;
     constructor(name?: string, entityManager?: IEntityManager, systemManager?: ISystemManager);
@@ -24,6 +26,7 @@ export default class World implements IWorld {
     removeEntity(entity: IEntity): this;
     removeSystem(system: ISystem | string): this;
     run(): this;
+    serialize(): any;
     unregisterEntityManager(): this;
     unregisterSystemManager(): this;
 }

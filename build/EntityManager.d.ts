@@ -7,9 +7,8 @@ export default class EntityManager extends Manager<IEntity> implements IEntityMa
     updatedEntities: Set<IEntity>;
     readonly isEntityManager = true;
     constructor(world?: IWorld);
-    addElementDirect(entity: IEntity): this;
     createEntity(name: string): IEntity;
-    removeElementByName(name: string): this;
-    removeElementByInstance(entity: IEntity): this;
+    protected addElementDirectly(entity: IEntity): this;
+    protected removeInstanceDirectly(entity: IEntity): this;
     private deleteEntityFromSystemSet;
 }
