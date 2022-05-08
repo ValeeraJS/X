@@ -428,10 +428,10 @@
   resolved "https://registry.npmmirror.com/@valeera/eventdispatcher/-/eventdispatcher-2.2.4.tgz#8a1fb79de91eb60e8ca18e77f34149497e41571f"
   integrity sha512-rN3+cGRECUtvz4Mc95h579GPIhjbgbgP8TnGcrJOY/OMrYoM7pRix20nVwYVZqJBfIWcqLQUzYuokBWT8YJpDw==
 
-"@valeera/idgenerator@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmmirror.com/@valeera/idgenerator/-/idgenerator-1.1.0.tgz#8dafebdcbb3f3ac951f34bb1df28db8d60391316"
-  integrity sha512-R8xmtuUPdwLzewZLV6/C/AFXVlpbLl0N2htBqxWR4RsxP7EL3w71GxVdJbrAHpsRzZ90w6PmGSMkYOJSmIBC7g==
+"@valeera/idgenerator@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.npmmirror.com/@valeera/idgenerator/-/idgenerator-1.1.1.tgz#e09e33dd11f3caa3a05a8bdf8bb089beb51cac7f"
+  integrity sha512-ATbUOvCkgrg+VA6qUoWxhQPYS5RkFw9/r2nfEYagLMlmwwFx1wPrLaknp96M/mkaVV4Y+Mt/u4eA1oRyahRG+A==
 
 "@valeera/tree@0.1.5-b":
   version "0.1.5-b"

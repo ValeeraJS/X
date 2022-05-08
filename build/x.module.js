@@ -328,11 +328,14 @@ class Entity extends TreeNodeWithEvent {
         }
         this.unregisterComponentManager();
     }
-    getComponent(name) {
-        return this.componentManager ? this.componentManager.get(name) : null;
+    getComponent(nameOrId) {
+        return this.componentManager?.get(nameOrId) || null;
+    }
+    getComponentsByTagLabel(label) {
+        return this.componentManager?.getComponentsByTagLabel(label) || [];
     }
     hasComponent(component) {
-        return this.componentManager ? this.componentManager.has(component) : false;
+        return this.componentManager?.has(component) || false;
     }
     registerComponentManager(manager = new ComponentManager()) {
         this.unregisterComponentManager();

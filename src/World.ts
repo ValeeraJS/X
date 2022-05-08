@@ -66,7 +66,7 @@ export default class World implements IWorld {
 		return this.entityManager?.createEntity(name) || null;
 	}
 
-	public hasEntity(entity: IEntity | string): boolean {
+	public hasEntity(entity: IEntity | string | number): boolean {
 		if (this.entityManager) {
 			return this.entityManager.has(entity);
 		}
@@ -74,7 +74,7 @@ export default class World implements IWorld {
 		return false;
 	}
 
-	public hasSystem(system: ISystem | string): boolean {
+	public hasSystem(system: ISystem | string | number): boolean {
 		if (this.systemManager) {
 			return this.systemManager.has(system);
 		}
@@ -110,7 +110,7 @@ export default class World implements IWorld {
 		}
 	}
 
-	public removeEntity(entity: IEntity): this {
+	public removeEntity(entity: IEntity | number | string): this {
 		if (this.entityManager) {
 			this.entityManager.remove(entity);
 		}
@@ -118,7 +118,7 @@ export default class World implements IWorld {
 		return this;
 	}
 
-	public removeSystem(system: ISystem | string): this {
+	public removeSystem(system: ISystem | string | number): this {
 		if (this.systemManager) {
 			this.systemManager.remove(system);
 		}

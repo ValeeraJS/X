@@ -502,11 +502,17 @@ var Entity = /** @class */ (function (_super) {
         }
         this.unregisterComponentManager();
     };
-    Entity.prototype.getComponent = function (name) {
-        return this.componentManager ? this.componentManager.get(name) : null;
+    Entity.prototype.getComponent = function (nameOrId) {
+        var _a;
+        return ((_a = this.componentManager) === null || _a === void 0 ? void 0 : _a.get(nameOrId)) || null;
+    };
+    Entity.prototype.getComponentsByTagLabel = function (label) {
+        var _a;
+        return ((_a = this.componentManager) === null || _a === void 0 ? void 0 : _a.getComponentsByTagLabel(label)) || [];
     };
     Entity.prototype.hasComponent = function (component) {
-        return this.componentManager ? this.componentManager.has(component) : false;
+        var _a;
+        return ((_a = this.componentManager) === null || _a === void 0 ? void 0 : _a.has(component)) || false;
     };
     Entity.prototype.registerComponentManager = function (manager) {
         if (manager === void 0) { manager = new ComponentManager(); }

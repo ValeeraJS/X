@@ -18,13 +18,13 @@ export default class World implements IWorld {
     addSystem(system: ISystem): this;
     clearAllEntities(): this;
     createEntity(name: string): IEntity | null;
-    hasEntity(entity: IEntity | string): boolean;
-    hasSystem(system: ISystem | string): boolean;
+    hasEntity(entity: IEntity | string | number): boolean;
+    hasSystem(system: ISystem | string | number): boolean;
     registerEntityManager(manager?: IEntityManager): this;
     registerSystemManager(manager?: ISystemManager): this;
     remove(element: IEntity | ISystem): this;
-    removeEntity(entity: IEntity): this;
-    removeSystem(system: ISystem | string): this;
+    removeEntity(entity: IEntity | number | string): this;
+    removeSystem(system: ISystem | string | number): this;
     run(): this;
     serialize(): any;
     unregisterEntityManager(): this;

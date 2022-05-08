@@ -66,12 +66,16 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 		this.unregisterComponentManager();
 	}
 
-	public getComponent(name: string): IComponent<any> | null {
-		return this.componentManager ? this.componentManager.get(name) : null;
+	public getComponent(nameOrId: string | number): IComponent<any> | null {
+		return this.componentManager?.get(nameOrId) || null;
 	}
 
-	public hasComponent(component: IComponent<any> | string): boolean {
-		return this.componentManager ? this.componentManager.has(component) : false;
+	public getComponentsByTagLabel(label: string): IComponent<any>[] {
+		return this.componentManager?.getComponentsByTagLabel(label) || [];
+	}
+
+	public hasComponent(component: IComponent<any> | string | number): boolean {
+		return this.componentManager?.has(component) || false;
 	}
 
 	public registerComponentManager(manager: IComponentManager = new ComponentManager()): this {
