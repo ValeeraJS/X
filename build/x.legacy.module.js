@@ -77,6 +77,9 @@ var System = /** @class */ (function () {
     System.prototype.run = function (world) {
         var _this = this;
         var _a;
+        if (this.disabled) {
+            return this;
+        }
         if (world.entityManager) {
             (_a = this.entitySet.get(world.entityManager)) === null || _a === void 0 ? void 0 : _a.forEach(function (item) {
                 if (!item.disabled) {
@@ -409,6 +412,25 @@ var ComponentManager = /** @class */ (function (_super) {
         }
         return result;
     };
+    ComponentManager.prototype.getFirstComponentByTagLabel = function (label) {
+        var e_3, _a;
+        try {
+            for (var _b = __values(this.elements), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var _d = __read(_c.value, 2), _ = _d[0], component = _d[1];
+                if (component.hasTagLabel(label)) {
+                    return component;
+                }
+            }
+        }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_3) throw e_3.error; }
+        }
+        return null;
+    };
     // 找到所有含目标组件唯一标签一致的组件。只要有任意1个标签符合就行。此处规定名称一致的tag，unique也必须是一致的。且不可修改
     ComponentManager.prototype.checkedComponentsWithTargetTags = function (component) {
         var result = new Set();
@@ -509,6 +531,10 @@ var Entity = /** @class */ (function (_super) {
     Entity.prototype.getComponentsByTagLabel = function (label) {
         var _a;
         return ((_a = this.componentManager) === null || _a === void 0 ? void 0 : _a.getComponentsByTagLabel(label)) || [];
+    };
+    Entity.prototype.getFirstComponentByTagLabel = function (label) {
+        var _a;
+        return ((_a = this.componentManager) === null || _a === void 0 ? void 0 : _a.getFirstComponentByTagLabel(label)) || null;
     };
     Entity.prototype.hasComponent = function (component) {
         var _a;

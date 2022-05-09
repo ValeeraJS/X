@@ -49,6 +49,16 @@ export default class ComponentManager
 		return result;
 	}
 
+	public getFirstComponentByTagLabel(label: string): IComponent<any> | null {
+		for (const [_, component] of this.elements) {
+			if (component.hasTagLabel(label)) {
+				return component;
+			}
+		}
+
+		return null;
+	}
+
 	// 找到所有含目标组件唯一标签一致的组件。只要有任意1个标签符合就行。此处规定名称一致的tag，unique也必须是一致的。且不可修改
 	private checkedComponentsWithTargetTags(component: IComponent<any>): Set<IComponent<any>> {
 		const result: Set<IComponent<any>> = new Set();

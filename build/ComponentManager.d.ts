@@ -15,5 +15,6 @@ export default class ComponentManager extends Manager<IComponent<any>> implement
     isComponentManager: boolean;
     add(element: IComponent<any>): this;
     getComponentsByTagLabel(label: string): IComponent<any>[];
+    getFirstComponentByTagLabel(label: string): IComponent<any> | null;
     private checkedComponentsWithTargetTags;
 }

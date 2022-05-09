@@ -19,6 +19,7 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
     destroy(): void;
     getComponent(nameOrId: string | number): IComponent<any> | null;
     getComponentsByTagLabel(label: string): IComponent<any>[];
+    getFirstComponentByTagLabel(label: string): IComponent<any> | null;
     hasComponent(component: IComponent<any> | string | number): boolean;
     registerComponentManager(manager?: IComponentManager): this;
     removeChild(entity: IEntity): this;

@@ -7,7 +7,7 @@ export { default as Manager } from "./Manager";
 export { default as Entitymanager } from "./EntityManager";
 export { default as SystemManager } from "./SystemManager";
 export { default as World } from "./World";
-export { default as IComponent } from "./interfaces/IComponent";
+export { default as IComponent, ComponentTag } from "./interfaces/IComponent";
 export { default as IComponentManager } from "./interfaces/IComponentManager";
 export { default as IECSObject } from "./interfaces/IECSObject";
 export { default as IEntity } from "./interfaces/IEntity";

@@ -7,6 +7,7 @@ export default interface IComponentManager extends IManager<IComponent<any>> {
 	usedBy: IEntity[];
 
 	getComponentsByTagLabel(label: string): IComponent<any>[];
+	getFirstComponentByTagLabel(label: string): IComponent<any> | null;
 	// isMixedFrom: (entity: IComponentManager) => boolean;
 	// mixFrom: (entity: IComponentManager) => this;
 }

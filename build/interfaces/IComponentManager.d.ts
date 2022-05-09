@@ -5,4 +5,5 @@ export default interface IComponentManager extends IManager<IComponent<any>> {
     readonly isComponentManager: boolean;
     usedBy: IEntity[];
     getComponentsByTagLabel(label: string): IComponent<any>[];
+    getFirstComponentByTagLabel(label: string): IComponent<any> | null;
 }

@@ -74,6 +74,10 @@ export default class Entity extends TreeNodeWithEvent implements IEntity {
 		return this.componentManager?.getComponentsByTagLabel(label) || [];
 	}
 
+	public getFirstComponentByTagLabel(label: string): IComponent<any> | null {
+		return this.componentManager?.getFirstComponentByTagLabel(label) || null;
+	}
+
 	public hasComponent(component: IComponent<any> | string | number): boolean {
 		return this.componentManager?.has(component) || false;
 	}
