@@ -12,6 +12,8 @@ export default interface IEntity extends IEventFirer<any>, IECSObject<IEntity>, 
 
 	addComponent(component: IComponent<any>): this;
 	getComponent(name: string): IComponent<any> | null;
+	getComponentsByTagLabel(label: string): IComponent<any>[];
+	getFirstComponentByTagLabel(label: string): IComponent<any> | null;
 	hasComponent(component: IComponent<any> | string): boolean;
 	removeComponent(component: IComponent<any> | string): this;
 }

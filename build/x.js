@@ -81,9 +81,8 @@
 	        }
 	        if (world.entityManager) {
 	            this.entitySet.get(world.entityManager)?.forEach((item) => {
-	                if (!item.disabled) {
-	                    this.handle(item, world.store);
-	                }
+	                // 此处不应该校验disabled。这个交给各自系统自行判断
+	                this.handle(item, world.store);
 	            });
 	        }
 	        return this;

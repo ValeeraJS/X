@@ -1,6 +1,6 @@
 {
 	"name": "@valeera/x",
-	"version": "0.1.18-b",
+	"version": "0.1.19",
 	"description": "ECS framework written in TS for web application.",
 	"main": "build/x.js",
 	"repository": "ValeeraJS/x",
