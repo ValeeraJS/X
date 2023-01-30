@@ -3,7 +3,7 @@ import typescript from "rollup-plugin-typescript2";
 // import resolve from "@rollup/plugin-node-resolve";
 
 export default {
-	external: ["@valeera/eventfirer", "@valeera/idgenerator"],
+	external: ["@valeera/eventfirer", "@valeera/idgenerator", "@valeera/tree"],
 	input: "src/index.ts",
 	output: [
 		{
