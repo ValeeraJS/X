@@ -61,13 +61,13 @@ export default class SystemManager extends Manager<ISystem> implements ISystemMa
 		return this;
 	}
 
-	public run(world: IWorld): this {
+	public run(world: IWorld, time: number, delta: number): this {
 		this.fire(SystemManager.Events.BEFORE_RUN, this);
 
 		this.elements.forEach((item) => {
 			item.checkUpdatedEntities(world.entityManager);
 			if (!item.disabled) {
-				item.run(world);
+				item.run(world, time, delta);
 			}
 		});
 		if (world.entityManager) {

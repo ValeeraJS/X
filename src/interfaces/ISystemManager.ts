@@ -7,5 +7,5 @@ export default interface ISystemManager extends IManager<ISystem> {
 	loopTimes: number;
 	usedBy: IWorld[];
 
-	run(world: IWorld): this;
+	run(world: IWorld, time: number, delta: number): this;
 }

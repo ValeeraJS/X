@@ -1,15 +1,16 @@
 import ComponentManager from "./ComponentManager";
+import EventFirer from "@valeera/eventfirer";
 import IComponent from "./interfaces/IComponent";
 import IComponentManager from "./interfaces/IComponentManager";
 import { IdGeneratorInstance } from "./Global";
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import IWorld from "./interfaces/IWorld";
-import TreeNodeWithEvent from "./TreeNodeWithEvent";
+import { TreeNode } from "@valeera/tree";
 
 let arr: any[];
 
-export default class Entity extends TreeNodeWithEvent implements IEntity {
+export default class Entity extends TreeNode.mixin(EventFirer) implements IEntity {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
 	public componentManager: IComponentManager | null = null;

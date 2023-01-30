@@ -1,18 +1,13 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@valeera/idgenerator'), require('@valeera/eventdispatcher'), require('@valeera/tree')) :
-	typeof define === 'function' && define.amd ? define(['exports', '@valeera/idgenerator', '@valeera/eventdispatcher', '@valeera/tree'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.X = {}, global.IdGenerator, global.EventDispatcher, global.Tree));
-})(this, (function (exports, IdGenerator, EventFirer, tree) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@valeera/eventfirer'), require('@valeera/idgenerator'), require('@valeera/tree')) :
+	typeof define === 'function' && define.amd ? define(['exports', '@valeera/eventfirer', '@valeera/idgenerator', '@valeera/tree'], factory) :
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.X = {}, global.EventFirer, global.IdGenerator, global.Tree));
+})(this, (function (exports, EventFirer, IdGenerator, tree) { 'use strict';
 
-	function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-	var IdGenerator__default = /*#__PURE__*/_interopDefaultLegacy(IdGenerator);
-	var EventFirer__default = /*#__PURE__*/_interopDefaultLegacy(EventFirer);
-
-	const IdGeneratorInstance = new IdGenerator__default["default"]();
+	const IdGeneratorInstance = new IdGenerator();
 
 	let weakMapTmp;
-	class System {
+	class System extends EventFirer {
 	    id = IdGeneratorInstance.next();
 	    isSystem = true;
 	    name = "";
@@ -29,6 +24,7 @@
 	        this._disabled = value;
 	    }
 	    constructor(name = "", fitRule) {
+	        super();
 	        this.name = name;
 	        this.disabled = false;
 	        this.rule = fitRule;
@@ -159,7 +155,7 @@
 	    ADD: "add",
 	    REMOVE: "remove"
 	};
-	class Manager extends EventFirer__default["default"] {
+	class Manager extends EventFirer {
 	    static Events = ElementChangeEvent;
 	    elements = new Map();
 	    disabled = false;
@@ -296,10 +292,8 @@
 	    }
 	}
 
-	const TreeNodeWithEvent = EventFirer.mixin(tree.TreeNode);
-
 	let arr$1;
-	class Entity extends TreeNodeWithEvent {
+	class Entity extends tree.TreeNode.mixin(EventFirer) {
 	    id = IdGeneratorInstance.next();
 	    isEntity = true;
 	    componentManager = null;
@@ -488,12 +482,12 @@
 	        }
 	        return this;
 	    }
-	    run(world) {
+	    run(world, time, delta) {
 	        this.fire(SystemManager.Events.BEFORE_RUN, this);
 	        this.elements.forEach((item) => {
 	            item.checkUpdatedEntities(world.entityManager);
 	            if (!item.disabled) {
-	                item.run(world);
+	                item.run(world, time, delta);
 	            }
 	        });
 	        if (world.entityManager) {
@@ -619,12 +613,12 @@
 	        }
 	        return this;
 	    }
-	    run() {
+	    run(time, delta) {
 	        if (this.disabled) {
 	            return this;
 	        }
 	        if (this.systemManager) {
-	            this.systemManager.run(this);
+	            this.systemManager.run(this, time, delta);
 	        }
 	        return this;
 	    }
@@ -664,7 +658,4 @@
 	exports.SystemManager = SystemManager;
 	exports.World = World;
 
-	Object.defineProperty(exports, '__esModule', { value: true });
-
 }));
-//# sourceMappingURL=x.js.map

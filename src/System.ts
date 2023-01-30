@@ -1,4 +1,5 @@
 import IWorld, { TWorldInjection } from "./interfaces/IWorld";
+import EventFirer from "@valeera/eventfirer";
 import { IdGeneratorInstance } from "./Global";
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
@@ -8,7 +9,7 @@ import ISystemManager from "./interfaces/ISystemManager";
 type TQueryRule = (entity: IEntity) => boolean;
 let weakMapTmp: Set<IEntity> | undefined;
 
-export default abstract class System implements ISystem {
+export default abstract class System extends EventFirer implements ISystem {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isSystem = true;
 	public name = "";
@@ -28,6 +29,7 @@ export default abstract class System implements ISystem {
 	}
 
 	public constructor(name = "", fitRule: TQueryRule) {
+		super();
 		this.name = name;
 		this.disabled = false;
 		this.rule = fitRule;

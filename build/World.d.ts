@@ -25,7 +25,7 @@ export default class World implements IWorld {
     remove(element: IEntity | ISystem): this;
     removeEntity(entity: IEntity | number | string): this;
     removeSystem(system: ISystem | string | number): this;
-    run(): this;
+    run(time: number, delta: number): this;
     serialize(): any;
     unregisterEntityManager(): this;
     unregisterSystemManager(): this;

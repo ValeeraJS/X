@@ -1,11 +1,11 @@
+import EventFirer from '@valeera/eventfirer';
 import IdGenerator from '@valeera/idgenerator';
-import EventFirer, { mixin } from '@valeera/eventdispatcher';
 import { TreeNode } from '@valeera/tree';
 
 const IdGeneratorInstance = new IdGenerator();
 
 let weakMapTmp;
-class System {
+class System extends EventFirer {
     id = IdGeneratorInstance.next();
     isSystem = true;
     name = "";
@@ -22,6 +22,7 @@ class System {
         this._disabled = value;
     }
     constructor(name = "", fitRule) {
+        super();
         this.name = name;
         this.disabled = false;
         this.rule = fitRule;
@@ -289,10 +290,8 @@ class ComponentManager extends Manager {
     }
 }
 
-const TreeNodeWithEvent = mixin(TreeNode);
-
 let arr$1;
-class Entity extends TreeNodeWithEvent {
+class Entity extends TreeNode.mixin(EventFirer) {
     id = IdGeneratorInstance.next();
     isEntity = true;
     componentManager = null;
@@ -481,12 +480,12 @@ class SystemManager extends Manager {
         }
         return this;
     }
-    run(world) {
+    run(world, time, delta) {
         this.fire(SystemManager.Events.BEFORE_RUN, this);
         this.elements.forEach((item) => {
             item.checkUpdatedEntities(world.entityManager);
             if (!item.disabled) {
-                item.run(world);
+                item.run(world, time, delta);
             }
         });
         if (world.entityManager) {
@@ -612,12 +611,12 @@ class World {
         }
         return this;
     }
-    run() {
+    run(time, delta) {
         if (this.disabled) {
             return this;
         }
         if (this.systemManager) {
-            this.systemManager.run(this);
+            this.systemManager.run(this, time, delta);
         }
         return this;
     }

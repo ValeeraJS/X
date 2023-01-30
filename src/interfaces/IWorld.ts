@@ -17,5 +17,5 @@ export default interface IWorld extends IECSObject<any> {
 	hasSystem(system: ISystem | string): boolean;
 	removeEntity(entity: IEntity): this;
 	removeSystem(system: ISystem): this;
-	run(): this;
+	run(time: number, delta: number): this;
 }

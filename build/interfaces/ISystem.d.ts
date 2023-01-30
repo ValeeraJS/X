@@ -15,5 +15,5 @@ export default interface ISystem extends IECSObject<ISystem> {
     destroy(): this;
     query(entity: IEntity): boolean;
     handle(entity: IEntity, params: TWorldInjection): this;
-    run(world: IWorld): this;
+    run(world: IWorld, time: number, delta: number): this;
 }

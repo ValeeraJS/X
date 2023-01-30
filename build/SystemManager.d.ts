@@ -23,7 +23,7 @@ export default class SystemManager extends Manager<ISystem> implements ISystemMa
     add(system: ISystem): this;
     clear(): this;
     remove(element: ISystem | string | number): this;
-    run(world: IWorld): this;
+    run(world: IWorld, time: number, delta: number): this;
     private updateSystemEntitySetByRemovedFromManager;
     private updateSystemEntitySetByAddFromManager;
 }

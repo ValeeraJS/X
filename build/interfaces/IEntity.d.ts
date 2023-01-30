@@ -2,9 +2,9 @@ import IComponent from "./IComponent";
 import IComponentManager from "./IComponentManager";
 import IECSObject from "./IECSObject";
 import IEntityManager from "./IEntityManager";
-import { IEventFirer } from "@valeera/eventdispatcher";
+import { IEventFirer } from "@valeera/eventfirer";
 import { ITreeNode } from "@valeera/tree";
-export default interface IEntity extends IEventFirer<any>, IECSObject<IEntity>, ITreeNode {
+export default interface IEntity extends IEventFirer, IECSObject<IEntity>, ITreeNode {
     readonly isEntity: boolean;
     componentManager: IComponentManager | null;
     usedBy: IEntityManager[];

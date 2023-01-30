@@ -1,22 +1,22 @@
-import typescript from "rollup-plugin-typescript2";
 import json from "rollup-plugin-json";
+import typescript from "rollup-plugin-typescript2";
 // import resolve from "@rollup/plugin-node-resolve";
 
 export default {
-	external: ["@valeera/eventdispatcher", "@valeera/idgenerator"],
+	external: ["@valeera/eventfirer", "@valeera/idgenerator"],
 	input: "src/index.ts",
 	output: [
 		{
 			file: "build/x.js",
 			format: "umd",
 			globals: {
-				"@valeera/eventdispatcher": "EventDispatcher",
+				"@valeera/eventfirer": "EventFirer",
 				"@valeera/idgenerator": "IdGenerator",
 				"@valeera/tree": "Tree"
 			},
 			indent: "\t",
 			name: "X",
-			sourcemap: true
+			sourcemap: false
 		},
 		{
 			file: "build/x.module.js",

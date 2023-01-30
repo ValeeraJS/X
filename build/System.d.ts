@@ -1,10 +1,11 @@
 import IWorld, { TWorldInjection } from "./interfaces/IWorld";
+import EventFirer from "@valeera/eventfirer";
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
-declare type TQueryRule = (entity: IEntity) => boolean;
-export default abstract class System implements ISystem {
+type TQueryRule = (entity: IEntity) => boolean;
+export default abstract class System extends EventFirer implements ISystem {
     readonly id: number;
     readonly isSystem = true;
     name: string;

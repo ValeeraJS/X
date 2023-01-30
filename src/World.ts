@@ -126,12 +126,12 @@ export default class World implements IWorld {
 		return this;
 	}
 
-	public run(): this {
+	public run(time: number, delta: number): this {
 		if (this.disabled) {
 			return this;
 		}
 		if (this.systemManager) {
-			this.systemManager.run(this);
+			this.systemManager.run(this, time, delta);
 		}
 
 		return this;

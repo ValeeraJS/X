@@ -20,8 +20,7 @@
 		"src": "src"
 	},
 	"scripts": {
-		"build": "rollup -c scripts/rollup.config.js",
-		"build-all": "npm run build && npm run build-legacy && npm run build-closure && npm run build-closure-legacy",
+		"build": "rollup -c scripts/rollup.config.mjs",
 		"start": "npm run dev",
 		"lint": "eslint src --ext js --ext ts",
 		"test": "nyc --reporter=html --reporter=text mocha --require esm",

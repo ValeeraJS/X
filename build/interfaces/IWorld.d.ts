@@ -3,7 +3,7 @@ import IEntity from "./IEntity";
 import IEntityManager from "./IEntityManager";
 import ISystem from "./ISystem";
 import ISystemManager from "./ISystemManager";
-export declare type TWorldInjection = Map<string, any>;
+export type TWorldInjection = Map<string, any>;
 export default interface IWorld extends IECSObject<any> {
     entityManager: IEntityManager | null;
     store: TWorldInjection;
@@ -14,5 +14,5 @@ export default interface IWorld extends IECSObject<any> {
     hasSystem(system: ISystem | string): boolean;
     removeEntity(entity: IEntity): this;
     removeSystem(system: ISystem): this;
-    run(): this;
+    run(time: number, delta: number): this;
 }
