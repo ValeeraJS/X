@@ -1,8 +1,8 @@
-import IWorld, { TWorldInjection } from "./IWorld";
 import IECSObject from "./IECSObject";
 import IEntity from "./IEntity";
 import IEntityManager from "./IEntityManager";
 import ISystemManager from "./ISystemManager";
+import IWorld from "./IWorld";
 
 export default interface ISystem extends IECSObject<ISystem> {
 	entitySet: WeakMap<IEntityManager, Set<IEntity>>;
@@ -17,6 +17,6 @@ export default interface ISystem extends IECSObject<ISystem> {
 	checkUpdatedEntities(manager: IEntityManager | null): this;
 	destroy(): this;
 	query(entity: IEntity): boolean;
-	handle(entity: IEntity, params: TWorldInjection): this;
+	handle(entity: IEntity, time: number, delta: number): this;
 	run(world: IWorld, time: number, delta: number): this;
 }

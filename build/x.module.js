@@ -69,14 +69,14 @@ class System extends EventFirer {
     query(entity) {
         return this.rule(entity);
     }
-    run(world) {
+    run(world, time, delta) {
         if (this.disabled) {
             return this;
         }
         if (world.entityManager) {
             this.entitySet.get(world.entityManager)?.forEach((item) => {
                 // 此处不应该校验disabled。这个交给各自系统自行判断
-                this.handle(item, world.store);
+                this.handle(item, time, delta);
             });
         }
         return this;
@@ -98,8 +98,8 @@ class PureSystem extends System {
         super(name, fitRule);
         this.handler = handler;
     }
-    handle(entity, params) {
-        this.handler(entity, params);
+    handle(entity, time, delta) {
+        this.handler(entity, time, delta);
         return this;
     }
 }

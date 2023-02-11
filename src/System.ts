@@ -1,10 +1,10 @@
-import IWorld, { TWorldInjection } from "./interfaces/IWorld";
 import EventFirer from "@valeera/eventfirer";
 import { IdGeneratorInstance } from "./Global";
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
+import IWorld from "./interfaces/IWorld";
 
 type TQueryRule = (entity: IEntity) => boolean;
 let weakMapTmp: Set<IEntity> | undefined;
@@ -79,14 +79,14 @@ export default abstract class System extends EventFirer implements ISystem {
 		return this.rule(entity);
 	}
 
-	public run(world: IWorld): this {
+	public run(world: IWorld, time: number, delta: number): this {
 		if (this.disabled) {
 			return this;
 		}
 		if (world.entityManager) {
 			this.entitySet.get(world.entityManager)?.forEach((item: IEntity) => {
 				// 此处不应该校验disabled。这个交给各自系统自行判断
-				this.handle(item, world.store);
+				this.handle(item, time, delta);
 			});
 		}
 
@@ -105,5 +105,5 @@ export default abstract class System extends EventFirer implements ISystem {
 		return this;
 	}
 
-	public abstract handle(entity: IEntity, params: TWorldInjection): this;
+	public abstract handle(entity: IEntity, time: number, delta: number): this;
 }

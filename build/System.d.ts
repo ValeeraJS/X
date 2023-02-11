@@ -1,9 +1,9 @@
-import IWorld, { TWorldInjection } from "./interfaces/IWorld";
 import EventFirer from "@valeera/eventfirer";
 import IEntity from "./interfaces/IEntity";
 import IEntityManager from "./interfaces/IEntityManager";
 import ISystem from "./interfaces/ISystem";
 import ISystemManager from "./interfaces/ISystemManager";
+import IWorld from "./interfaces/IWorld";
 type TQueryRule = (entity: IEntity) => boolean;
 export default abstract class System extends EventFirer implements ISystem {
     readonly id: number;
@@ -21,9 +21,9 @@ export default abstract class System extends EventFirer implements ISystem {
     checkUpdatedEntities(manager: IEntityManager | null): this;
     checkEntityManager(manager: IEntityManager | null): this;
     query(entity: IEntity): boolean;
-    run(world: IWorld): this;
+    run(world: IWorld, time: number, delta: number): this;
     serialize(): any;
     destroy(): this;
-    abstract handle(entity: IEntity, params: TWorldInjection): this;
+    abstract handle(entity: IEntity, time: number, delta: number): this;
 }
 export {};

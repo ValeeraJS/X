@@ -1,6 +1,6 @@
 {
 	"name": "@valeera/x",
-	"version": "0.1.22",
+	"version": "0.1.23",
 	"description": "ECS framework written in TS for web application.",
 	"main": "build/x.js",
 	"repository": "ValeeraJS/x",
@@ -58,7 +58,6 @@
 		"nyc": "latest",
 		"prettier": "latest",
 		"rollup": "latest",
-		"rollup-plugin-json": "latest",
 		"rollup-plugin-typescript2": "latest",
 		"typescript": "latest",
 		"@types/clone-deep": "latest"
@@ -73,10 +72,7 @@
 			"README.md",
 			"build/x.js",
 			"build/x.min.js",
-			"build/x.module.js",
-			"build/x.legacy.js",
-			"build/x.legacy.min.js",
-			"build/x.legacy.module.js"
+			"build/x.module.js"
 		],
 		"directories": {}
 	}

@@ -1,6 +1,5 @@
 import IEntity from "./interfaces/IEntity";
 import System from "./System";
-import { TWorldInjection } from "./interfaces/IWorld";
 
 type TQueryRule = (entity: IEntity) => boolean;
 
@@ -11,8 +10,8 @@ export default class PureSystem extends System {
 		this.handler = handler;
 	}
 
-	public handle(entity: IEntity, params: TWorldInjection): this {
-		this.handler(entity, params);
+	public handle(entity: IEntity, time: number, delta: number): this {
+		this.handler(entity, time, delta);
 
 		return this;
 	}
