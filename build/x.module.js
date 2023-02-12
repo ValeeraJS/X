@@ -149,7 +149,7 @@ class Component {
             id: this.id,
             name: this.name,
             tags: this.tags,
-            type: "component"
+            type: "component",
         };
     }
 }
@@ -158,7 +158,7 @@ class Component {
 let elementTmp;
 const ElementChangeEvent = {
     ADD: "add",
-    REMOVE: "remove"
+    REMOVE: "remove",
 };
 class Manager extends EventFirer {
     static Events = ElementChangeEvent;
@@ -474,7 +474,7 @@ const SystemEvent = {
     ADD: "add",
     AFTER_RUN: "afterRun",
     BEFORE_RUN: "beforeRun",
-    REMOVE: "remove"
+    REMOVE: "remove",
 };
 class SystemManager extends Manager {
     static Events = SystemEvent;
@@ -658,7 +658,7 @@ class World {
         return {
             id: this.id,
             name: this.name,
-            type: "world"
+            type: "world",
         };
     }
     unregisterEntityManager() {

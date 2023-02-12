@@ -62,7 +62,7 @@ export class Component<T> implements IComponent<T> {
 			id: this.id,
 			name: this.name,
 			tags: this.tags,
-			type: "component"
+			type: "component",
 		};
 	}
 }

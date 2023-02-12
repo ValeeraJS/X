@@ -141,7 +141,7 @@ export class World implements IWorld {
 		return {
 			id: this.id,
 			name: this.name,
-			type: "world"
+			type: "world",
 		};
 	}
 

@@ -4,7 +4,7 @@ import { Manager } from "./Manager";
 
 export enum EComponentEvent {
 	ADD_COMPONENT = "addComponent",
-	REMOVE_COMPONENT = "removeComponent"
+	REMOVE_COMPONENT = "removeComponent",
 }
 
 export interface ComponentEventObject {

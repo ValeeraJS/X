@@ -7,7 +7,7 @@ let elementTmp: any;
 
 export const ElementChangeEvent = {
 	ADD: "add",
-	REMOVE: "remove"
+	REMOVE: "remove",
 };
 
 export class Manager<T extends IECSObject<T>> extends EventFirer implements IManager<T> {

@@ -9,6 +9,7 @@ export interface IComponent<T> extends IECSObject<IComponent<any>> {
     data: T;
     usedBy: IComponentManager[];
     tags: ComponentTag[];
+    dirty: boolean;
     clone(): IComponent<T>;
     hasTagLabel(label: string): boolean;
 }

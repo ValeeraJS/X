@@ -9,7 +9,7 @@ export const SystemEvent = {
 	ADD: "add",
 	AFTER_RUN: "afterRun",
 	BEFORE_RUN: "beforeRun",
-	REMOVE: "remove"
+	REMOVE: "remove",
 };
 
 export class SystemManager extends Manager<ISystem> implements ISystemManager {

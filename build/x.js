@@ -151,7 +151,7 @@
 	            id: this.id,
 	            name: this.name,
 	            tags: this.tags,
-	            type: "component"
+	            type: "component",
 	        };
 	    }
 	}
@@ -160,7 +160,7 @@
 	let elementTmp;
 	const ElementChangeEvent = {
 	    ADD: "add",
-	    REMOVE: "remove"
+	    REMOVE: "remove",
 	};
 	class Manager extends EventFirer {
 	    static Events = ElementChangeEvent;
@@ -476,7 +476,7 @@
 	    ADD: "add",
 	    AFTER_RUN: "afterRun",
 	    BEFORE_RUN: "beforeRun",
-	    REMOVE: "remove"
+	    REMOVE: "remove",
 	};
 	class SystemManager extends Manager {
 	    static Events = SystemEvent;
@@ -660,7 +660,7 @@
 	        return {
 	            id: this.id,
 	            name: this.name,
-	            type: "world"
+	            type: "world",
 	        };
 	    }
 	    unregisterEntityManager() {
