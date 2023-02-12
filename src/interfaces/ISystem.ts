@@ -1,14 +1,15 @@
-import IECSObject from "./IECSObject";
-import IEntity from "./IEntity";
-import IEntityManager from "./IEntityManager";
-import ISystemManager from "./ISystemManager";
-import IWorld from "./IWorld";
+import { IECSObject } from "./IECSObject";
+import { IEntity } from "./IEntity";
+import { IEntityManager } from "./IEntityManager";
+import { ISystemManager } from "./ISystemManager";
+import { IWorld } from "./IWorld";
 
-export default interface ISystem extends IECSObject<ISystem> {
+export interface ISystem extends IECSObject<ISystem> {
 	entitySet: WeakMap<IEntityManager, Set<IEntity>>;
 	loopTimes: number;
 	usedBy: ISystemManager[];
 	cache: WeakMap<IEntity, any>;
+	autoUpdate: boolean;
 
 	set disabled(disabled: boolean);
 	get disabled(): boolean;

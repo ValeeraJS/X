@@ -1,9 +1,9 @@
-import IEntity from "./interfaces/IEntity";
-import IEntityManager from "./interfaces/IEntityManager";
-import ISystem from "./interfaces/ISystem";
-import ISystemManager from "./interfaces/ISystemManager";
-import IWorld from "./interfaces/IWorld";
-export default class World implements IWorld {
+import { IEntity } from "./interfaces/IEntity";
+import { IEntityManager } from "./interfaces/IEntityManager";
+import { ISystem } from "./interfaces/ISystem";
+import { ISystemManager } from "./interfaces/ISystemManager";
+import { IWorld } from "./interfaces/IWorld";
+export declare class World implements IWorld {
     disabled: boolean;
     name: string;
     entityManager: IEntityManager | null;

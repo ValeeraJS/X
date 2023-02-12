@@ -1,11 +1,11 @@
 import EventFirer from "@valeera/eventfirer";
-import IECSObject from "./interfaces/IECSObject";
-import IManager from "./interfaces/IManager";
+import { IECSObject } from "./interfaces/IECSObject";
+import { IManager } from "./interfaces/IManager";
 export declare const ElementChangeEvent: {
     ADD: string;
     REMOVE: string;
 };
-export default class Manager<T extends IECSObject<T>> extends EventFirer implements IManager<T> {
+export declare class Manager<T extends IECSObject<T>> extends EventFirer implements IManager<T> {
     static readonly Events: {
         ADD: string;
         REMOVE: string;
@@ -16,7 +16,7 @@ export default class Manager<T extends IECSObject<T>> extends EventFirer impleme
     readonly isManager = true;
     add(element: T): this;
     clear(): this;
-    get(name: string | number): T | null;
+    get(name: string | number | (new () => any)): T | null;
     has(element: T | string | number): boolean;
     remove(element: T | string | number): this;
     protected addElementDirectly(element: T): this;

@@ -1,8 +1,8 @@
-import IEntity from "./IEntity";
-import IManager from "./IManager";
-import IWorld from "./IWorld";
+import { IEntity } from "./IEntity";
+import { IManager } from "./IManager";
+import { IWorld } from "./IWorld";
 
-export default interface IEntityManager extends IManager<IEntity> {
+export interface IEntityManager extends IManager<IEntity> {
 	readonly isEntityManager: boolean;
 	updatedEntities: Set<IEntity>;
 	usedBy: IWorld[];

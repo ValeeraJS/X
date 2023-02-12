@@ -1,16 +1,16 @@
-import ComponentManager from "./ComponentManager";
+import { ComponentManager } from "./ComponentManager";
 import EventFirer from "@valeera/eventfirer";
-import IComponent from "./interfaces/IComponent";
-import IComponentManager from "./interfaces/IComponentManager";
+import { IComponent } from "./interfaces/IComponent";
+import { ComponentConstructor, IComponentManager } from "./interfaces/IComponentManager";
 import { IdGeneratorInstance } from "./Global";
-import IEntity from "./interfaces/IEntity";
-import IEntityManager from "./interfaces/IEntityManager";
-import IWorld from "./interfaces/IWorld";
+import { IEntity } from "./interfaces/IEntity";
+import { IEntityManager } from "./interfaces/IEntityManager";
+import { IWorld } from "./interfaces/IWorld";
 import { TreeNode } from "@valeera/tree";
 
 let arr: any[];
 
-export default class Entity extends TreeNode.mixin(EventFirer) implements IEntity {
+export class Entity extends TreeNode.mixin(EventFirer) implements IEntity {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
 	public componentManager: IComponentManager | null = null;
@@ -67,7 +67,7 @@ export default class Entity extends TreeNode.mixin(EventFirer) implements IEntit
 		this.unregisterComponentManager();
 	}
 
-	public getComponent(nameOrId: string | number): IComponent<any> | null {
+	public getComponent(nameOrId: string | number | ComponentConstructor): IComponent<any> | null {
 		return this.componentManager?.get(nameOrId) || null;
 	}
 
@@ -75,8 +75,16 @@ export default class Entity extends TreeNode.mixin(EventFirer) implements IEntit
 		return this.componentManager?.getComponentsByTagLabel(label) || [];
 	}
 
-	public getFirstComponentByTagLabel(label: string): IComponent<any> | null {
-		return this.componentManager?.getFirstComponentByTagLabel(label) || null;
+	public getComponentByTagLabel(label: string): IComponent<any> | null {
+		return this.componentManager?.getComponentByTagLabel(label) || null;
+	}
+
+	public getComponentsByClass(clazz: ComponentConstructor): IComponent<any>[] {
+		return this.componentManager?.getComponentsByClass(clazz) || [];
+	}
+
+	public getComponentByClass(clazz: ComponentConstructor): IComponent<any> | null {
+		return this.componentManager?.getComponentByClass(clazz) || null;
 	}
 
 	public hasComponent(component: IComponent<any> | string | number): boolean {

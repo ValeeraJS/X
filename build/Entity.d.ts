@@ -1,8 +1,8 @@
-import IComponent from "./interfaces/IComponent";
-import IComponentManager from "./interfaces/IComponentManager";
-import IEntity from "./interfaces/IEntity";
-import IEntityManager from "./interfaces/IEntityManager";
-import IWorld from "./interfaces/IWorld";
+import { IComponent } from "./interfaces/IComponent";
+import { ComponentConstructor, IComponentManager } from "./interfaces/IComponentManager";
+import { IEntity } from "./interfaces/IEntity";
+import { IEntityManager } from "./interfaces/IEntityManager";
+import { IWorld } from "./interfaces/IWorld";
 declare const Entity_base: {
     new (...a: any[]): {
         parent: import("@valeera/tree").ITreeNode | null;
@@ -63,7 +63,7 @@ declare const Entity_base: {
     };
     mixin: (Base?: (new (...a: any[]) => Object) | undefined, eventKeyList?: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey[] | undefined) => any;
 };
-export default class Entity extends Entity_base implements IEntity {
+export declare class Entity extends Entity_base implements IEntity {
     readonly id: number;
     readonly isEntity = true;
     componentManager: IComponentManager | null;
@@ -76,9 +76,11 @@ export default class Entity extends Entity_base implements IEntity {
     addTo(manager: IEntityManager): this;
     addToWorld(world: IWorld): this;
     destroy(): void;
-    getComponent(nameOrId: string | number): IComponent<any> | null;
+    getComponent(nameOrId: string | number | ComponentConstructor): IComponent<any> | null;
     getComponentsByTagLabel(label: string): IComponent<any>[];
-    getFirstComponentByTagLabel(label: string): IComponent<any> | null;
+    getComponentByTagLabel(label: string): IComponent<any> | null;
+    getComponentsByClass(clazz: ComponentConstructor): IComponent<any>[];
+    getComponentByClass(clazz: ComponentConstructor): IComponent<any> | null;
     hasComponent(component: IComponent<any> | string | number): boolean;
     registerComponentManager(manager?: IComponentManager): this;
     removeChild(entity: IEntity): this;

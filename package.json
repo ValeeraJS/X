@@ -1,6 +1,6 @@
 {
 	"name": "@valeera/x",
-	"version": "0.1.23",
+	"version": "0.1.24",
 	"description": "ECS framework written in TS for web application.",
 	"main": "build/x.js",
 	"repository": "ValeeraJS/x",
@@ -37,19 +37,20 @@
 	"license": "MIT",
 	"dependencies": {
 		"@valeera/eventfirer": "latest",
-		"@valeera/tree": "latest",
 		"@valeera/idgenerator": "latest",
+		"@valeera/tree": "latest",
 		"clone-deep": "latest"
 	},
 	"devDependencies": {
 		"@rollup/plugin-json": "latest",
 		"@rollup/plugin-node-resolve": "latest",
+		"@types/clone-deep": "latest",
 		"@typescript-eslint/eslint-plugin": "latest",
 		"@typescript-eslint/parser": "latest",
 		"chai": "latest",
 		"concurrently": "latest",
 		"eslint": "latest",
-		"eslint-config-valeera": "latest",
+		"eslint-config-valeera": "^0.1.3",
 		"eslint-plugin-html": "latest",
 		"eslint-plugin-prettier": "latest",
 		"esm": "latest",
@@ -59,8 +60,7 @@
 		"prettier": "latest",
 		"rollup": "latest",
 		"rollup-plugin-typescript2": "latest",
-		"typescript": "latest",
-		"@types/clone-deep": "latest"
+		"typescript": "latest"
 	},
 	"publishConfig": {
 		"access": "public"

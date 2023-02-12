@@ -1,8 +1,8 @@
-import IEntity from "./interfaces/IEntity";
-import IEntityManager from "./interfaces/IEntityManager";
-import IWorld from "./interfaces/IWorld";
-import Manager from "./Manager";
-export default class EntityManager extends Manager<IEntity> implements IEntityManager {
+import { IEntity } from "./interfaces/IEntity";
+import { IEntityManager } from "./interfaces/IEntityManager";
+import { IWorld } from "./interfaces/IWorld";
+import { Manager } from "./Manager";
+export declare class EntityManager extends Manager<IEntity> implements IEntityManager {
     data: any;
     updatedEntities: Set<IEntity>;
     readonly isEntityManager = true;

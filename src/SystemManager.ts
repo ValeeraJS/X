@@ -1,7 +1,7 @@
-import ISystem from "./interfaces/ISystem";
-import ISystemManager from "./interfaces/ISystemManager";
-import IWorld from "./interfaces/IWorld";
-import Manager from "./Manager";
+import { ISystem } from "./interfaces/ISystem";
+import { ISystemManager } from "./interfaces/ISystemManager";
+import { IWorld } from "./interfaces/IWorld";
+import { Manager } from "./Manager";
 
 let systemTmp: ISystem | undefined | null;
 
@@ -12,7 +12,7 @@ export const SystemEvent = {
 	REMOVE: "remove"
 };
 
-export default class SystemManager extends Manager<ISystem> implements ISystemManager {
+export class SystemManager extends Manager<ISystem> implements ISystemManager {
 	public static readonly Events = SystemEvent;
 
 	public disabled = false;
@@ -66,7 +66,7 @@ export default class SystemManager extends Manager<ISystem> implements ISystemMa
 
 		this.elements.forEach((item) => {
 			item.checkUpdatedEntities(world.entityManager);
-			if (!item.disabled) {
+			if (!item.disabled && item.autoUpdate) {
 				item.run(world, time, delta);
 			}
 		});

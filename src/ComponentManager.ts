@@ -1,9 +1,6 @@
-import IComponent from "./interfaces/IComponent";
-import IComponentManager from "./interfaces/IComponentManager";
-import Manager from "./Manager";
-
-// 私有全局变量，外部无法访问
-// let componentTmp: IComponent<any> | undefined;
+import { IComponent } from "./interfaces/IComponent";
+import { ComponentConstructor, IComponentManager } from "./interfaces/IComponentManager";
+import { Manager } from "./Manager";
 
 export enum EComponentEvent {
 	ADD_COMPONENT = "addComponent",
@@ -17,10 +14,7 @@ export interface ComponentEventObject {
 	target: IComponent<any>;
 }
 
-export default class ComponentManager
-	extends Manager<IComponent<any>>
-	implements IComponentManager
-{
+export class ComponentManager extends Manager<IComponent<any>> implements IComponentManager {
 	public isComponentManager = true;
 
 	public add(element: IComponent<any>): this {
@@ -37,20 +31,42 @@ export default class ComponentManager
 		return this.addElementDirectly(element);
 	}
 
-	public getComponentsByTagLabel(label: string): IComponent<any>[] {
+	public getComponentsByClass(clazz: ComponentConstructor): IComponent<any>[] {
 		const result: IComponent<any>[] = [];
 
-		for (const [_, component] of this.elements) {
-			if (component.hasTagLabel(label)) {
+		this.elements.forEach((component) => {
+			if (component instanceof clazz) {
 				result.push(component);
 			}
-		}
+		});
 
 		return result;
 	}
 
-	public getFirstComponentByTagLabel(label: string): IComponent<any> | null {
-		for (const [_, component] of this.elements) {
+	public getComponentByClass(clazz: ComponentConstructor): IComponent<any> | null {
+		for (const [, component] of this.elements) {
+			if (component instanceof clazz) {
+				return component;
+			}
+		}
+
+		return null;
+	}
+
+	public getComponentsByTagLabel(label: string): IComponent<any>[] {
+		const result: IComponent<any>[] = [];
+
+		this.elements.forEach((component) => {
+			if (component.hasTagLabel(label)) {
+				result.push(component);
+			}
+		});
+
+		return result;
+	}
+
+	public getComponentByTagLabel(label: string): IComponent<any> | null {
+		for (const [, component] of this.elements) {
 			if (component.hasTagLabel(label)) {
 				return component;
 			}

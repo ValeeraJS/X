@@ -1,4 +1,4 @@
-import IComponent, { ComponentTag } from "./interfaces/IComponent";
+import { ComponentTag, IComponent } from "./interfaces/IComponent";
 import { IdGeneratorInstance } from "./Global";
 import { ISerializedJson } from "./interfaces/ISerializable";
 
@@ -8,7 +8,7 @@ export interface IComponentSerializedJson<T> extends ISerializedJson {
 	disabled: boolean;
 }
 
-export default class Component<T> implements IComponent<T> {
+export class Component<T> implements IComponent<T> {
 	public static unserialize<T>(json: IComponentSerializedJson<T>): Component<T> {
 		const component = new Component(json.name, json.data);
 
@@ -23,8 +23,16 @@ export default class Component<T> implements IComponent<T> {
 	public disabled = false;
 	public name: string;
 	public usedBy = [];
-	public dirty = false;
 	public tags: ComponentTag[];
+	#dirty = false;
+
+	public get dirty(): boolean {
+		return this.#dirty;
+	}
+
+	public set dirty(v: boolean) {
+		this.#dirty = v;
+	}
 
 	public constructor(name: string, data: T, tags: ComponentTag[] = []) {
 		this.name = name;

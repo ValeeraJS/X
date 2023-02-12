@@ -15,6 +15,7 @@
 	    entitySet = new WeakMap();
 	    usedBy = [];
 	    cache = new WeakMap();
+	    autoUpdate = true;
 	    rule;
 	    _disabled = false;
 	    get disabled() {
@@ -118,8 +119,14 @@
 	    disabled = false;
 	    name;
 	    usedBy = [];
-	    dirty = false;
 	    tags;
+	    #dirty = false;
+	    get dirty() {
+	        return this.#dirty;
+	    }
+	    set dirty(v) {
+	        this.#dirty = v;
+	    }
 	    constructor(name, data, tags = []) {
 	        this.name = name;
 	        this.data = data;
@@ -175,8 +182,14 @@
 	        if (typeof name === "number") {
 	            return this.elements.get(name) || null;
 	        }
-	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-	        for (const [_, item] of this.elements) {
+	        if (typeof name === "function" && name.prototype) {
+	            for (const [, item] of this.elements) {
+	                if (item instanceof name) {
+	                    return item;
+	                }
+	            }
+	        }
+	        for (const [, item] of this.elements) {
 	            if (item.name === name) {
 	                return item;
 	            }
@@ -238,13 +251,11 @@
 	    }
 	}
 
-	// 私有全局变量，外部无法访问
-	// let componentTmp: IComponent<any> | undefined;
-	var EComponentEvent;
+	exports.EComponentEvent = void 0;
 	(function (EComponentEvent) {
 	    EComponentEvent["ADD_COMPONENT"] = "addComponent";
 	    EComponentEvent["REMOVE_COMPONENT"] = "removeComponent";
-	})(EComponentEvent || (EComponentEvent = {}));
+	})(exports.EComponentEvent || (exports.EComponentEvent = {}));
 	class ComponentManager extends Manager {
 	    isComponentManager = true;
 	    add(element) {
@@ -257,17 +268,34 @@
 	        }
 	        return this.addElementDirectly(element);
 	    }
+	    getComponentsByClass(clazz) {
+	        const result = [];
+	        this.elements.forEach((component) => {
+	            if (component instanceof clazz) {
+	                result.push(component);
+	            }
+	        });
+	        return result;
+	    }
+	    getComponentByClass(clazz) {
+	        for (const [, component] of this.elements) {
+	            if (component instanceof clazz) {
+	                return component;
+	            }
+	        }
+	        return null;
+	    }
 	    getComponentsByTagLabel(label) {
 	        const result = [];
-	        for (const [_, component] of this.elements) {
+	        this.elements.forEach((component) => {
 	            if (component.hasTagLabel(label)) {
 	                result.push(component);
 	            }
-	        }
+	        });
 	        return result;
 	    }
-	    getFirstComponentByTagLabel(label) {
-	        for (const [_, component] of this.elements) {
+	    getComponentByTagLabel(label) {
+	        for (const [, component] of this.elements) {
 	            if (component.hasTagLabel(label)) {
 	                return component;
 	            }
@@ -345,8 +373,14 @@
 	    getComponentsByTagLabel(label) {
 	        return this.componentManager?.getComponentsByTagLabel(label) || [];
 	    }
-	    getFirstComponentByTagLabel(label) {
-	        return this.componentManager?.getFirstComponentByTagLabel(label) || null;
+	    getComponentByTagLabel(label) {
+	        return this.componentManager?.getComponentByTagLabel(label) || null;
+	    }
+	    getComponentsByClass(clazz) {
+	        return this.componentManager?.getComponentsByClass(clazz) || [];
+	    }
+	    getComponentByClass(clazz) {
+	        return this.componentManager?.getComponentByClass(clazz) || null;
 	    }
 	    hasComponent(component) {
 	        return this.componentManager?.has(component) || false;
@@ -486,7 +520,7 @@
 	        this.fire(SystemManager.Events.BEFORE_RUN, this);
 	        this.elements.forEach((item) => {
 	            item.checkUpdatedEntities(world.entityManager);
-	            if (!item.disabled) {
+	            if (!item.disabled && item.autoUpdate) {
 	                item.run(world, time, delta);
 	            }
 	        });
@@ -649,12 +683,14 @@
 
 	exports.Component = Component;
 	exports.ComponentManager = ComponentManager;
+	exports.ElementChangeEvent = ElementChangeEvent;
 	exports.Entity = Entity;
-	exports.Entitymanager = EntityManager;
+	exports.EntityManager = EntityManager;
 	exports.IdGeneratorInstance = IdGeneratorInstance;
 	exports.Manager = Manager;
 	exports.PureSystem = PureSystem;
 	exports.System = System;
+	exports.SystemEvent = SystemEvent;
 	exports.SystemManager = SystemManager;
 	exports.World = World;
 

@@ -1,15 +1,15 @@
-import EntityManager from "./EntityManager";
+import { EntityManager } from "./EntityManager";
 import { IdGeneratorInstance } from "./Global";
-import IEntity from "./interfaces/IEntity";
-import IEntityManager from "./interfaces/IEntityManager";
-import ISystem from "./interfaces/ISystem";
-import ISystemManager from "./interfaces/ISystemManager";
-import IWorld from "./interfaces/IWorld";
-import SystemManager from "./SystemManager";
+import { IEntity } from "./interfaces/IEntity";
+import { IEntityManager } from "./interfaces/IEntityManager";
+import { ISystem } from "./interfaces/ISystem";
+import { ISystemManager } from "./interfaces/ISystemManager";
+import { IWorld } from "./interfaces/IWorld";
+import { SystemManager } from "./SystemManager";
 
 let arr: any[];
 
-export default class World implements IWorld {
+export class World implements IWorld {
 	public disabled = false;
 	public name: string;
 	public entityManager: IEntityManager | null = null;

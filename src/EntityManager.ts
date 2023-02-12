@@ -1,11 +1,11 @@
-import Entity from "./Entity";
-import IEntity from "./interfaces/IEntity";
-import IEntityManager from "./interfaces/IEntityManager";
-import ISystem from "./interfaces/ISystem";
-import IWorld from "./interfaces/IWorld";
-import Manager from "./Manager";
+import { Entity } from "./Entity";
+import { IEntity } from "./interfaces/IEntity";
+import { IEntityManager } from "./interfaces/IEntityManager";
+import { ISystem } from "./interfaces/ISystem";
+import { IWorld } from "./interfaces/IWorld";
+import { Manager } from "./Manager";
 
-export default class EntityManager extends Manager<IEntity> implements IEntityManager {
+export class EntityManager extends Manager<IEntity> implements IEntityManager {
 	// public elements: Map<string, IEntity> = new Map();
 	public data: any = null;
 	public updatedEntities: Set<IEntity> = new Set();

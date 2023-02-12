@@ -1,15 +1,15 @@
 import EventFirer from "@valeera/eventfirer";
 import { IdGeneratorInstance } from "./Global";
-import IEntity from "./interfaces/IEntity";
-import IEntityManager from "./interfaces/IEntityManager";
-import ISystem from "./interfaces/ISystem";
-import ISystemManager from "./interfaces/ISystemManager";
-import IWorld from "./interfaces/IWorld";
+import { IEntity } from "./interfaces/IEntity";
+import { IEntityManager } from "./interfaces/IEntityManager";
+import { ISystem } from "./interfaces/ISystem";
+import { ISystemManager } from "./interfaces/ISystemManager";
+import { IWorld } from "./interfaces/IWorld";
 
 type TQueryRule = (entity: IEntity) => boolean;
 let weakMapTmp: Set<IEntity> | undefined;
 
-export default abstract class System extends EventFirer implements ISystem {
+export abstract class System extends EventFirer implements ISystem {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isSystem = true;
 	public name = "";
@@ -17,6 +17,7 @@ export default abstract class System extends EventFirer implements ISystem {
 	public entitySet: WeakMap<IEntityManager, Set<IEntity>> = new WeakMap();
 	public usedBy: ISystemManager[] = [];
 	public cache: WeakMap<IEntity, any> = new WeakMap();
+	public autoUpdate = true;
 	protected rule: TQueryRule;
 	protected _disabled = false;
 

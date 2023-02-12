@@ -952,10 +952,10 @@ escape-string-regexp@^1.0.5:
   resolved "https://registry.npm.taobao.org/escape-string-regexp/download/escape-string-regexp-1.0.5.tgz?cache=0&sync_timestamp=1618677243201&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fescape-string-regexp%2Fdownload%2Fescape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
-eslint-config-valeera@latest:
-  version "0.1.1"
-  resolved "https://registry.npmmirror.com/eslint-config-valeera/-/eslint-config-valeera-0.1.1.tgz#0d6694974f42d284e4f6b536fa7307a719680aec"
-  integrity sha512-Ac6Q+Cpa0L0MojoaZjQEKpkWUbxlkQtoP1I8xFoDiFNSYTXeC9s4UZluKMnnOYU9/3Ta2idtHucyufTLV5YbGQ==
+eslint-config-valeera@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.npmmirror.com/eslint-config-valeera/-/eslint-config-valeera-0.1.3.tgz#2190e7de6e99bbb0035acd5dc22e0f13ab1143b8"
+  integrity sha512-tUWMCqLzPdHBRJSuZzipBbcIDIHQPxnl7ZcIlIsxSwXOGTY0qBa+mqGvyu0bNCqL7YtJZlTX6gDShpJGqTuKug==
 
 eslint-plugin-html@latest:
   version "7.1.0"
@@ -1091,11 +1091,6 @@ estraverse@^5.1.0, estraverse@^5.2.0:
   version "5.2.0"
   resolved "https://registry.nlark.com/estraverse/download/estraverse-5.2.0.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2Festraverse%2Fdownload%2Festraverse-5.2.0.tgz#307df42547e6cc7324d3cf03c155d5cdb8c53880"
   integrity sha1-MH30JUfmzHMk088DwVXVzbjFOIA=
-
-estree-walker@^0.6.1:
-  version "0.6.1"
-  resolved "https://registry.npmmirror.com/estree-walker/-/estree-walker-0.6.1.tgz#53049143f40c6eb918b23671d1fe3219f3a1b362"
-  integrity sha512-SqmZANLWS0mnatqbSfRP5g8OXZC12Fgg1IwNtLsyHDzJizORW4khDfjPqJZsemPWBB2uqykUah5YpQ6epsqC/w==
 
 estree-walker@^2.0.1, estree-walker@^2.0.2:
   version "2.0.2"
@@ -2181,13 +2176,6 @@ rimraf@^3.0.0, rimraf@^3.0.2:
   dependencies:
     glob "^7.1.3"
 
-rollup-plugin-json@latest:
-  version "4.0.0"
-  resolved "https://registry.npmmirror.com/rollup-plugin-json/-/rollup-plugin-json-4.0.0.tgz#a18da0a4b30bf5ca1ee76ddb1422afbb84ae2b9e"
-  integrity sha512-hgb8N7Cgfw5SZAkb3jf0QXii6QX/FOkiIq2M7BAQIEydjHvTyxXHQiIzZaTFgx1GK0cRCHOCBHIyEkkLdWKxow==
-  dependencies:
-    rollup-pluginutils "^2.5.0"
-
 rollup-plugin-typescript2@latest:
   version "0.34.1"
   resolved "https://registry.npmmirror.com/rollup-plugin-typescript2/-/rollup-plugin-typescript2-0.34.1.tgz#c457f155a71d133c142689213fce78694e30d0be"
@@ -2198,13 +2186,6 @@ rollup-plugin-typescript2@latest:
     fs-extra "^10.0.0"
     semver "^7.3.7"
     tslib "^2.4.0"
-
-rollup-pluginutils@^2.5.0:
-  version "2.8.2"
-  resolved "https://registry.npmmirror.com/rollup-pluginutils/-/rollup-pluginutils-2.8.2.tgz#72f2af0748b592364dbd3389e600e5a9444a351e"
-  integrity sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==
-  dependencies:
-    estree-walker "^0.6.1"
 
 rollup@latest:
   version "3.5.1"

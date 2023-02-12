@@ -1,7 +1,6 @@
 import EventFirer from "@valeera/eventfirer";
-import IECSObject from "./interfaces/IECSObject";
-// import IEntity from "./interfaces/IEntity";
-import IManager from "./interfaces/IManager";
+import { IECSObject } from "./interfaces/IECSObject";
+import { IManager } from "./interfaces/IManager";
 
 // 私有全局变量，外部无法访问
 let elementTmp: any;
@@ -11,7 +10,7 @@ export const ElementChangeEvent = {
 	REMOVE: "remove"
 };
 
-export default class Manager<T extends IECSObject<T>> extends EventFirer implements IManager<T> {
+export class Manager<T extends IECSObject<T>> extends EventFirer implements IManager<T> {
 	public static readonly Events = ElementChangeEvent;
 
 	public elements: Map<number, T> = new Map();
@@ -33,12 +32,18 @@ export default class Manager<T extends IECSObject<T>> extends EventFirer impleme
 		return this;
 	}
 
-	public get(name: string | number): T | null {
+	public get(name: string | number | (new () => any)): T | null {
 		if (typeof name === "number") {
 			return this.elements.get(name) || null;
 		}
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		for (const [_, item] of this.elements) {
+		if (typeof name === "function" && name.prototype) {
+			for (const [, item] of this.elements) {
+				if (item instanceof name) {
+					return item;
+				}
+			}
+		}
+		for (const [, item] of this.elements) {
 			if (item.name === name) {
 				return item;
 			}

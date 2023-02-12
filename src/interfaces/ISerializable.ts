@@ -1,4 +1,4 @@
-export default interface ISerializable {
+export interface ISerializable {
 	readonly id: number;
 	serialize: () => { [key: string]: any };
 }

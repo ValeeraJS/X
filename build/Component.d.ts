@@ -1,11 +1,12 @@
-import IComponent, { ComponentTag } from "./interfaces/IComponent";
+import { ComponentTag, IComponent } from "./interfaces/IComponent";
 import { ISerializedJson } from "./interfaces/ISerializable";
 export interface IComponentSerializedJson<T> extends ISerializedJson {
     data: T;
     name: string;
     disabled: boolean;
 }
-export default class Component<T> implements IComponent<T> {
+export declare class Component<T> implements IComponent<T> {
+    #private;
     static unserialize<T>(json: IComponentSerializedJson<T>): Component<T>;
     readonly isComponent = true;
     readonly id: number;
@@ -13,8 +14,9 @@ export default class Component<T> implements IComponent<T> {
     disabled: boolean;
     name: string;
     usedBy: never[];
-    dirty: boolean;
     tags: ComponentTag[];
+    get dirty(): boolean;
+    set dirty(v: boolean);
     constructor(name: string, data: T, tags?: ComponentTag[]);
     clone(): IComponent<T>;
     hasTagLabel(label: string): boolean;

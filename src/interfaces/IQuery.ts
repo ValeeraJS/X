@@ -1,6 +1,6 @@
-import IEntity from "./IEntity";
+import { IEntity } from "./IEntity";
 
-export default interface IQuery {
+export interface IQuery {
 	entities: IEntity[];
 	add: (entity: IEntity) => this;
 	remove: (entity: IEntity) => this;
