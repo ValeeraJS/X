@@ -33,36 +33,27 @@ declare const Entity_base: {
     removeChild(node: import("@valeera/tree").ITreeNodeData, child: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData;
     toArray(node: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData[];
     traverse(node: import("@valeera/tree").ITreeNodeData, visitor: import("@valeera/tree").IVisitor, rest?: any): import("@valeera/tree").ITreeNodeData;
-} & {
-    new (...a: any[]): {
-        "__#5@#isFire": boolean;
-        "__#5@#fireIndex": number;
-        "__#5@#offCount": Map<import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey, number>;
-        eventKeyList: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey[];
-        filters: import("@valeera/eventfirer/build/interfaces/IEventFirer").TFilter[];
-        listeners: Map<import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey, import("@valeera/eventfirer/build/interfaces/IEventFirer").TListenersValue>;
-        all(listener: import("@valeera/eventfirer/build/interfaces/IEventFirer").TListener): any;
-        clearListenersByKey(eventKey: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey): any;
-        clearAllListeners(): any;
-        filt(rule: Function, listener: import("@valeera/eventfirer/build/interfaces/IEventFirer").TListener): any;
-        fire(eventKey: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey | import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey[], target?: any): any;
-        off(eventKey: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey, listener: import("@valeera/eventfirer/build/interfaces/IEventFirer").TListener): any;
-        on(eventKey: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey | import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey[], listener: import("@valeera/eventfirer/build/interfaces/IEventFirer").TListener): any;
-        once(eventKey: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey, listener: import("@valeera/eventfirer/build/interfaces/IEventFirer").TListener): any;
-        times(eventKey: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey, times: number, listener: import("@valeera/eventfirer/build/interfaces/IEventFirer").TListener): any;
-        checkFilt(eventKey: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey, target: any): any;
-        checkEventKeyAvailable(eventKey: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey): boolean;
-        constructor: Function;
-        toString(): string;
-        toLocaleString(): string;
-        valueOf(): Object;
-        hasOwnProperty(v: PropertyKey): boolean;
-        isPrototypeOf(v: Object): boolean;
-        propertyIsEnumerable(v: PropertyKey): boolean;
-        should: Chai.Assertion;
-    };
-    mixin: (Base?: (new (...a: any[]) => Object) | undefined, eventKeyList?: import("@valeera/eventfirer/build/interfaces/IEventFirer").TEventKey[] | undefined) => any;
-};
+} & (new () => {
+    filters: import("@valeera/eventfire").TFilter[];
+    listeners: Map<import("@valeera/eventfire").TEventKey, import("@valeera/eventfire").TListenersValue>;
+    all(listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
+    clearListenersByKey(eventKey: import("@valeera/eventfire").TEventKey): any;
+    clearAllListeners(): any;
+    filt(rule: import("@valeera/eventfire").TEventFilter, listener: import("@valeera/eventfire").TListenerFilter, checkDuplicate?: boolean | undefined): any;
+    fire(eventKey: import("@valeera/eventfire").TEventKey | import("@valeera/eventfire").TEventKey[], target?: any): any;
+    off(eventKey: import("@valeera/eventfire").TEventKey, listener: import("@valeera/eventfire").TListener): any;
+    on(eventKey: import("@valeera/eventfire").TEventKey | import("@valeera/eventfire").TEventKey[], listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
+    once(eventKey: import("@valeera/eventfire").TEventKey, listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
+    times(eventKey: import("@valeera/eventfire").TEventKey, times: number, listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
+    constructor: Function;
+    toString(): string;
+    toLocaleString(): string;
+    valueOf(): Object;
+    hasOwnProperty(v: PropertyKey): boolean;
+    isPrototypeOf(v: Object): boolean;
+    propertyIsEnumerable(v: PropertyKey): boolean;
+    should: Chai.Assertion;
+});
 export declare class Entity extends Entity_base implements IEntity {
     readonly id: number;
     readonly isEntity = true;

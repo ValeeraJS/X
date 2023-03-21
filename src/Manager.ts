@@ -1,4 +1,4 @@
-import EventFirer from "@valeera/eventfirer";
+import { EventFirer } from "@valeera/eventfire";
 import { IECSObject } from "./interfaces/IECSObject";
 import { IManager } from "./interfaces/IManager";
 

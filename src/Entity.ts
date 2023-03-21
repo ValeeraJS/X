@@ -1,5 +1,5 @@
 import { ComponentManager } from "./ComponentManager";
-import EventFirer from "@valeera/eventfirer";
+import { EventFirer } from "@valeera/eventfire";
 import { IComponent } from "./interfaces/IComponent";
 import { ComponentConstructor, IComponentManager } from "./interfaces/IComponentManager";
 import { IdGeneratorInstance } from "./Global";

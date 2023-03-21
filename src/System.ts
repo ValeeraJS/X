@@ -1,4 +1,4 @@
-import EventFirer from "@valeera/eventfirer";
+import { EventFirer } from "@valeera/eventfire";
 import { IdGeneratorInstance } from "./Global";
 import { IEntity } from "./interfaces/IEntity";
 import { IEntityManager } from "./interfaces/IEntityManager";

@@ -1,8 +1,245 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@valeera/eventfirer'), require('@valeera/idgenerator'), require('@valeera/tree')) :
-	typeof define === 'function' && define.amd ? define(['exports', '@valeera/eventfirer', '@valeera/idgenerator', '@valeera/tree'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.X = {}, global.EventFirer, global.IdGenerator, global.Tree));
-})(this, (function (exports, EventFirer, IdGenerator, tree) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.X = {}));
+})(this, (function (exports) { 'use strict';
+
+	const RefWeakMap = new WeakMap();
+	const allFilter = () => true;
+
+	function checkFilt(firer, eventKey, target) {
+	    for (const item of firer.filters) {
+	        if (item.rule(eventKey, target)) {
+	            item.listener(target, eventKey);
+	        }
+	    }
+	    return firer;
+	}
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+	const mixin$1 = (Base = Object) => {
+	    return class EventFirer extends Base {
+	        filters;
+	        listeners;
+	        constructor() {
+	            super();
+	            this.filters = [];
+	            this.listeners = new Map();
+	            RefWeakMap.set(this, {
+	                fireIndex: -1,
+	                isFire: false,
+	                offCount: new Map()
+	            });
+	        }
+	        all(listener, checkDuplicate) {
+	            return this.filt(allFilter, listener, checkDuplicate);
+	        }
+	        clearListenersByKey(eventKey) {
+	            this.listeners.delete(eventKey);
+	            return this;
+	        }
+	        clearAllListeners() {
+	            const keys = this.listeners.keys();
+	            for (const key of keys) {
+	                this.listeners.delete(key);
+	            }
+	            return this;
+	        }
+	        filt(rule, listener, checkDuplicate) {
+	            if (checkDuplicate) {
+	                let f;
+	                for (let i = 0, j = this.filters.length; i < j; i++) {
+	                    f = this.filters[i];
+	                    if (f.rule === rule && f.listener === listener) {
+	                        return this;
+	                    }
+	                }
+	            }
+	            this.filters.push({
+	                listener,
+	                rule
+	            });
+	            return this;
+	        }
+	        fire(eventKey, target) {
+	            if (eventKey instanceof Array) {
+	                for (let i = 0, len = eventKey.length; i < len; i++) {
+	                    this.fire(eventKey[i], target);
+	                }
+	                return this;
+	            }
+	            const ref = RefWeakMap.get(this);
+	            ref.isFire = true;
+	            const array = this.listeners.get(eventKey) || [];
+	            // let len = array.length;
+	            let item;
+	            for (let i = 0; i < array.length; i++) {
+	                ref.fireIndex = i;
+	                item = array[i];
+	                item.listener(target);
+	                item.times--;
+	                if (item.times <= 0) {
+	                    array.splice(i--, 1);
+	                }
+	                const count = ref.offCount.get(eventKey);
+	                if (count) {
+	                    // 如果在当前事件触发时，监听器依次触发，已触发的被移除
+	                    i -= count;
+	                    ref.offCount.clear();
+	                }
+	            }
+	            checkFilt(this, eventKey, target);
+	            ref.fireIndex = -1;
+	            ref.offCount.clear();
+	            ref.isFire = false;
+	            return this;
+	        }
+	        off(eventKey, listener) {
+	            const array = this.listeners.get(eventKey);
+	            const ref = RefWeakMap.get(this);
+	            if (!array) {
+	                return this;
+	            }
+	            const len = array.length;
+	            for (let i = 0; i < len; i++) {
+	                if (array[i].listener === listener) {
+	                    array.splice(i, 1);
+	                    if (ref.isFire && ref.fireIndex >= i) {
+	                        const v = ref.offCount.get(eventKey) ?? 0;
+	                        ref.offCount.set(eventKey, v + 1);
+	                    }
+	                    break;
+	                }
+	            }
+	            return this;
+	        }
+	        on(eventKey, listener, checkDuplicate) {
+	            if (eventKey instanceof Array) {
+	                for (let i = 0, j = eventKey.length; i < j; i++) {
+	                    this.times(eventKey[i], Infinity, listener, checkDuplicate);
+	                }
+	                return this;
+	            }
+	            return this.times(eventKey, Infinity, listener, checkDuplicate);
+	        }
+	        once(eventKey, listener, checkDuplicate) {
+	            return this.times(eventKey, 1, listener, checkDuplicate);
+	        }
+	        times(eventKey, times, listener, checkDuplicate = false) {
+	            const array = this.listeners.get(eventKey) || [];
+	            if (!this.listeners.has(eventKey)) {
+	                this.listeners.set(eventKey, array);
+	            }
+	            if (checkDuplicate) {
+	                for (let i = 0, j = array.length; i < j; i++) {
+	                    if (array[i].listener === listener) {
+	                        return this;
+	                    }
+	                }
+	            }
+	            array.push({
+	                listener,
+	                times
+	            });
+	            return this;
+	        }
+	    };
+	};
+	const EventFirer = mixin$1(Object);
+
+	const S4 = () => {
+	    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+	};
+	/**
+	 * @class
+	 * @classdesc 数字id生成器，用于生成递增id
+	 * @param {number} [initValue = 0] 从几开始生成递增id
+	 * @implements IdGenerator.IIncreaser
+	 */
+	class IdGenerator {
+	    initValue;
+	    value;
+	    /**
+	     * @member IdGenerator.initValue
+	     * @desc id从该值开始递增，在创建实例时进行设置。设置之后将无法修改。
+	     * @readonly
+	     * @public
+	     */
+	    constructor(initValue = 0) {
+	        this.value = this.initValue = initValue;
+	    }
+	    /**
+	     * @method IdGenerator.prototype.current
+	     * @desc 返回当前的id
+	     * @readonly
+	     * @public
+	     * @returns {number} id
+	     */
+	    current() {
+	        return this.value;
+	    }
+	    jumpTo(value) {
+	        if (this.value < value) {
+	            this.value = value;
+	            return true;
+	        }
+	        return false;
+	    }
+	    /**
+	     * @method IdGenerator.prototype.next
+	     * @desc 生成新的id
+	     * @public
+	     * @returns {number} id
+	     */
+	    next() {
+	        return ++this.value;
+	    }
+	    /**
+	     * @method IdGenerator.prototype.skip
+	     * @desc 跳过一段值生成新的id
+	     * @public
+	     * @param {number} [value = 1] 跳过的范围，必须大于等于1
+	     * @returns {number} id
+	     */
+	    skip(value = 1) {
+	        if (value < 1) {
+	            value = 1;
+	        }
+	        this.value += value;
+	        return ++this.value;
+	    }
+	    /**
+	     * @method IdGenerator.prototype.skip
+	     * @desc 生成新的32位uuid
+	     * @public
+	     * @returns {string} uuid
+	     */
+	    uuid() {
+	        if (crypto.randomUUID) {
+	            return crypto.randomUUID();
+	        }
+	        else {
+	            return S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4();
+	        }
+	    }
+	    /**
+	     * @method IdGenerator.prototype.skip
+	     * @desc 生成新的32位BigInt
+	     * @public
+	     * @returns {BigInt} uuid
+	     */
+	    uuidBigInt() {
+	        // return bi4(7) + bi4(6) + bi4(5) + bi4(4) + bi4(3) + bi4(2) + bi4(1) + bi4(0);
+	        const arr = crypto.getRandomValues(new Uint16Array(8));
+	        return (BigInt(arr[0]) * 65536n * 65536n * 65536n * 65536n * 65536n * 65536n * 65536n +
+	            BigInt(arr[1]) * 65536n * 65536n * 65536n * 65536n * 65536n * 65536n +
+	            BigInt(arr[2]) * 65536n * 65536n * 65536n * 65536n * 65536n +
+	            BigInt(arr[3]) * 65536n * 65536n * 65536n * 65536n +
+	            BigInt(arr[4]) * 65536n * 65536n * 65536n +
+	            BigInt(arr[5]) * 65536n * 65536n +
+	            BigInt(arr[6]) * 65536n +
+	            BigInt(arr[6]));
+	    }
+	}
 
 	const IdGeneratorInstance = new IdGenerator();
 
@@ -320,8 +557,123 @@
 	    }
 	}
 
+	const FIND_LEAVES_VISITOR = {
+	    enter: (node, result) => {
+	        if (!node.children.length) {
+	            result.push(node);
+	        }
+	    }
+	};
+	const ARRAY_VISITOR = {
+	    enter: (node, result) => {
+	        result.push(node);
+	    }
+	};
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+	const mixin = (Base = Object) => {
+	    return class TreeNode extends Base {
+	        static mixin = mixin;
+	        static addChild(node, child) {
+	            if (TreeNode.hasAncestor(node, child)) {
+	                throw new Error("The node added is one of the ancestors of current one.");
+	            }
+	            node.children.push(child);
+	            child.parent = node;
+	            return node;
+	        }
+	        static depth(node) {
+	            if (!node.children.length) {
+	                return 1;
+	            }
+	            else {
+	                const childrenDepth = [];
+	                for (const item of node.children) {
+	                    item && childrenDepth.push(this.depth(item));
+	                }
+	                let max = 0;
+	                for (const item of childrenDepth) {
+	                    max = Math.max(max, item);
+	                }
+	                return 1 + max;
+	            }
+	        }
+	        static findLeaves(node) {
+	            const result = [];
+	            TreeNode.traverse(node, FIND_LEAVES_VISITOR, result);
+	            return result;
+	        }
+	        static findRoot(node) {
+	            if (node.parent) {
+	                return this.findRoot(node.parent);
+	            }
+	            return node;
+	        }
+	        static hasAncestor(node, ancestor) {
+	            if (!node.parent) {
+	                return false;
+	            }
+	            else {
+	                if (node.parent === ancestor) {
+	                    return true;
+	                }
+	                else {
+	                    return TreeNode.hasAncestor(node.parent, ancestor);
+	                }
+	            }
+	        }
+	        static removeChild(node, child) {
+	            if (node.children.includes(child)) {
+	                node.children.splice(node.children.indexOf(child), 1);
+	                child.parent = null;
+	            }
+	            return node;
+	        }
+	        static toArray(node) {
+	            const result = [];
+	            TreeNode.traverse(node, ARRAY_VISITOR, result);
+	            return result;
+	        }
+	        static traverse(node, visitor, rest) {
+	            visitor.enter?.(node, rest);
+	            visitor.visit?.(node, rest);
+	            for (const item of node.children) {
+	                item && TreeNode.traverse(item, visitor, rest);
+	            }
+	            visitor.leave?.(node, rest);
+	            return node;
+	        }
+	        parent = null;
+	        children = [];
+	        addChild(node) {
+	            return TreeNode.addChild(this, node);
+	        }
+	        depth() {
+	            return TreeNode.depth(this);
+	        }
+	        findLeaves() {
+	            return TreeNode.findLeaves(this);
+	        }
+	        findRoot() {
+	            return TreeNode.findRoot(this);
+	        }
+	        hasAncestor(ancestor) {
+	            return TreeNode.hasAncestor(this, ancestor);
+	        }
+	        removeChild(child) {
+	            return TreeNode.removeChild(this, child);
+	        }
+	        toArray() {
+	            return TreeNode.toArray(this);
+	        }
+	        traverse(visitor, rest) {
+	            return TreeNode.traverse(this, visitor, rest);
+	        }
+	    };
+	};
+	var TreeNode = mixin(Object);
+
 	let arr$1;
-	class Entity extends tree.TreeNode.mixin(EventFirer) {
+	class Entity extends TreeNode.mixin(EventFirer) {
 	    id = IdGeneratorInstance.next();
 	    isEntity = true;
 	    componentManager = null;

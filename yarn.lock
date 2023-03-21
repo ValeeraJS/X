@@ -416,10 +416,10 @@
     "@typescript-eslint/types" "5.45.0"
     eslint-visitor-keys "^3.3.0"
 
-"@valeera/eventfirer@latest":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@valeera/eventfirer/-/eventfirer-1.0.0.tgz#18fcdab9ef82e17c0766644ed410b5af27ea26ae"
-  integrity sha512-KM/N23Wp2N/khjhIRPUuqcLQ6qSqEdn7HhROv6IvBQ2S2+uwueMHBBP9htmIdT5vtrBY2tOILbIzkrnRa4GDFg==
+"@valeera/eventfire@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.npmmirror.com/@valeera/eventfire/-/eventfire-1.1.0.tgz#d43c851c3f48b1f02858c86ee2165953e287e5b7"
+  integrity sha512-Pc01K5O4SFqg2YA7KF+GG7pgEpj5bWZX5U0nz+NurpI6txH79JKssQPhPpbuJrY6Wx3OPk7JrDA/mchaUk+PYg==
 
 "@valeera/idgenerator@latest":
   version "1.1.1"

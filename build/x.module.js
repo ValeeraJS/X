@@ -1,4 +1,4 @@
-import EventFirer from '@valeera/eventfirer';
+import { EventFirer } from '@valeera/eventfire';
 import IdGenerator from '@valeera/idgenerator';
 import { TreeNode } from '@valeera/tree';
 
