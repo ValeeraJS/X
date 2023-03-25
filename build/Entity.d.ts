@@ -33,7 +33,7 @@ declare const Entity_base: {
     removeChild(node: import("@valeera/tree").ITreeNodeData, child: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData;
     toArray(node: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData[];
     traverse(node: import("@valeera/tree").ITreeNodeData, visitor: import("@valeera/tree").IVisitor, rest?: any): import("@valeera/tree").ITreeNodeData;
-} & (new () => {
+} & (new (...args: any[]) => {
     filters: import("@valeera/eventfire").TFilter[];
     listeners: Map<import("@valeera/eventfire").TEventKey, import("@valeera/eventfire").TListenersValue>;
     all(listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
@@ -45,15 +45,7 @@ declare const Entity_base: {
     on(eventKey: import("@valeera/eventfire").TEventKey | import("@valeera/eventfire").TEventKey[], listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
     once(eventKey: import("@valeera/eventfire").TEventKey, listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
     times(eventKey: import("@valeera/eventfire").TEventKey, times: number, listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
-    constructor: Function;
-    toString(): string;
-    toLocaleString(): string;
-    valueOf(): Object;
-    hasOwnProperty(v: PropertyKey): boolean;
-    isPrototypeOf(v: Object): boolean;
-    propertyIsEnumerable(v: PropertyKey): boolean;
-    should: Chai.Assertion;
-});
+}) & ObjectConstructor;
 export declare class Entity extends Entity_base implements IEntity {
     readonly id: number;
     readonly isEntity = true;

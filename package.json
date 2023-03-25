@@ -37,7 +37,7 @@
 	"author": "hypnosnova",
 	"license": "MIT",
 	"dependencies": {
-		"@valeera/eventfire": "1.1.0",
+		"@valeera/eventfire": "1.1.1",
 		"@valeera/idgenerator": "latest",
 		"@valeera/tree": "latest",
 		"clone-deep": "latest"
