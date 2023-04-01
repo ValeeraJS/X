@@ -1,10 +1,11 @@
+import { IEventFirer } from "@valeera/eventfire";
 import { IECSObject } from "./IECSObject";
 import { IEntity } from "./IEntity";
 import { IEntityManager } from "./IEntityManager";
 import { ISystem } from "./ISystem";
 import { ISystemManager } from "./ISystemManager";
 export type TWorldInjection = Map<string, any>;
-export interface IWorld extends IECSObject<any> {
+export interface IWorld extends IECSObject<any>, IEventFirer {
     entityManager: IEntityManager | null;
     store: TWorldInjection;
     systemManager: ISystemManager | null;
