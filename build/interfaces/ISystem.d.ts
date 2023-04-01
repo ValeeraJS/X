@@ -15,6 +15,6 @@ export interface ISystem extends IECSObject<ISystem> {
     checkUpdatedEntities(manager: IEntityManager | null): this;
     destroy(): this;
     query(entity: IEntity): boolean;
-    handle(entity: IEntity, time: number, delta: number): this;
+    handle(entity: IEntity, time: number, delta: number, world: IWorld): this;
     run(world: IWorld, time: number, delta: number): this;
 }

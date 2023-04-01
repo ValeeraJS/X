@@ -1,3 +1,4 @@
+import { EventFirer } from "@valeera/eventfire";
 import { EntityManager } from "./EntityManager";
 import { IdGeneratorInstance } from "./Global";
 import { IEntity } from "./interfaces/IEntity";
@@ -9,7 +10,7 @@ import { SystemManager } from "./SystemManager";
 
 let arr: any[];
 
-export class World implements IWorld {
+export class World extends EventFirer implements IWorld {
 	public disabled = false;
 	public name: string;
 	public entityManager: IEntityManager | null = null;
@@ -21,6 +22,7 @@ export class World implements IWorld {
 	public readonly isWorld = true;
 
 	public constructor(name = "", entityManager?: IEntityManager, systemManager?: ISystemManager) {
+		super();
 		this.name = name;
 		this.registerEntityManager(entityManager);
 		this.registerSystemManager(systemManager);

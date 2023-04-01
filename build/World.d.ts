@@ -1,9 +1,10 @@
+import { EventFirer } from "@valeera/eventfire";
 import { IEntity } from "./interfaces/IEntity";
 import { IEntityManager } from "./interfaces/IEntityManager";
 import { ISystem } from "./interfaces/ISystem";
 import { ISystemManager } from "./interfaces/ISystemManager";
 import { IWorld } from "./interfaces/IWorld";
-export declare class World implements IWorld {
+export declare class World extends EventFirer implements IWorld {
     disabled: boolean;
     name: string;
     entityManager: IEntityManager | null;

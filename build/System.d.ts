@@ -25,6 +25,6 @@ export declare abstract class System extends EventFirer implements ISystem {
     run(world: IWorld, time: number, delta: number): this;
     serialize(): any;
     destroy(): this;
-    abstract handle(entity: IEntity, time: number, delta: number): this;
+    abstract handle(entity: IEntity, time: number, delta: number, world: IWorld): this;
 }
 export {};

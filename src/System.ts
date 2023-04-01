@@ -87,7 +87,7 @@ export abstract class System extends EventFirer implements ISystem {
 		if (world.entityManager) {
 			this.entitySet.get(world.entityManager)?.forEach((item: IEntity) => {
 				// 此处不应该校验disabled。这个交给各自系统自行判断
-				this.handle(item, time, delta);
+				this.handle(item, time, delta, world);
 			});
 		}
 
@@ -106,5 +106,5 @@ export abstract class System extends EventFirer implements ISystem {
 		return this;
 	}
 
-	public abstract handle(entity: IEntity, time: number, delta: number): this;
+	public abstract handle(entity: IEntity, time: number, delta: number, world: IWorld): this;
 }

@@ -77,7 +77,7 @@ class System extends EventFirer {
         if (world.entityManager) {
             this.entitySet.get(world.entityManager)?.forEach((item) => {
                 // 此处不应该校验disabled。这个交给各自系统自行判断
-                this.handle(item, time, delta);
+                this.handle(item, time, delta, world);
             });
         }
         return this;
@@ -548,7 +548,7 @@ class SystemManager extends Manager {
 }
 
 let arr;
-class World {
+class World extends EventFirer {
     disabled = false;
     name;
     entityManager = null;
@@ -558,6 +558,7 @@ class World {
     id = IdGeneratorInstance.next();
     isWorld = true;
     constructor(name = "", entityManager, systemManager) {
+        super();
         this.name = name;
         this.registerEntityManager(entityManager);
         this.registerSystemManager(systemManager);
