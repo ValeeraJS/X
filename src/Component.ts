@@ -1,6 +1,7 @@
 import { ComponentTag, IComponent } from "./interfaces/IComponent";
 import { IdGeneratorInstance } from "./Global";
 import { ISerializedJson } from "./interfaces/ISerializable";
+import IComponentManager from "./interfaces/IComponentManager";
 
 export interface IComponentSerializedJson<T> extends ISerializedJson {
 	data: T;
@@ -22,7 +23,7 @@ export class Component<T> implements IComponent<T> {
 	public data: T;
 	public disabled = false;
 	public name: string;
-	public usedBy = [];
+	public usedBy: IComponentManager[] = [];
 	public tags: ComponentTag[];
 	#dirty = false;
 
