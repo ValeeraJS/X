@@ -1,7 +1,7 @@
 import { ComponentTag, IComponent } from "./interfaces/IComponent";
 import { IdGeneratorInstance } from "./Global";
 import { ISerializedJson } from "./interfaces/ISerializable";
-import IComponentManager from "./interfaces/IComponentManager";
+import { IComponentManager } from "./interfaces/IComponentManager";
 
 export interface IComponentSerializedJson<T> extends ISerializedJson {
 	data: T;

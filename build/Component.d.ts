@@ -1,5 +1,6 @@
 import { ComponentTag, IComponent } from "./interfaces/IComponent";
 import { ISerializedJson } from "./interfaces/ISerializable";
+import { IComponentManager } from "./interfaces/IComponentManager";
 export interface IComponentSerializedJson<T> extends ISerializedJson {
     data: T;
     name: string;
@@ -13,7 +14,7 @@ export declare class Component<T> implements IComponent<T> {
     data: T;
     disabled: boolean;
     name: string;
-    usedBy: never[];
+    usedBy: IComponentManager[];
     tags: ComponentTag[];
     get dirty(): boolean;
     set dirty(v: boolean);
