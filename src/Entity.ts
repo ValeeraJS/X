@@ -1,5 +1,5 @@
 import { ComponentManager } from "./ComponentManager";
-import { EventFirer } from "@valeera/eventfire";
+import { mixin } from "@valeera/eventfire";
 import { IComponent } from "./interfaces/IComponent";
 import { ComponentConstructor, IComponentManager } from "./interfaces/IComponentManager";
 import { IdGeneratorInstance } from "./Global";
@@ -10,7 +10,7 @@ import { TreeNode } from "@valeera/tree";
 
 let arr: any[];
 
-export class Entity extends TreeNode.mixin(EventFirer) implements IEntity {
+export class Entity extends mixin(TreeNode) implements IEntity {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
 	public componentManager: IComponentManager | null = null;

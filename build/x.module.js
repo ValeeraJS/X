@@ -1,4 +1,4 @@
-import { EventFirer } from '@valeera/eventfire';
+import { EventFirer, mixin } from '@valeera/eventfire';
 import IdGenerator from '@valeera/idgenerator';
 import { TreeNode } from '@valeera/tree';
 
@@ -319,7 +319,7 @@ class ComponentManager extends Manager {
 }
 
 let arr$1;
-class Entity extends TreeNode.mixin(EventFirer) {
+class Entity extends mixin(TreeNode) {
     id = IdGeneratorInstance.next();
     isEntity = true;
     componentManager = null;

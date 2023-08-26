@@ -3,37 +3,7 @@ import { ComponentConstructor, IComponentManager } from "./interfaces/IComponent
 import { IEntity } from "./interfaces/IEntity";
 import { IEntityManager } from "./interfaces/IEntityManager";
 import { IWorld } from "./interfaces/IWorld";
-declare const Entity_base: {
-    new (...a: any[]): {
-        parent: import("@valeera/tree").ITreeNode | null;
-        children: (import("@valeera/tree").ITreeNode | null)[];
-        addChild(node: import("@valeera/tree").ITreeNodeData): any;
-        depth(): number;
-        findLeaves(): import("@valeera/tree").ITreeNodeData[];
-        findRoot(): import("@valeera/tree").ITreeNodeData;
-        hasAncestor(ancestor: import("@valeera/tree").ITreeNodeData): boolean;
-        removeChild(child: import("@valeera/tree").ITreeNodeData): any;
-        toArray(): import("@valeera/tree").ITreeNodeData[];
-        traverse(visitor: import("@valeera/tree").IVisitor, rest?: any): any;
-        constructor: Function;
-        toString(): string;
-        toLocaleString(): string;
-        valueOf(): Object;
-        hasOwnProperty(v: PropertyKey): boolean;
-        isPrototypeOf(v: Object): boolean;
-        propertyIsEnumerable(v: PropertyKey): boolean;
-        should: Chai.Assertion;
-    };
-    mixin: any;
-    addChild(node: import("@valeera/tree").ITreeNodeData, child: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData;
-    depth(node: import("@valeera/tree").ITreeNodeData): number;
-    findLeaves(node: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData[];
-    findRoot(node: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData;
-    hasAncestor(node: import("@valeera/tree").ITreeNodeData, ancestor: import("@valeera/tree").ITreeNodeData): boolean;
-    removeChild(node: import("@valeera/tree").ITreeNodeData, child: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData;
-    toArray(node: import("@valeera/tree").ITreeNodeData): import("@valeera/tree").ITreeNodeData[];
-    traverse(node: import("@valeera/tree").ITreeNodeData, visitor: import("@valeera/tree").IVisitor, rest?: any): import("@valeera/tree").ITreeNodeData;
-} & (new (...args: any[]) => {
+declare const Entity_base: (new (...args: any[]) => {
     filters: import("@valeera/eventfire").TFilter[];
     listeners: Map<import("@valeera/eventfire").TEventKey, import("@valeera/eventfire").TListenersValue>;
     all(listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
@@ -45,7 +15,18 @@ declare const Entity_base: {
     on(eventKey: import("@valeera/eventfire").TEventKey | import("@valeera/eventfire").TEventKey[], listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
     once(eventKey: import("@valeera/eventfire").TEventKey, listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
     times(eventKey: import("@valeera/eventfire").TEventKey, times: number, listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
-}) & ObjectConstructor;
+}) & (new (...rest: any[]) => {
+    parent: import("@valeera/tree").ITreeNode<unknown> | null;
+    children: (import("@valeera/tree").ITreeNode<unknown> | null)[];
+    addChild(node: import("@valeera/tree").ITreeNodeData<unknown>): any;
+    depth(): number;
+    findLeaves(): import("@valeera/tree").ITreeNodeData<unknown>[];
+    findRoot(): import("@valeera/tree").ITreeNodeData<unknown>;
+    hasAncestor(ancestor: import("@valeera/tree").ITreeNodeData<unknown>): boolean;
+    removeChild(child: import("@valeera/tree").ITreeNodeData<unknown>): any;
+    toArray(): import("@valeera/tree").ITreeNodeData<unknown>[];
+    traverse(visitor: import("@valeera/tree").IVisitor<unknown>, rest?: any): any;
+});
 export declare class Entity extends Entity_base implements IEntity {
     readonly id: number;
     readonly isEntity = true;
