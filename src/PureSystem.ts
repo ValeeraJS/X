@@ -5,7 +5,7 @@ type TQueryRule = (entity: IEntity) => boolean;
 
 export class PureSystem extends System {
 	private handler: Function;
-	public constructor(name = "", fitRule: TQueryRule, handler: Function) {
+	public constructor(name = "Untitled PureSystem", fitRule: TQueryRule, handler: Function) {
 		super(name, fitRule);
 		this.handler = handler;
 	}

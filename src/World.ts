@@ -21,7 +21,7 @@ export class World extends EventFirer implements IWorld {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isWorld = true;
 
-	public constructor(name = "", entityManager?: IEntityManager, systemManager?: ISystemManager) {
+	public constructor(name = "Untitled World", entityManager?: IEntityManager, systemManager?: ISystemManager) {
 		super();
 		this.name = name;
 		this.registerEntityManager(entityManager);

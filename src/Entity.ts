@@ -18,7 +18,7 @@ export class Entity extends mixin(TreeNode) implements IEntity {
 	public name = "";
 	public usedBy: IEntityManager[] = [];
 
-	public constructor(name = "", componentManager?: IComponentManager) {
+	public constructor(name = "Untitled Entity", componentManager?: IComponentManager) {
 		super();
 		this.name = name;
 		this.registerComponentManager(componentManager);

@@ -14,6 +14,9 @@ class System extends EventFirer {
     usedBy = [];
     cache = new WeakMap();
     autoUpdate = true;
+    currentDelta = 0;
+    currentTime = 0;
+    currentWorld = null;
     rule;
     _disabled = false;
     get disabled() {
@@ -22,7 +25,7 @@ class System extends EventFirer {
     set disabled(value) {
         this._disabled = value;
     }
-    constructor(name = "", fitRule) {
+    constructor(name = "Untitled System", fitRule) {
         super();
         this.name = name;
         this.disabled = false;
@@ -74,6 +77,7 @@ class System extends EventFirer {
         if (this.disabled) {
             return this;
         }
+        this.handleBefore(time, delta, world);
         if (world.entityManager) {
             this.entitySet.get(world.entityManager)?.forEach((item) => {
                 // 此处不应该校验disabled。这个交给各自系统自行判断
@@ -91,11 +95,18 @@ class System extends EventFirer {
         }
         return this;
     }
+    handleBefore(time, delta, world) {
+        this.currentTime = time;
+        this.currentDelta = delta;
+        this.currentWorld = world;
+        this.loopTimes++;
+        return this;
+    }
 }
 
 class PureSystem extends System {
     handler;
-    constructor(name = "", fitRule, handler) {
+    constructor(name = "Untitled PureSystem", fitRule, handler) {
         super(name, fitRule);
         this.handler = handler;
     }
@@ -326,7 +337,7 @@ class Entity extends mixin(TreeNode) {
     disabled = false;
     name = "";
     usedBy = [];
-    constructor(name = "", componentManager) {
+    constructor(name = "Untitled Entity", componentManager) {
         super();
         this.name = name;
         this.registerComponentManager(componentManager);
@@ -557,7 +568,7 @@ class World extends EventFirer {
     usedBy = [];
     id = IdGeneratorInstance.next();
     isWorld = true;
-    constructor(name = "", entityManager, systemManager) {
+    constructor(name = "Untitled World", entityManager, systemManager) {
         super();
         this.name = name;
         this.registerEntityManager(entityManager);

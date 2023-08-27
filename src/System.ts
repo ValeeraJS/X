@@ -18,6 +18,10 @@ export abstract class System extends EventFirer implements ISystem {
 	public usedBy: ISystemManager[] = [];
 	public cache: WeakMap<IEntity, any> = new WeakMap();
 	public autoUpdate = true;
+
+	protected currentDelta: number = 0;
+	protected currentTime: number = 0;
+	protected currentWorld: IWorld | null = null;
 	protected rule: TQueryRule;
 	protected _disabled = false;
 
@@ -29,7 +33,7 @@ export abstract class System extends EventFirer implements ISystem {
 		this._disabled = value;
 	}
 
-	public constructor(name = "", fitRule: TQueryRule) {
+	public constructor(name = "Untitled System", fitRule: TQueryRule) {
 		super();
 		this.name = name;
 		this.disabled = false;
@@ -84,6 +88,7 @@ export abstract class System extends EventFirer implements ISystem {
 		if (this.disabled) {
 			return this;
 		}
+		this.handleBefore(time, delta, world);
 		if (world.entityManager) {
 			this.entitySet.get(world.entityManager)?.forEach((item: IEntity) => {
 				// 此处不应该校验disabled。这个交给各自系统自行判断
@@ -102,6 +107,15 @@ export abstract class System extends EventFirer implements ISystem {
 		for (let i = this.usedBy.length - 1; i > -1; i--) {
 			this.usedBy[i].remove(this);
 		}
+
+		return this;
+	}
+
+	public handleBefore(time: number, delta: number, world: IWorld): this {
+		this.currentTime = time;
+		this.currentDelta = delta;
+		this.currentWorld = world;
+		this.loopTimes++;
 
 		return this;
 	}

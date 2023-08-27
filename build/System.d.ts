@@ -14,6 +14,9 @@ export declare abstract class System extends EventFirer implements ISystem {
     usedBy: ISystemManager[];
     cache: WeakMap<IEntity, any>;
     autoUpdate: boolean;
+    protected currentDelta: number;
+    protected currentTime: number;
+    protected currentWorld: IWorld | null;
     protected rule: TQueryRule;
     protected _disabled: boolean;
     get disabled(): boolean;
@@ -25,6 +28,7 @@ export declare abstract class System extends EventFirer implements ISystem {
     run(world: IWorld, time: number, delta: number): this;
     serialize(): any;
     destroy(): this;
+    handleBefore(time: number, delta: number, world: IWorld): this;
     abstract handle(entity: IEntity, time: number, delta: number, world: IWorld): this;
 }
 export {};
