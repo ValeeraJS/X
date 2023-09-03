@@ -16,16 +16,16 @@ declare const Entity_base: (new (...args: any[]) => {
     once(eventKey: import("@valeera/eventfire").TEventKey, listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
     times(eventKey: import("@valeera/eventfire").TEventKey, times: number, listener: import("@valeera/eventfire").TListener, checkDuplicate?: boolean | undefined): any;
 }) & (new (...rest: any[]) => {
-    parent: import("@valeera/tree").ITreeNode<unknown> | null;
-    children: (import("@valeera/tree").ITreeNode<unknown> | null)[];
-    addChild(node: import("@valeera/tree").ITreeNodeData<unknown>): any;
+    parent: import("@valeera/tree").ITreeNode<ObjectConstructor> | null;
+    children: (import("@valeera/tree").ITreeNode<ObjectConstructor> | null)[];
+    addChild(node: import("@valeera/tree").ITreeNodeData<ObjectConstructor>): any;
     depth(): number;
-    findLeaves(): import("@valeera/tree").ITreeNodeData<unknown>[];
-    findRoot(): import("@valeera/tree").ITreeNodeData<unknown>;
-    hasAncestor(ancestor: import("@valeera/tree").ITreeNodeData<unknown>): boolean;
-    removeChild(child: import("@valeera/tree").ITreeNodeData<unknown>): any;
-    toArray(): import("@valeera/tree").ITreeNodeData<unknown>[];
-    traverse(visitor: import("@valeera/tree").IVisitor<unknown>, rest?: any): any;
+    findLeaves(): import("@valeera/tree").ITreeNodeData<ObjectConstructor>[];
+    findRoot(): import("@valeera/tree").ITreeNodeData<ObjectConstructor>;
+    hasAncestor(ancestor: import("@valeera/tree").ITreeNodeData<ObjectConstructor>): boolean;
+    removeChild(child: import("@valeera/tree").ITreeNodeData<ObjectConstructor>): any;
+    toArray(): import("@valeera/tree").ITreeNodeData<ObjectConstructor>[];
+    traverse(visitor: import("@valeera/tree").IVisitor<ObjectConstructor>, rest?: any): any;
 });
 export declare class Entity extends Entity_base implements IEntity {
     readonly id: number;
