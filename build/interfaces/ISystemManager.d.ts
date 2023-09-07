@@ -6,4 +6,5 @@ export interface ISystemManager extends IManager<ISystem> {
     loopTimes: number;
     usedBy: IWorld[];
     run(world: IWorld, time: number, delta: number): this;
+    updatePriorityOrder(): this;
 }

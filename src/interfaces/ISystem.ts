@@ -10,6 +10,7 @@ export interface ISystem extends IECSObject<ISystem> {
 	usedBy: ISystemManager[];
 	cache: WeakMap<IEntity, any>;
 	autoUpdate: boolean;
+	priority: number;
 
 	set disabled(disabled: boolean);
 	get disabled(): boolean;

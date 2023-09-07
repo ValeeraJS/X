@@ -12,6 +12,8 @@ export const SystemEvent = {
 	REMOVE: "remove",
 };
 
+const sort = (a: [number, ISystem], b: [number, ISystem]) => a[1].priority - b[1].priority;
+
 export class SystemManager extends Manager<ISystem> implements ISystemManager {
 	public static readonly Events = SystemEvent;
 
@@ -19,6 +21,8 @@ export class SystemManager extends Manager<ISystem> implements ISystemManager {
 	public elements: Map<number, ISystem> = new Map();
 	public loopTimes = 0;
 	public usedBy: IWorld[] = [];
+
+	#systemChunks: ISystem[] = [];
 
 	public constructor(world?: IWorld) {
 		super();
@@ -29,6 +33,7 @@ export class SystemManager extends Manager<ISystem> implements ISystemManager {
 
 	public add(system: ISystem): this {
 		super.add(system);
+		this.updatePriorityOrder();
 		this.updateSystemEntitySetByAddFromManager(system);
 
 		return this;
@@ -76,6 +81,17 @@ export class SystemManager extends Manager<ISystem> implements ISystemManager {
 		this.loopTimes++;
 
 		this.fire(SystemManager.Events.BEFORE_RUN, this);
+
+		return this;
+	}
+
+	public updatePriorityOrder(): this {
+		const arr = Array.from(this.elements);
+		arr.sort(sort);
+		this.#systemChunks.length = 0;
+		for (let i = 0; i < arr.length; i++) {
+			this.#systemChunks.push(arr[i][1]);
+		}
 
 		return this;
 	}

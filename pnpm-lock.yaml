@@ -12,8 +12,8 @@ dependencies:
     specifier: ^1.2.2
     version: 1.2.2
   '@valeera/tree':
-    specifier: 0.1.9alpha-1
-    version: 0.1.9-alpha-1
+    specifier: 0.1.9alpha-2
+    version: 0.1.9-alpha-2
   clone-deep:
     specifier: latest
     version: 4.0.1
@@ -663,8 +663,8 @@ packages:
     resolution: {integrity: sha512-7JM6tQRINMfLHklacUReA+Xq9w2eaMwjtdVCdDWJgCWbAelB6F962LWsTUbk0m+W2ZpuLmJoJxPUSpY80Qo4ug==}
     dev: false
 
-  /@valeera/tree@0.1.9-alpha-1:
-    resolution: {integrity: sha512-zoC2jydeFOrbxCW3AlJIK9SwowdRPX3GPvq1qsgae3C0VUhezGCAHOumWLsxTq662wyugWradmk/lZBOQi9wdQ==}
+  /@valeera/tree@0.1.9-alpha-2:
+    resolution: {integrity: sha512-lsigjfqdMcqoYKDZA+I7kvFSb42ZcZYinOR/y5qo1+MuYU2i5lj5BxVdM+T32UapDbavv78ufsyGcYR/prXOXQ==}
     dependencies:
       '@valeera/mathx': 0.1.61-alpha1
     dev: false

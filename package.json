@@ -1,6 +1,6 @@
 {
 	"name": "@valeera/x",
-	"version": "0.1.31",
+	"version": "0.1.32alpha-1",
 	"description": "ECS framework written in TS for web application.",
 	"main": "build/x.js",
 	"repository": "ValeeraJS/x",
@@ -39,7 +39,7 @@
 	"dependencies": {
 		"@valeera/eventfire": "^1.1.1",
 		"@valeera/idgenerator": "^1.2.2",
-		"@valeera/tree": "0.1.9alpha-1",
+		"@valeera/tree": "0.1.9alpha-2",
 		"clone-deep": "latest"
 	},
 	"devDependencies": {

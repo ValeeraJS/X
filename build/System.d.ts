@@ -19,8 +19,11 @@ export declare abstract class System extends EventFirer implements ISystem {
     protected currentWorld: IWorld | null;
     protected rule: TQueryRule;
     protected _disabled: boolean;
+    protected _priority: number;
     get disabled(): boolean;
     set disabled(value: boolean);
+    get priority(): number;
+    set priority(v: number);
     constructor(name: string | undefined, fitRule: TQueryRule);
     checkUpdatedEntities(manager: IEntityManager | null): this;
     checkEntityManager(manager: IEntityManager | null): this;

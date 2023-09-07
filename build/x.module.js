@@ -19,11 +19,21 @@ class System extends EventFirer {
     currentWorld = null;
     rule;
     _disabled = false;
+    _priority = 0;
     get disabled() {
         return this._disabled;
     }
     set disabled(value) {
         this._disabled = value;
+    }
+    get priority() {
+        return this._priority;
+    }
+    set priority(v) {
+        this._priority = v;
+        for (let i = 0, len = this.usedBy.length; i < len; i++) {
+            this.usedBy[i].updatePriorityOrder();
+        }
     }
     constructor(name = "Untitled System", fitRule) {
         super();
@@ -487,12 +497,14 @@ const SystemEvent = {
     BEFORE_RUN: "beforeRun",
     REMOVE: "remove",
 };
+const sort = (a, b) => a[1].priority - b[1].priority;
 class SystemManager extends Manager {
     static Events = SystemEvent;
     disabled = false;
     elements = new Map();
     loopTimes = 0;
     usedBy = [];
+    #systemChunks = [];
     constructor(world) {
         super();
         if (world) {
@@ -501,6 +513,7 @@ class SystemManager extends Manager {
     }
     add(system) {
         super.add(system);
+        this.updatePriorityOrder();
         this.updateSystemEntitySetByAddFromManager(system);
         return this;
     }
@@ -538,6 +551,15 @@ class SystemManager extends Manager {
         }
         this.loopTimes++;
         this.fire(SystemManager.Events.BEFORE_RUN, this);
+        return this;
+    }
+    updatePriorityOrder() {
+        const arr = Array.from(this.elements);
+        arr.sort(sort);
+        this.#systemChunks.length = 0;
+        for (let i = 0; i < arr.length; i++) {
+            this.#systemChunks.push(arr[i][1]);
+        }
         return this;
     }
     updateSystemEntitySetByRemovedFromManager(system) {

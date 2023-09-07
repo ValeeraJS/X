@@ -24,6 +24,7 @@ export abstract class System extends EventFirer implements ISystem {
 	protected currentWorld: IWorld | null = null;
 	protected rule: TQueryRule;
 	protected _disabled = false;
+	protected _priority = 0;
 
 	public get disabled(): boolean {
 		return this._disabled;
@@ -31,6 +32,18 @@ export abstract class System extends EventFirer implements ISystem {
 
 	public set disabled(value: boolean) {
 		this._disabled = value;
+	}
+
+	public get priority(): number {
+		return this._priority;
+	}
+
+	public set priority(v: number) {
+		this._priority = v;
+
+		for (let i = 0, len = this.usedBy.length; i < len; i++) {
+			this.usedBy[i].updatePriorityOrder();
+		}
 	}
 
 	public constructor(name = "Untitled System", fitRule: TQueryRule) {

@@ -8,4 +8,5 @@ export interface ISystemManager extends IManager<ISystem> {
 	usedBy: IWorld[];
 
 	run(world: IWorld, time: number, delta: number): this;
+	updatePriorityOrder(): this;
 }
