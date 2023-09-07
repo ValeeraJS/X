@@ -1,5 +1,5 @@
 import { IComponent } from "./interfaces/IComponent";
-import { ComponentConstructor, IComponentManager } from "./interfaces/IComponentManager";
+import { IComponentManager } from "./interfaces/IComponentManager";
 import { Manager } from "./Manager";
 export declare enum EComponentEvent {
     ADD_COMPONENT = "addComponent",
@@ -14,8 +14,8 @@ export interface ComponentEventObject {
 export declare class ComponentManager extends Manager<IComponent<any>> implements IComponentManager {
     isComponentManager: boolean;
     add(element: IComponent<any>): this;
-    getComponentsByClass(clazz: ComponentConstructor): IComponent<any>[];
-    getComponentByClass(clazz: ComponentConstructor): IComponent<any> | null;
+    getComponentsByClass<T extends IComponent<any>>(clazz: new () => T): T[];
+    getComponentByClass<T extends IComponent<any>>(clazz: new () => T): T | null;
     getComponentsByTagLabel(label: string): IComponent<any>[];
     getComponentByTagLabel(label: string): IComponent<any> | null;
     private checkedComponentsWithTargetTags;

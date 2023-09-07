@@ -1,5 +1,5 @@
 import { IComponent } from "./interfaces/IComponent";
-import { ComponentConstructor, IComponentManager } from "./interfaces/IComponentManager";
+import { IComponentManager } from "./interfaces/IComponentManager";
 import { Manager } from "./Manager";
 
 export enum EComponentEvent {
@@ -31,8 +31,8 @@ export class ComponentManager extends Manager<IComponent<any>> implements ICompo
 		return this.addElementDirectly(element);
 	}
 
-	public getComponentsByClass(clazz: ComponentConstructor): IComponent<any>[] {
-		const result: IComponent<any>[] = [];
+	public getComponentsByClass<T extends IComponent<any>>(clazz: new () => T): T[] {
+		const result: T[] = [];
 
 		this.elements.forEach((component) => {
 			if (component instanceof clazz) {
@@ -43,7 +43,7 @@ export class ComponentManager extends Manager<IComponent<any>> implements ICompo
 		return result;
 	}
 
-	public getComponentByClass(clazz: ComponentConstructor): IComponent<any> | null {
+	public getComponentByClass<T extends IComponent<any>>(clazz: new () => T): T | null {
 		for (const [, component] of this.elements) {
 			if (component instanceof clazz) {
 				return component;
