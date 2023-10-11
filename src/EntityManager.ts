@@ -1,3 +1,4 @@
+import { ComponentManager } from "./ComponentManager";
 import { Entity } from "./Entity";
 import { IEntity } from "./interfaces/IEntity";
 import { IEntityManager } from "./interfaces/IEntityManager";
@@ -19,8 +20,7 @@ export class EntityManager extends Manager<IEntity> implements IEntityManager {
 	}
 
 	public createEntity(name: string): IEntity {
-		const entity = new Entity(name);
-
+		const entity = new Entity(new ComponentManager(), name);
 		this.add(entity);
 
 		return entity;

@@ -46,7 +46,7 @@ export abstract class System extends EventFirer implements ISystem {
 		}
 	}
 
-	public constructor(name = "Untitled System", fitRule: TQueryRule) {
+	public constructor(fitRule: TQueryRule, name = "Untitled System") {
 		super();
 		this.name = name;
 		this.disabled = false;

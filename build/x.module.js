@@ -35,7 +35,7 @@ class System extends EventFirer {
             this.usedBy[i].updatePriorityOrder();
         }
     }
-    constructor(name = "Untitled System", fitRule) {
+    constructor(fitRule, name = "Untitled System") {
         super();
         this.name = name;
         this.disabled = false;
@@ -116,8 +116,8 @@ class System extends EventFirer {
 
 class PureSystem extends System {
     handler;
-    constructor(name = "Untitled PureSystem", fitRule, handler) {
-        super(name, fitRule);
+    constructor(fitRule, handler, name = "Untitled PureSystem") {
+        super(fitRule, name);
         this.handler = handler;
     }
     handle(entity, time, delta) {
@@ -128,7 +128,7 @@ class PureSystem extends System {
 
 class Component {
     static unserialize(json) {
-        const component = new Component(json.name, json.data);
+        const component = new Component(json.data, json.tags, json.name);
         component.disabled = json.disabled;
         return component;
     }
@@ -146,13 +146,13 @@ class Component {
     set dirty(v) {
         this.#dirty = v;
     }
-    constructor(name, data, tags = []) {
+    constructor(data, tags = [], name) {
         this.name = name;
         this.data = data;
         this.tags = tags;
     }
     clone() {
-        return new Component(this.name, this.data, this.tags);
+        return new Component(this.data, this.tags, this.name);
     }
     // 此处为只要tag标签相同就是同一类
     hasTagLabel(label) {
@@ -347,7 +347,7 @@ class Entity extends mixin(TreeNode) {
     disabled = false;
     name = "";
     usedBy = [];
-    constructor(name = "Untitled Entity", componentManager) {
+    constructor(componentManager = new ComponentManager(), name = "Untitled Entity") {
         super();
         this.name = name;
         this.registerComponentManager(componentManager);
@@ -380,6 +380,20 @@ class Entity extends mixin(TreeNode) {
         }
         return this;
     }
+    clone(cloneComponenT) {
+        const entity = new Entity(new ComponentManager(), this.name);
+        if (cloneComponenT) {
+            this.componentManager?.elements.forEach((component) => {
+                entity.addComponent(component.clone());
+            });
+        }
+        else {
+            this.componentManager?.elements.forEach((component) => {
+                entity.addComponent(component);
+            });
+        }
+        return entity;
+    }
     destroy() {
         for (const manager of this.usedBy) {
             manager.remove(this);
@@ -404,7 +418,7 @@ class Entity extends mixin(TreeNode) {
     hasComponent(component) {
         return this.componentManager?.has(component) || false;
     }
-    registerComponentManager(manager = new ComponentManager()) {
+    registerComponentManager(manager) {
         this.unregisterComponentManager();
         this.componentManager = manager;
         if (!this.componentManager.usedBy.includes(this)) {
@@ -452,7 +466,7 @@ class EntityManager extends Manager {
         }
     }
     createEntity(name) {
-        const entity = new Entity(name);
+        const entity = new Entity(new ComponentManager(), name);
         this.add(entity);
         return entity;
     }

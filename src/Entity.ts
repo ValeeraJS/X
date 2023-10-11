@@ -18,7 +18,7 @@ export class Entity extends mixin(TreeNode) implements IEntity {
 	public name = "";
 	public usedBy: IEntityManager[] = [];
 
-	public constructor(name = "Untitled Entity", componentManager?: IComponentManager) {
+	public constructor(componentManager: IComponentManager = new ComponentManager(), name = "Untitled Entity") {
 		super();
 		this.name = name;
 		this.registerComponentManager(componentManager);
@@ -60,6 +60,20 @@ export class Entity extends mixin(TreeNode) implements IEntity {
 		return this;
 	}
 
+	public clone(cloneComponenT?: Boolean) {
+		const entity = new Entity(new ComponentManager(), this.name);
+		if (cloneComponenT) {
+			this.componentManager?.elements.forEach((component) => {
+				entity.addComponent(component.clone());
+			});
+		} else {
+			this.componentManager?.elements.forEach((component) => {
+				entity.addComponent(component);
+			});
+		}
+		return entity;
+	}
+
 	public destroy(): void {
 		for (const manager of this.usedBy) {
 			manager.remove(this);
@@ -91,7 +105,7 @@ export class Entity extends mixin(TreeNode) implements IEntity {
 		return this.componentManager?.has(component) || false;
 	}
 
-	public registerComponentManager(manager: IComponentManager = new ComponentManager()): this {
+	public registerComponentManager(manager: IComponentManager): this {
 		this.unregisterComponentManager();
 		this.componentManager = manager;
 		if (!this.componentManager.usedBy.includes(this)) {

@@ -7,11 +7,12 @@ export interface IComponentSerializedJson<T> extends ISerializedJson {
 	data: T;
 	name: string;
 	disabled: boolean;
+	tags: ComponentTag[];
 }
 
 export class Component<T> implements IComponent<T> {
 	public static unserialize<T>(json: IComponentSerializedJson<T>): Component<T> {
-		const component = new Component(json.name, json.data);
+		const component = new Component(json.data, json.tags, json.name);
 
 		component.disabled = json.disabled;
 
@@ -35,14 +36,14 @@ export class Component<T> implements IComponent<T> {
 		this.#dirty = v;
 	}
 
-	public constructor(name: string, data: T, tags: ComponentTag[] = []) {
+	public constructor(data: T, tags: ComponentTag[] = [], name: string) {
 		this.name = name;
 		this.data = data;
 		this.tags = tags;
 	}
 
 	public clone(): IComponent<T> {
-		return new Component(this.name, this.data, this.tags);
+		return new Component(this.data, this.tags, this.name);
 	}
 
 	// 此处为只要tag标签相同就是同一类

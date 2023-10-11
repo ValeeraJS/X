@@ -5,6 +5,7 @@ export interface IComponentSerializedJson<T> extends ISerializedJson {
     data: T;
     name: string;
     disabled: boolean;
+    tags: ComponentTag[];
 }
 export declare class Component<T> implements IComponent<T> {
     #private;
@@ -18,7 +19,7 @@ export declare class Component<T> implements IComponent<T> {
     tags: ComponentTag[];
     get dirty(): boolean;
     set dirty(v: boolean);
-    constructor(name: string, data: T, tags?: ComponentTag[]);
+    constructor(data: T, tags: ComponentTag[] | undefined, name: string);
     clone(): IComponent<T>;
     hasTagLabel(label: string): boolean;
     serialize(): any;

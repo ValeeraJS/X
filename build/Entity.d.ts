@@ -34,11 +34,12 @@ export declare class Entity extends Entity_base implements IEntity {
     disabled: boolean;
     name: string;
     usedBy: IEntityManager[];
-    constructor(name?: string, componentManager?: IComponentManager);
+    constructor(componentManager?: IComponentManager, name?: string);
     addComponent(component: IComponent<any>): this;
     addChild(entity: IEntity): this;
     addTo(manager: IEntityManager): this;
     addToWorld(world: IWorld): this;
+    clone(cloneComponenT?: Boolean): Entity;
     destroy(): void;
     getComponent(nameOrId: string | number | ComponentConstructor): IComponent<any> | null;
     getComponentsByTagLabel(label: string): IComponent<any>[];
@@ -46,7 +47,7 @@ export declare class Entity extends Entity_base implements IEntity {
     getComponentsByClass(clazz: ComponentConstructor): IComponent<any>[];
     getComponentByClass(clazz: ComponentConstructor): IComponent<any> | null;
     hasComponent(component: IComponent<any> | string | number): boolean;
-    registerComponentManager(manager?: IComponentManager): this;
+    registerComponentManager(manager: IComponentManager): this;
     removeChild(entity: IEntity): this;
     removeComponent(component: IComponent<any> | string): this;
     serialize(): any;
