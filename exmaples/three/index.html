@@ -42,12 +42,12 @@
 		<script>
 			class RotationComponent extends X.Component {
 				constructor(speed) {
-					super("rotationSpeed", speed, [{ label: "rotation", unique: true }]);
+					super(speed, [{ label: "rotation", unique: true }], "rotationSpeed");
 				}
 			}
 
 			class MeshEntity extends X.Entity {
-				constructor(name, geometry, material) {
+				constructor(geometry, material, name) {
 					super(name);
 					this.mesh = new THREE.Mesh(geometry, material);
 					this.mesh.name = name;
@@ -56,9 +56,9 @@
 
 			class RotationSystem extends X.System {
 				constructor() {
-					super("Rotation System", (entity) => {
+					super((entity) => {
 						return entity.hasComponent("rotationSpeed");
-					});
+					}, "Rotation System");
 				}
 
 				handle(entity) {
@@ -68,9 +68,9 @@
 
 			class RenderSystem extends X.System {
 				constructor() {
-					super("Render System", (entity) => {
+					super((entity) => {
 						return true;
-					});
+					}, "Render System");
 					this.renderer = new THREE.WebGLRenderer({ antialias: true });
 					this.renderer.setSize(window.innerWidth, window.innerHeight);
 					document.body.appendChild(this.renderer.domElement);
@@ -126,27 +126,18 @@
 
 			const world = new ThreeWorld("My World");
 			const entity = new MeshEntity(
-				"test",
 				new THREE.BoxGeometry(0.2, 0.2, 0.2),
-				new THREE.MeshNormalMaterial()
+				new THREE.MeshNormalMaterial(),
+				"test"
 			);
 
 			entity.addComponent(r1);
 
 			const entity2 = new MeshEntity(
-				"test2",
 				new THREE.BoxGeometry(0.2, 0.2, 0.2),
-				new THREE.MeshNormalMaterial()
+				new THREE.MeshNormalMaterial(),
+				"test2"
 			);
-
-			// const entity3 = new MeshEntity(
-			// 	"test3",
-			// 	new THREE.BoxGeometry(0.2, 0.2, 0.2),
-			// 	new THREE.MeshNormalMaterial()
-			// );
-
-			// entity3.mesh.position.y = 0.3;
-			// entity2.addNode(entity3);
 
 			entity2.addComponent(r2);
 			entity2.mesh.position.x = -0.5;
