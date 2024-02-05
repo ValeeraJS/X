@@ -1,68 +1,48 @@
-import { ComponentManager } from "./ComponentManager";
 import { Entity } from "./Entity";
-import { IEntity } from "./interfaces/IEntity";
-import { IEntityManager } from "./interfaces/IEntityManager";
-import { ISystem } from "./interfaces/ISystem";
-import { IWorld } from "./interfaces/IWorld";
 import { Manager } from "./Manager";
+import { System } from "./System";
+import { World } from "./World";
 
-export class EntityManager extends Manager<IEntity> implements IEntityManager {
-	// public elements: Map<string, IEntity> = new Map();
+export class EntityManager extends Manager<Entity, World> {
 	public data: any = null;
-	public updatedEntities: Set<IEntity> = new Set();
+	public updatedEntities: Set<Entity> = new Set();
 	public readonly isEntityManager = true;
 
-	public constructor(world?: IWorld) {
-		super();
-		if (world) {
-			this.usedBy.push(world);
-		}
-	}
-
-	public createEntity(name: string): IEntity {
-		const entity = new Entity(new ComponentManager(), name);
+	public createEntity(name: string): Entity {
+		const entity = new Entity(name);
 		this.add(entity);
 
 		return entity;
 	}
 
-	protected addElementDirectly(entity: IEntity): this {
+	protected addElementDirectly(entity: Entity): this {
 		super.addElementDirectly(entity);
 		this.updatedEntities.add(entity);
 
 		for (const child of entity.children) {
-			if (child) {
-				this.add(child as IEntity);
-			}
+			this.add(child as Entity);
 		}
 
 		return this;
 	}
 
-	protected removeInstanceDirectly(entity: IEntity): this {
-		super.removeInstanceDirectly(entity);
+	protected removeElementDirectly(entity: Entity): this {
+		super.removeElementDirectly(entity);
 		this.deleteEntityFromSystemSet(entity);
 
 		for (const child of entity.children) {
-			if (child) {
-				this.remove(child as IEntity);
-			}
+			this.remove(child as Entity);
 		}
 
 		return this;
 	}
 
-	private deleteEntityFromSystemSet(entity: IEntity) {
+	private deleteEntityFromSystemSet(entity: Entity) {
 		entity.usedBy.splice(entity.usedBy.indexOf(this), 1);
 
-		for (const world of this.usedBy) {
-			if (world.systemManager) {
-				world.systemManager.elements.forEach((system: ISystem) => {
-					if (system.entitySet.get(this)) {
-						(system.entitySet.get(this) as any).delete(entity);
-					}
-				});
-			}
-		}
+		const world = this.usedBy;
+		world.systemManager.elements.forEach((system: System) => {
+			system.entitySet.get(this)?.delete(entity);
+		});
 	}
 }
