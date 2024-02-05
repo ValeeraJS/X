@@ -1,19 +1,14 @@
-import { ComponentTag, IComponent } from "./interfaces/IComponent";
+import { ComponentTag } from "./interfaces/IComponent";
 import { IdGeneratorInstance } from "./Global";
-import { ISerializedJson } from "./interfaces/ISerializable";
-import { IComponentManager } from "./interfaces/IComponentManager";
+import { IComponentSerializedJson } from "./interfaces/ISerializable";
+import { ComponentManager } from "./ComponentManager";
+import { EventFirer } from "@valeera/eventfire";
 
-export interface IComponentSerializedJson<T> extends ISerializedJson {
-	data: T;
-	name: string;
-	disabled: boolean;
-	tags: ComponentTag[];
-}
+export type ComponentConstructor<T> = new (...args: any[]) => Component<T>;
 
-export class Component<T> implements IComponent<T> {
+export class Component<T> extends EventFirer {
 	public static unserialize<T>(json: IComponentSerializedJson<T>): Component<T> {
 		const component = new Component(json.data, json.tags, json.name);
-
 		component.disabled = json.disabled;
 
 		return component;
@@ -21,10 +16,10 @@ export class Component<T> implements IComponent<T> {
 
 	public readonly isComponent = true;
 	public readonly id = IdGeneratorInstance.next();
-	public data: T;
+	public data: T | null = null;
 	public disabled = false;
 	public name: string;
-	public usedBy: IComponentManager[] = [];
+	public usedBy: ComponentManager[] = [];
 	public tags: ComponentTag[];
 	#dirty = false;
 
@@ -36,14 +31,22 @@ export class Component<T> implements IComponent<T> {
 		this.#dirty = v;
 	}
 
-	public constructor(data: T, tags: ComponentTag[] = [], name: string) {
+	public constructor(data: T | null = null, tags: ComponentTag[] = [], name: string = "Untitled Component") {
+		super();
 		this.name = name;
 		this.data = data;
 		this.tags = tags;
 	}
 
-	public clone(): IComponent<T> {
-		return new Component(this.data, this.tags, this.name);
+	public clone(): Component<T> {
+		return new Component(structuredClone(this.data), this.tags, this.name);
+	}
+
+	public destroy() {
+		this.usedBy.forEach((manager) => {
+			manager.usedBy.remove(this);
+		});
+		this.data = null;
 	}
 
 	// 此处为只要tag标签相同就是同一类
@@ -57,14 +60,14 @@ export class Component<T> implements IComponent<T> {
 		return false;
 	}
 
-	public serialize(): any {
+	public serialize(): IComponentSerializedJson<T | null> {
 		return {
+			class: "Component",
 			data: this.data,
 			disabled: this.disabled,
 			id: this.id,
 			name: this.name,
 			tags: this.tags,
-			type: "component",
 		};
 	}
 }
