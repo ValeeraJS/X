@@ -1,14 +1,12 @@
-import { IEntity } from "./interfaces/IEntity";
-import { IEntityManager } from "./interfaces/IEntityManager";
-import { IWorld } from "./interfaces/IWorld";
+import { Entity } from "./Entity";
 import { Manager } from "./Manager";
-export declare class EntityManager extends Manager<IEntity> implements IEntityManager {
+import { World } from "./World";
+export declare class EntityManager extends Manager<Entity, World> {
     data: any;
-    updatedEntities: Set<IEntity>;
+    updatedEntities: Set<Entity>;
     readonly isEntityManager = true;
-    constructor(world?: IWorld);
-    createEntity(name: string): IEntity;
-    protected addElementDirectly(entity: IEntity): this;
-    protected removeInstanceDirectly(entity: IEntity): this;
+    createEntity(name: string): Entity;
+    protected addElementDirectly(entity: Entity): this;
+    protected removeElementDirectly(entity: Entity): this;
     private deleteEntityFromSystemSet;
 }

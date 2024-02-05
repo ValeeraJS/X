@@ -8,8 +8,6 @@ import { World } from "./World";
 
 type TQueryRule = (entity: Entity) => boolean;
 
-export type SystemConstructor = new (...a: any[]) => System;
-
 export class System extends EventFirer {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isSystem = true;
@@ -147,3 +145,5 @@ export class System extends EventFirer {
 		return this;
 	}
 }
+
+export type SystemConstructor = new (...a: any[]) => System;

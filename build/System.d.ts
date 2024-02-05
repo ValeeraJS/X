@@ -1,22 +1,23 @@
 import { EventFirer } from "@valeera/eventfire";
-import { IEntity } from "./interfaces/IEntity";
-import { IEntityManager } from "./interfaces/IEntityManager";
-import { ISystem } from "./interfaces/ISystem";
-import { ISystemManager } from "./interfaces/ISystemManager";
-import { IWorld } from "./interfaces/IWorld";
-type TQueryRule = (entity: IEntity) => boolean;
-export declare abstract class System extends EventFirer implements ISystem {
+import { Entity } from "./Entity";
+import { EntityManager } from "./EntityManager";
+import { ISystemSerializedJson } from "./interfaces/ISerializable";
+import { SystemManager } from "./SystemManager";
+import { World } from "./World";
+type TQueryRule = (entity: Entity) => boolean;
+export declare class System extends EventFirer {
+    #private;
     readonly id: number;
     readonly isSystem = true;
     name: string;
     loopTimes: number;
-    entitySet: WeakMap<IEntityManager, Set<IEntity>>;
-    usedBy: ISystemManager[];
-    cache: WeakMap<IEntity, any>;
+    entitySet: WeakMap<EntityManager, Set<Entity>>;
+    usedBy: SystemManager[];
+    cache: WeakMap<Entity, any>;
     autoUpdate: boolean;
     protected currentDelta: number;
     protected currentTime: number;
-    protected currentWorld: IWorld | null;
+    protected currentWorld: World | null;
     protected rule: TQueryRule;
     protected _disabled: boolean;
     protected _priority: number;
@@ -24,14 +25,15 @@ export declare abstract class System extends EventFirer implements ISystem {
     set disabled(value: boolean);
     get priority(): number;
     set priority(v: number);
-    constructor(fitRule: TQueryRule, name?: string);
-    checkUpdatedEntities(manager: IEntityManager | null): this;
-    checkEntityManager(manager: IEntityManager | null): this;
-    query(entity: IEntity): boolean;
-    run(world: IWorld, time: number, delta: number): this;
-    serialize(): any;
+    constructor(fitRule: TQueryRule, handler: (entity: Entity, time: number, delta: number, world: World) => any, handlerBefore?: (time: number, delta: number, world: World) => any, handlerAfter?: (time: number, delta: number, world: World) => any, name?: string);
+    checkEntityManager(manager: EntityManager): this;
+    query(entity: Entity): boolean;
+    run(world: World, time: number, delta: number): this;
+    serialize(): ISystemSerializedJson;
     destroy(): this;
-    handleBefore(time: number, delta: number, world: IWorld): this;
-    abstract handle(entity: IEntity, time: number, delta: number, world: IWorld): this;
+    handle(entity: Entity, time: number, delta: number, world: World): this;
+    handleAfter(time: number, delta: number, world: World): this;
+    handleBefore(time: number, delta: number, world: World): this;
 }
+export type SystemConstructor = new (...a: any[]) => System;
 export {};

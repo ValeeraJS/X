@@ -10,10 +10,8 @@ export interface ISystem extends IECSObject<ISystem> {
     cache: WeakMap<IEntity, any>;
     autoUpdate: boolean;
     priority: number;
-    set disabled(disabled: boolean);
-    get disabled(): boolean;
+    readonly isSystem: true;
     checkEntityManager(entityManager: IEntityManager): this;
-    checkUpdatedEntities(manager: IEntityManager | null): this;
     destroy(): this;
     query(entity: IEntity): boolean;
     handle(entity: IEntity, time: number, delta: number, world: IWorld): this;

@@ -12,4 +12,5 @@ export interface IComponent<T> extends IECSObject<IComponent<any>> {
     dirty: boolean;
     clone(): IComponent<T>;
     hasTagLabel(label: string): boolean;
+    destroy(): any;
 }

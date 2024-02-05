@@ -1,12 +1,11 @@
 import { IComponent } from "./IComponent";
 import { IEntity } from "./IEntity";
 import { IManager } from "./IManager";
-export type ComponentConstructor = new () => IComponent<any>;
-export interface IComponentManager extends IManager<IComponent<any>> {
+export interface IComponentManager extends IManager<IComponent<any>, IEntity> {
     readonly isComponentManager: boolean;
-    usedBy: IEntity[];
+    usedBy: IEntity;
     getComponentsByTagLabel(label: string): IComponent<any>[];
     getComponentByTagLabel(label: string): IComponent<any> | null;
-    getComponentsByClass(clazz: ComponentConstructor): IComponent<any>[];
-    getComponentByClass(clazz: ComponentConstructor): IComponent<any> | null;
+    getComponentsByClass(clazz: any): IComponent<any>[];
+    getComponentByClass(clazz: any): IComponent<any> | null;
 }

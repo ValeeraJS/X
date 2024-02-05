@@ -24,7 +24,7 @@
 		"build:umd": "rollup -c scripts/rollup.config.umd.mjs",
 		"start": "npm run dev",
 		"lint": "eslint src --ext js --ext ts",
-		"test": "TS_NODE_PROJECT=tsconfig.test.json nyc --reporter=html --reporter=text mocha -r ts-node/register ./test/*.ts",
+		"test": "nyc --reporter=html --reporter=text mocha -r ts-node/register ./test/*.ts",
 		"travis": "npm run lint && npm test"
 	},
 	"keywords": [
