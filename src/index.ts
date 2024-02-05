@@ -1,5 +1,4 @@
 export * from "./System";
-export * from "./PureSystem";
 export * from "./Component";
 export * from "./ComponentManager";
 export * from "./Entity";
@@ -7,14 +6,3 @@ export * from "./Manager";
 export * from "./EntityManager";
 export * from "./SystemManager";
 export * from "./World";
-export * from "./interfaces/IComponent";
-export * from "./interfaces/IComponentManager";
-export * from "./interfaces/IECSObject";
-export * from "./interfaces/IEntity";
-export * from "./interfaces/IEntityManager";
-export * from "./interfaces/ISerializable";
-export * from "./interfaces/ISystem";
-export * from "./interfaces/ISystemManager";
-export * from "./interfaces/IWorld";
-
-export * from "./Global";
