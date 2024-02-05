@@ -1,129 +1,86 @@
 import { EventFirer } from "@valeera/eventfire";
+import type { Entity } from "./Entity";
 import { EntityManager } from "./EntityManager";
 import { IdGeneratorInstance } from "./Global";
-import { IEntity } from "./interfaces/IEntity";
-import { IEntityManager } from "./interfaces/IEntityManager";
-import { ISystem } from "./interfaces/ISystem";
-import { ISystemManager } from "./interfaces/ISystemManager";
-import { IWorld } from "./interfaces/IWorld";
+import { IWorldSerializedJson } from "./interfaces/ISerializable";
+import { System, SystemConstructor } from "./System";
 import { SystemManager } from "./SystemManager";
 
-let arr: any[];
-
-export class World extends EventFirer implements IWorld {
+export class World extends EventFirer {
 	public disabled = false;
 	public name: string;
-	public entityManager: IEntityManager | null = null;
-	public systemManager: ISystemManager | null = null;
-	public store: Map<string, any> = new Map();
-	public usedBy = [];
+	public entityManager: EntityManager = new EntityManager(this);
+	public systemManager: SystemManager = new SystemManager(this);
+	public usedBy: any[] = [];
 
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isWorld = true;
 
-	public constructor(name = "Untitled World", entityManager?: IEntityManager, systemManager?: ISystemManager) {
+	public constructor(name?: string) {
 		super();
-		this.name = name;
-		this.registerEntityManager(entityManager);
-		this.registerSystemManager(systemManager);
+		this.name = name ?? this.constructor.name;
 	}
 
-	public add(element: IEntity | ISystem): this {
-		if ((element as IEntity).isEntity) {
-			return this.addEntity(element as IEntity);
+	public add(element: Entity | System): this {
+		if ((element as Entity).isEntity) {
+			return this.addEntity(element as Entity);
 		} else {
-			return this.addSystem(element as ISystem);
+			return this.addSystem(element as System);
 		}
 	}
 
-	public addEntity(entity: IEntity): this {
-		if (this.entityManager) {
-			this.entityManager.add(entity);
-		} else {
-			throw new Error("The world doesn't have an entityManager yet.");
-		}
+	public addEntity(entity: Entity): this {
+		this.entityManager.add(entity);
 
 		return this;
 	}
 
-	public addSystem(system: ISystem): this {
-		if (this.systemManager) {
-			this.systemManager.add(system);
-		} else {
-			throw new Error("The world doesn't have a systemManager yet.");
-		}
+	public addSystem(system: System): this {
+		this.systemManager.add(system);
 
 		return this;
 	}
 
 	public clearAllEntities(): this {
-		if (this.entityManager) {
-			this.entityManager.clear();
-		}
+		this.entityManager.clear();
 
 		return this;
 	}
 
-	public createEntity(name: string): IEntity | null {
-		return this.entityManager?.createEntity(name) || null;
-	}
-
-	public hasEntity(entity: IEntity | string | number): boolean {
-		if (this.entityManager) {
-			return this.entityManager.has(entity);
-		}
-
-		return false;
-	}
-
-	public hasSystem(system: ISystem | string | number): boolean {
-		if (this.systemManager) {
-			return this.systemManager.has(system);
-		}
-
-		return false;
-	}
-
-	public registerEntityManager(manager?: IEntityManager): this {
-		this.unregisterEntityManager();
-		this.entityManager = manager || new EntityManager(this);
-		if (!this.entityManager.usedBy.includes(this)) {
-			this.entityManager.usedBy.push(this);
-		}
+	public clearAllSystems(): this {
+		this.systemManager.clear();
 
 		return this;
 	}
 
-	public registerSystemManager(manager?: ISystemManager): this {
-		this.unregisterSystemManager();
-		this.systemManager = manager || new SystemManager(this);
-		if (!this.systemManager.usedBy.includes(this)) {
-			this.systemManager.usedBy.push(this);
-		}
-
-		return this;
+	public createEntity(name: string): Entity {
+		return this.entityManager.createEntity(name);
 	}
 
-	public remove(element: IEntity | ISystem): this {
-		if ((element as IEntity).isEntity) {
-			return this.removeEntity(element as IEntity);
+	public hasEntity(entity: Entity | string | number): boolean {
+		return this.entityManager.has(entity);
+	}
+
+	public hasSystem(system: System | string | number | SystemConstructor): boolean {
+		return this.systemManager.has(system);
+	}
+
+	public remove(element: Entity | System | SystemConstructor): this {
+		if (element instanceof System || typeof element === "function") {
+			return this.removeSystem(element);
 		} else {
-			return this.removeSystem(element as ISystem);
+			return this.removeEntity(element);
 		}
 	}
 
-	public removeEntity(entity: IEntity | number | string): this {
-		if (this.entityManager) {
-			this.entityManager.remove(entity);
-		}
+	public removeEntity(entity: Entity | number | string | (new (...args: any[]) => Entity)): this {
+		this.entityManager.remove(entity);
 
 		return this;
 	}
 
-	public removeSystem(system: ISystem | string | number): this {
-		if (this.systemManager) {
-			this.systemManager.remove(system);
-		}
+	public removeSystem(system: System | string | number | SystemConstructor): this {
+		this.systemManager.remove(system);
 
 		return this;
 	}
@@ -132,38 +89,20 @@ export class World extends EventFirer implements IWorld {
 		if (this.disabled) {
 			return this;
 		}
-		if (this.systemManager) {
-			this.systemManager.run(this, time, delta);
-		}
+		this.systemManager.run(this, time, delta);
 
 		return this;
 	}
 
-	public serialize(): any {
+	public serialize(): IWorldSerializedJson {
 		return {
 			id: this.id,
 			name: this.name,
 			type: "world",
+			class: this.constructor.name,
+			disabled: this.disabled,
+			systems: [],
+			entities: [],
 		};
-	}
-
-	public unregisterEntityManager(): this {
-		if (this.entityManager) {
-			arr = this.entityManager.usedBy;
-			arr.splice(arr.indexOf(this) - 1, 1);
-			this.entityManager = null;
-		}
-
-		return this;
-	}
-
-	public unregisterSystemManager(): this {
-		if (this.systemManager) {
-			arr = this.systemManager.usedBy;
-			arr.splice(arr.indexOf(this) - 1, 1);
-			this.entityManager = null;
-		}
-
-		return this;
 	}
 }
