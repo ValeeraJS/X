@@ -1,6 +1,6 @@
 {
 	"name": "@valeera/x",
-	"version": "0.1.32alpha-3",
+	"version": "0.2.0",
 	"description": "ECS framework written in TS for web application.",
 	"main": "build/x.js",
 	"repository": "ValeeraJS/x",
@@ -24,7 +24,7 @@
 		"build:umd": "rollup -c scripts/rollup.config.umd.mjs",
 		"start": "npm run dev",
 		"lint": "eslint src --ext js --ext ts",
-		"test": "nyc --reporter=html --reporter=text mocha --require esm",
+		"test": "TS_NODE_PROJECT=tsconfig.test.json nyc --reporter=html --reporter=text mocha -r ts-node/register ./test/*.ts",
 		"travis": "npm run lint && npm test"
 	},
 	"keywords": [
@@ -39,14 +39,12 @@
 	"dependencies": {
 		"@valeera/eventfire": "^1.1.1",
 		"@valeera/idgenerator": "^1.2.2",
-		"@valeera/tree": "0.1.9alpha-2",
-		"clone-deep": "latest"
+		"@valeera/tree": "0.2.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-json": "^6.0.0",
 		"@rollup/plugin-node-resolve": "^15.2.1",
 		"@types/chai": "^4.3.5",
-		"@types/clone-deep": "^4.0.1",
 		"@types/mocha": "^10.0.1",
 		"@typescript-eslint/eslint-plugin": "^6.5.0",
 		"@typescript-eslint/parser": "^6.5.0",
@@ -63,7 +61,8 @@
 		"prettier": "^3.0.3",
 		"rollup": "^3.28.1",
 		"rollup-plugin-typescript2": "^0.35.0",
-		"typescript": "^5.2.2"
+		"ts-node": "latest",
+		"typescript": "^5.3.3"
 	},
 	"publishConfig": {
 		"access": "public"
