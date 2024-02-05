@@ -1,7 +1,6 @@
 {
 	"compilerOptions": {
 		"declaration": true,
-		"strictNullChecks": true,
 		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
@@ -12,7 +11,7 @@
 		"target": "ESNext",
 		"lib": [
 			"dom",
-			"es2017"
+			"esnext"
 		]
 	},
 	"include": [
