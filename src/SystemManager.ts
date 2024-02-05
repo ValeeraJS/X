@@ -1,37 +1,30 @@
-import { ISystem } from "./interfaces/ISystem";
-import { ISystemManager } from "./interfaces/ISystemManager";
-import { IWorld } from "./interfaces/IWorld";
+import { Entity } from "./Entity";
+import { EntityManager } from "./EntityManager";
 import { Manager } from "./Manager";
+import { System, SystemConstructor } from "./System";
+import { World } from "./World";
 
-let systemTmp: ISystem | undefined | null;
-
-export const SystemEvent = {
+const SystemEvent = {
 	ADD: "add",
 	AFTER_RUN: "afterRun",
 	BEFORE_RUN: "beforeRun",
 	REMOVE: "remove",
+	ADDED: "added",
+	REMOVED: "removed",
 };
 
-const sort = (a: [number, ISystem], b: [number, ISystem]) => a[1].priority - b[1].priority;
+const sort = (a: [number, System], b: [number, System]) => a[1].priority - b[1].priority;
 
-export class SystemManager extends Manager<ISystem> implements ISystemManager {
+export class SystemManager extends Manager<System, World> {
 	public static readonly Events = SystemEvent;
 
 	public disabled = false;
-	public elements: Map<number, ISystem> = new Map();
+	public elements: Map<number, System> = new Map();
 	public loopTimes = 0;
-	public usedBy: IWorld[] = [];
 
-	#systemChunks: ISystem[] = [];
+	#systemChunks: System[] = [];
 
-	public constructor(world?: IWorld) {
-		super();
-		if (world) {
-			this.usedBy.push(world);
-		}
-	}
-
-	public add(system: ISystem): this {
+	public add(system: System): this {
 		super.add(system);
 		this.updatePriorityOrder();
 		this.updateSystemEntitySetByAddFromManager(system);
@@ -45,41 +38,45 @@ export class SystemManager extends Manager<ISystem> implements ISystemManager {
 		return this;
 	}
 
-	public remove(element: ISystem | string | number): this {
+	public remove(element: System | string | number | SystemConstructor): this {
 		if (typeof element === "number" || typeof element === "string") {
-			systemTmp = this.get(element);
+			const systemTmp = this.get(element);
 			if (systemTmp) {
-				this.removeInstanceDirectly(systemTmp);
+				this.removeElementDirectly(systemTmp);
 				this.updateSystemEntitySetByRemovedFromManager(systemTmp);
 				systemTmp.usedBy.splice(systemTmp.usedBy.indexOf(this), 1);
 			}
-
-			return this;
-		}
-
-		if (this.elements.has(element.id)) {
-			this.removeInstanceDirectly(element);
-			this.updateSystemEntitySetByRemovedFromManager(element);
-			element.usedBy.splice(element.usedBy.indexOf(this), 1);
+		} else if (element instanceof System) {
+			if (this.elements.has(element.id)) {
+				this.removeElementDirectly(element);
+				this.updateSystemEntitySetByRemovedFromManager(element);
+				element.usedBy.splice(element.usedBy.indexOf(this), 1);
+			}
+		} else {
+			this.elements.forEach((system) => {
+				if (system instanceof element) {
+					this.removeElementDirectly(system);
+					this.updateSystemEntitySetByRemovedFromManager(system);
+					system.usedBy.splice(system.usedBy.indexOf(this), 1);
+				}
+			});
 		}
 
 		return this;
 	}
 
-	public run(world: IWorld, time: number, delta: number): this {
+	public run(world: World, time: number, delta: number): this {
 		this.fire(SystemManager.Events.BEFORE_RUN, this);
 
 		this.elements.forEach((item) => {
-			item.checkUpdatedEntities(world.entityManager);
+			this.checkUpdatedEntities(item, world.entityManager);
 			if (!item.disabled && item.autoUpdate) {
 				item.run(world, time, delta);
 			}
 		});
-		if (world.entityManager) {
-			world.entityManager.updatedEntities.clear();
-		}
-		this.loopTimes++;
 
+		world.entityManager.updatedEntities.clear();
+		this.loopTimes++;
 		this.fire(SystemManager.Events.BEFORE_RUN, this);
 
 		return this;
@@ -96,22 +93,27 @@ export class SystemManager extends Manager<ISystem> implements ISystemManager {
 		return this;
 	}
 
-	private updateSystemEntitySetByRemovedFromManager(system: ISystem): this {
-		for (const item of this.usedBy) {
-			if (item.entityManager) {
-				system.entitySet.delete(item.entityManager);
+	private checkUpdatedEntities(system: System, manager: EntityManager): this {
+		let weakMapTmp = system.entitySet.get(manager);
+		manager.updatedEntities.forEach((item: Entity) => {
+			if (system.query(item)) {
+				weakMapTmp.add(item);
+			} else {
+				weakMapTmp.delete(item);
 			}
-		}
+		});
 
 		return this;
 	}
 
-	private updateSystemEntitySetByAddFromManager(system: ISystem): this {
-		for (const item of this.usedBy) {
-			if (item.entityManager) {
-				system.checkEntityManager(item.entityManager);
-			}
-		}
+	private updateSystemEntitySetByRemovedFromManager(system: System): this {
+		system.entitySet.delete(this.usedBy.entityManager);
+
+		return this;
+	}
+
+	private updateSystemEntitySetByAddFromManager(system: System): this {
+		system.checkEntityManager(this.usedBy.entityManager);
 
 		return this;
 	}
