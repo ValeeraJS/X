@@ -1,22 +1,19 @@
 import { EventFirer } from "@valeera/eventfire";
 import { IECSObject } from "./interfaces/IECSObject";
-import { IManager } from "./interfaces/IManager";
 
 // 私有全局变量，外部无法访问
 let elementTmp: any;
 
-export const ElementChangeEvent = {
-	ADD: "add",
-	REMOVE: "remove",
-};
-
-export class Manager<T extends IECSObject<T>> extends EventFirer implements IManager<T> {
-	public static readonly Events = ElementChangeEvent;
-
+export class Manager<T extends IECSObject<T>, U extends IECSObject<any>> extends EventFirer {
 	public elements: Map<number, T> = new Map();
 	public disabled = false;
-	public usedBy: any[] = [];
+	public usedBy: U;
 	public readonly isManager = true;
+
+	constructor(usedBy: U) {
+		super();
+		this.usedBy = usedBy;
+	}
 
 	public add(element: T): this {
 		if (this.has(element)) {
@@ -32,9 +29,9 @@ export class Manager<T extends IECSObject<T>> extends EventFirer implements IMan
 		return this;
 	}
 
-	public get(name: string | number | (new () => any)): T | null {
+	public get(name: string | number | (new (...args: any[]) => any)): T | null {
 		if (typeof name === "number") {
-			return this.elements.get(name) || null;
+			return this.elements.get(name) ?? null;
 		}
 		if (typeof name === "function" && name.prototype) {
 			for (const [, item] of this.elements) {
@@ -52,35 +49,48 @@ export class Manager<T extends IECSObject<T>> extends EventFirer implements IMan
 		return null;
 	}
 
-	public has(element: T | string | number): boolean {
+	public has(element: T | string | number | (new (...args: any[]) => T)): boolean {
 		if (typeof element === "number") {
 			return this.elements.has(element);
 		} else if (typeof element === "string") {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			for (const [_, item] of this.elements) {
+			for (const [, item] of this.elements) {
 				if (item.name === element) {
 					return true;
 				}
 			}
 
 			return false;
+		} else if (typeof element === "function" && element.prototype) {
+			for (const [, item] of this.elements) {
+				if (item.constructor === element) {
+					return true;
+				}
+			}
+
+			return false;
 		} else {
-			return this.elements.has(element.id);
+			return this.elements.has((element as T).id);
 		}
 	}
 
-	public remove(element: T | string | number): this {
+	public remove(element: T | string | number | (new (...args: any[]) => T)): this {
 		if (typeof element === "number" || typeof element === "string") {
 			elementTmp = this.get(element);
 			if (elementTmp) {
-				this.removeInstanceDirectly(elementTmp);
+				this.removeElementDirectly(elementTmp);
 			}
-
-			return this;
-		}
-
-		if (this.elements.has(element.id)) {
-			return this.removeInstanceDirectly(element);
+		} else if (typeof element === "function") {
+			this.elements.forEach((item: T) => {
+				if (item.constructor === element) {
+					this.removeElementDirectly(item);
+				}
+			});
+		} else {
+			this.elements.forEach((item: T) => {
+				if (item === element) {
+					this.removeElementDirectly(element);
+				}
+			});
 		}
 
 		return this;
@@ -89,29 +99,15 @@ export class Manager<T extends IECSObject<T>> extends EventFirer implements IMan
 	protected addElementDirectly(element: T): this {
 		this.elements.set(element.id, element);
 		element.usedBy.push(this);
-		this.elementChangedFireEvent(Manager.Events.ADD, this);
 
 		return this;
 	}
 
 	// 必定有element情况
-	protected removeInstanceDirectly(element: T): this {
+	protected removeElementDirectly(element: T): this {
 		this.elements.delete(element.id);
 		element.usedBy.splice(element.usedBy.indexOf(this), 1);
 
-		this.elementChangedFireEvent(Manager.Events.REMOVE, this);
-
 		return this;
-	}
-
-	private elementChangedFireEvent(type: string, eventObject: any) {
-		for (const entity of this.usedBy) {
-			(entity as any).fire?.(type, eventObject);
-			if (entity.usedBy) {
-				for (const manager of entity.usedBy) {
-					manager.updatedEntities.add(entity);
-				}
-			}
-		}
 	}
 }
