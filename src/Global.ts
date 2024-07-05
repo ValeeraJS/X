@@ -1,5 +1,3 @@
 import IdGenerator from "@valeera/idgenerator";
 
-const IdGeneratorInstance = new IdGenerator();
-
-export { IdGeneratorInstance };
+export const IdGeneratorInstance = new IdGenerator();
