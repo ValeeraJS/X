@@ -1,19 +1,20 @@
-import { ComponentManager } from "./ComponentManager";
-import { IEventFirer, mixin } from "@valeera/eventfire";
 import { IdGeneratorInstance } from "./Global";
 import { TreeNode } from "@valeera/tree";
-import { IEntitySerializedJson } from "./interfaces/ISerializable";
-import { EntityManager } from "./EntityManager";
 import { Component, ComponentConstructor } from "./Component";
-import { World } from "./World";
+import { EntitiesCache, World } from "./World";
+import { IECSObject } from "./interfaces/IECSObject";
+import { add, clear, get, has, remove } from "./utils/ecsManagerOperations";
 
-export class Entity extends mixin(TreeNode) implements IEventFirer {
+export type EntityConstructor = new (...args: any[]) => Entity;
+
+export class Entity extends TreeNode implements IECSObject<World>{
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
-	public readonly componentManager: ComponentManager = new ComponentManager(this);
+	public readonly components = new Map<number, Component<any>>();
 	public disabled = false;
-	public name = "";
-	public usedBy: EntityManager[] = [];
+	public name: string;
+	public usedBy: World[] = [];
+	public children: Entity[] = [];
 
 	public constructor(name = "Untitled Entity") {
 		super();
@@ -29,7 +30,11 @@ export class Entity extends mixin(TreeNode) implements IEventFirer {
 	}
 
 	public addComponent(component: Component<any>): this {
-		this.componentManager.add(component);
+		add(component, this.components, this as Entity);
+		
+		for (let i = 0, len = this.usedBy.length; i < len; i++) {
+			EntitiesCache.get(this.usedBy[i]).add(this);
+		}
 
 		return this;
 	}
@@ -37,35 +42,9 @@ export class Entity extends mixin(TreeNode) implements IEventFirer {
 	public addChild(entity: Entity): this {
 		super.addChild(entity);
 
-		for (const manager of this.usedBy) {
-			manager.add(entity);
+		for (const world of this.usedBy) {
+			world.add(entity);
 		}
-
-		return this;
-	}
-
-	public addTo(worldOrManager: EntityManager | World | Entity): this {
-		if (worldOrManager instanceof World) {
-			return this.addToWorld(worldOrManager);
-		}
-
-		if (worldOrManager instanceof Entity) {
-			worldOrManager.addChild(this);
-
-			return this;
-		}
-
-		return this.addToManager(worldOrManager);
-	}
-
-	public addToWorld(world: World): this {
-		world.entityManager.add(this);
-
-		return this;
-	}
-
-	public addToManager(manager: EntityManager): this {
-		manager.add(this);
 
 		return this;
 	}
@@ -73,11 +52,11 @@ export class Entity extends mixin(TreeNode) implements IEventFirer {
 	public clone(cloneComponents?: boolean, includeChildren?: boolean) {
 		const entity = new Entity(this.name);
 		if (cloneComponents) {
-			this.componentManager.elements.forEach((component) => {
+			this.components.forEach((component) => {
 				entity.addComponent(component.clone());
 			});
 		} else {
-			this.componentManager.elements.forEach((component) => {
+			this.components.forEach((component) => {
 				entity.addComponent(component);
 			});
 		}
@@ -93,32 +72,20 @@ export class Entity extends mixin(TreeNode) implements IEventFirer {
 		for (const manager of this.usedBy) {
 			manager.remove(this);
 		}
-		this.componentManager.elements.forEach((c) => {
+
+		this.components.forEach((c) => {
 			c.destroy();
 		});
-		this.componentManager.clear();
-
-		return this;
+		
+		return clear(this.components, this as Entity) as this;
 	}
 
 	public getComponent<T>(nameOrId: string | number | ComponentConstructor<T>): Component<T> | null {
-		return this.componentManager.get(nameOrId);
-	}
-
-	public getComponentsByTagLabel(label: string): Component<any>[] {
-		return this.componentManager.getComponentsByTagLabel(label);
-	}
-
-	public getComponentByTagLabel(label: string): Component<any> | null {
-		return this.componentManager.getComponentByTagLabel(label);
-	}
-
-	public getComponentsByClass<T>(clazz: ComponentConstructor<T>): Component<T>[] {
-		return this.componentManager.getComponentsByClass(clazz);
+		return get(this.components, nameOrId);
 	}
 
 	public hasComponent(component: Component<any> | string | number | ComponentConstructor<any>): boolean {
-		return this.componentManager.has(component);
+		return has(this.components, component);
 	}
 
 	public remove(entityOrComponent: Entity | Component<any> | ComponentConstructor<any>) {
@@ -132,32 +99,20 @@ export class Entity extends mixin(TreeNode) implements IEventFirer {
 	public removeChild(entity: Entity): this {
 		super.removeChild(entity);
 
-		for (const manager of this.usedBy) {
-			manager.remove(entity);
+		for (const world of this.usedBy) {
+			world.removeEntity(entity);
 		}
 
 		return this;
 	}
 
 	public removeComponent(component: Component<any> | string | ComponentConstructor<any>): this {
-		this.componentManager.remove(component);
+		for (let i = 0, len = this.usedBy.length; i < len; i++) {
+			EntitiesCache.get(this.usedBy[i]).add(this);
+		}
+
+		remove(this.components, component, this as Entity);
 
 		return this;
-	}
-
-	public serialize(): IEntitySerializedJson {
-		const result: IEntitySerializedJson = {
-			id: this.id,
-			name: this.name,
-			disabled: this.disabled,
-			class: "Entity",
-			components: [],
-		};
-
-		this.componentManager.elements.forEach((c) => {
-			result.components.push(c.id);
-		});
-
-		return result;
 	}
 }
