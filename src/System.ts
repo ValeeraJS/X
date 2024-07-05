@@ -1,33 +1,25 @@
-import { EventFirer } from "@valeera/eventfire";
 import { Entity } from "./Entity";
-import { EntityManager } from "./EntityManager";
 import { IdGeneratorInstance } from "./Global";
-import { ISystemSerializedJson } from "./interfaces/ISerializable";
-import { SystemManager } from "./SystemManager";
-import { World } from "./World";
+import { World, updateOrder } from "./World";
 
-type TQueryRule = (entity: Entity) => boolean;
+export type TQueryRule = (entity: Entity) => boolean;
 
-export class System extends EventFirer {
+export class System {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isSystem = true;
 	public name = "";
 	public loopTimes = 0;
-	public entitySet: WeakMap<EntityManager, Set<Entity>> = new WeakMap();
-	public usedBy: SystemManager[] = [];
-	public cache: WeakMap<Entity, any> = new WeakMap();
+	public entitySet: WeakMap<World, Set<Entity>> = new WeakMap();
+	public usedBy: World[] = [];
 	public autoUpdate = true;
+	public handler: (entity: Entity, time: number, delta: number, world: World) => any;
 
 	protected currentDelta: number = 0;
 	protected currentTime: number = 0;
 	protected currentWorld: World | null = null;
 	protected rule: TQueryRule;
-	protected _disabled = false;
-	protected _priority = 0;
-
-	#handler: (entity: Entity, time: number, delta: number, world: World) => any;
-	#handlerBefore?: (time: number, delta: number, world: World) => any;
-	#handlerAfter?: (time: number, delta: number, world: World) => any;
+	private _disabled = false;
+	private _priority = 0;
 
 	public get disabled(): boolean {
 		return this._disabled;
@@ -45,35 +37,30 @@ export class System extends EventFirer {
 		this._priority = v;
 
 		for (let i = 0, len = this.usedBy.length; i < len; i++) {
-			this.usedBy[i].updatePriorityOrder();
+			updateOrder(this.usedBy[i]);
 		}
 	}
 
 	public constructor(
 		fitRule: TQueryRule,
-		handler: (entity: Entity, time: number, delta: number, world: World) => any,
-		handlerBefore?: (time: number, delta: number, world: World) => any,
-		handlerAfter?: (time: number, delta: number, world: World) => any,
+		handler?: (entity: Entity, time: number, delta: number, world: World) => any,
 		name?: string,
 	) {
-		super();
 		this.name = name ?? this.constructor.name;
 		this.disabled = false;
-		this.#handler = handler;
-		this.#handlerAfter = handlerAfter;
-		this.#handlerBefore = handlerBefore;
+		this.handler = handler ?? (() => {});
 		this.rule = fitRule;
 	}
 
-	public checkEntityManager(manager: EntityManager): this {
-		let weakMapTmp = this.entitySet.get(manager);
+	public checkEntityManager(world: World): this {
+		let weakMapTmp = this.entitySet.get(world);
 		if (!weakMapTmp) {
 			weakMapTmp = new Set();
-			this.entitySet.set(manager, weakMapTmp);
+			this.entitySet.set(world, weakMapTmp);
 		} else {
 			weakMapTmp.clear();
 		}
-		manager.elements.forEach((item: Entity) => {
+		world.entities.forEach((item: Entity) => {
 			if (this.query(item)) {
 				weakMapTmp.add(item);
 			} else {
@@ -93,25 +80,12 @@ export class System extends EventFirer {
 			return this;
 		}
 
-		this.handleBefore(time, delta, world);
-		this.entitySet.get(world.entityManager)?.forEach((item: Entity) => {
+		this.entitySet.get(world)?.forEach((item: Entity) => {
 			// 此处不应该校验disabled。这个交给各自系统自行判断
 			this.handle(item, time, delta, world);
 		});
-		this.handleAfter?.(time, delta, world);
 
 		return this;
-	}
-
-	public serialize(): ISystemSerializedJson {
-		return {
-			id: this.id,
-			name: this.name,
-			autoUpdate: this.autoUpdate,
-			priority: this.priority,
-			disabled: this.disabled,
-			class: this.constructor.name,
-		};
 	}
 
 	public destroy(): this {
@@ -123,24 +97,7 @@ export class System extends EventFirer {
 	}
 
 	public handle(entity: Entity, time: number, delta: number, world: World): this {
-		this.#handler(entity, time, delta, world);
-
-		return this;
-	}
-
-	public handleAfter(time: number, delta: number, world: World): this {
-		this.#handlerAfter?.(time, delta, world);
-
-		return this;
-	}
-
-	public handleBefore(time: number, delta: number, world: World): this {
-		this.currentTime = time;
-		this.currentDelta = delta;
-		this.currentWorld = world;
-		this.loopTimes++;
-
-		this.#handlerBefore?.(time, delta, world);
+		this.handler(entity, time, delta, world);
 
 		return this;
 	}
