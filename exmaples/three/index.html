@@ -42,7 +42,7 @@
 		<script>
 			class RotationComponent extends X.Component {
 				constructor(speed) {
-					super(speed, [{ label: "rotation", unique: true }], "rotationSpeed");
+					super(speed, "rotationSpeed");
 				}
 			}
 
@@ -95,7 +95,7 @@
 					this.runParams = {
 						scene: this.scene,
 						camera: this.camera,
-						entities: this.entityManager.elements
+						entities: this.entities
 					};
 				}
 
@@ -208,13 +208,13 @@
 				const e2 = document.getElementById("entity2Btn");
 
 				e2.addEventListener("click", () => {
-					if (entity2.getComponent("rotationSpeed").data > 0) {
-						entity2.addComponent(r2);
+					const c = entity2.getComponent("rotationSpeed");
+					if (c.data > 0) {
 						e2.innerText = "切换逆时针旋转";
 					} else {
-						entity2.addComponent(r1);
 						e2.innerText = "切换顺时针旋转";
 					}
+					c.data *= -1;
 				});
 			}
 		</script>
