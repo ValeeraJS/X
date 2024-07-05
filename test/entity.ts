@@ -3,22 +3,9 @@ import { Component, World } from "../src";
 import { expect } from "chai";
 import { Entity } from "../src/Entity";
 
-describe("world has entity", function () {
-    const world = new World();
-    const e1 = new Entity();
-	it('entity add to world', function () {
-		expect(world.hasEntity(e1)).to.equal(false);
-        e1.addTo(world);
-		expect(world.hasEntity(e1)).to.equal(true);
-        world.clearAllEntities();
-        e1.addTo(world.entityManager);
-		expect(world.hasEntity(e1)).to.equal(true);
-	});
-});
-
 describe("entity has component", function () {
     const e1 = new Entity();
-    const c = new Component(0, [], "Component");
+    const c = new Component(0, "Component");
 	it('entity has component', function () {
 		expect(e1.hasComponent(c)).to.equal(false);
         e1.add(c);
@@ -36,14 +23,27 @@ describe("entity has component", function () {
 		expect(e1.hasComponent(c)).to.equal(false);
 
         e1.add(c);
-        e1.componentManager.remove(Component);
+        e1.remove(Component);
 		expect(e1.hasComponent(c)).to.equal(false);
+
+        e1.add(c);
+		expect(e1.hasComponent(c)).to.equal(true);
+        e1.removeComponent(c.name);
+		expect(e1.hasComponent(c)).to.equal(false);
+
+        class BBB extends Component<any> {}
+        const bbb = new BBB();
+        e1.add(bbb);
+		expect(e1.hasComponent(bbb)).to.equal(true);
+        e1.remove(Component);
+		expect(e1.hasComponent(bbb)).to.equal(true);
+
 	});
 });
 
 describe("entity clone", function () {
     const e1 = new Entity();
-    const c = new Component(0, []);
+    const c = new Component(0);
 	it('entity add to world', function () {
         e1.add(c);
 		const e2 = e1.clone();
@@ -63,7 +63,7 @@ describe("entity clone", function () {
 
 describe("entity destroy", function () {
     const e1 = new Entity();
-    const c = new Component(0, []);
+    const c = new Component(0);
     const world = new World();
 	it('entity destroy', function () {
         world.add(e1);
@@ -71,37 +71,5 @@ describe("entity destroy", function () {
 		e1.destroy();
         expect(e1.hasComponent(c)).to.equal(false);
         expect(world.hasEntity(e1)).to.equal(false);
-	});
-});
-
-describe("entity get components", function () {
-    const e1 = new Entity();
-    const c = new Component(0, [{label: 'aaa', unique: false}]);
-    const c2 = new Component(0, [{label: 'aaa', unique: false}]);
-    class CC extends Component<number> {}
-	it('entity get component by label', function () {
-        e1.add(c);
-        expect(e1.getComponentByTagLabel('aaa')).to.equal(c);
-        expect(e1.getComponentByTagLabel('aaaaaa')).to.equal(null);
-	});
-    it('entity get components by label', function () {
-        expect(e1.getComponentsByTagLabel('aaa')[0]).to.equal(c);
-        expect(e1.getComponentsByTagLabel('aaaaa').length).to.equal(0);
-	});
-    it('entity get components by class', function () {
-        e1.add(c2);
-        expect(e1.getComponentsByClass(Component)[1]).to.equal(c2);
-        expect(e1.getComponentsByClass(CC).length).to.equal(0);
-	});
-});
-
-describe("entity serialize", function () {
-    const e1 = new Entity();
-    const c = new Component(0, []);
-	it('serialize', function () {
-        e1.addComponent(c);
-		const json = e1.serialize();
-        expect(json.id).to.equal(e1.id);
-        expect(json.components[0]).to.equal(c.id);
 	});
 });
