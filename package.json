@@ -1,6 +1,6 @@
 {
 	"name": "@valeera/x",
-	"version": "0.2.0",
+	"version": "1.0.0",
 	"description": "ECS framework written in TS for web application.",
 	"main": "build/x.js",
 	"repository": "ValeeraJS/x",
@@ -21,10 +21,11 @@
 	},
 	"scripts": {
 		"build": "rollup -c scripts/rollup.config.mjs",
-		"build:umd": "rollup -c scripts/rollup.config.umd.mjs",
+		"build:iife": "rollup -c scripts/rollup.config.iife.mjs",
 		"start": "npm run dev",
 		"lint": "eslint src --ext js --ext ts",
 		"test": "nyc --reporter=html --reporter=text mocha -r ts-node/register ./test/*.ts",
+		"mix": "nyc --reporter=html --reporter=text mocha -r ts-node/register ./test/mix.ts",
 		"travis": "npm run lint && npm test"
 	},
 	"keywords": [
