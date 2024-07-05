@@ -4,10 +4,10 @@ import { Entity } from "../src/Entity";
 
 describe("System", function () {
     const world = new World();
-    const e1 = new Entity();
-    const e2 = new Entity();
-    const c = new Component(1, []);
-    e2.add(c).addTo(e1);
+    const e1 = new Entity('e1');
+    const e2 = new Entity('e2');
+    const c = new Component(1);
+    e1.add(e2.add(c));
     const s = new System((e) => {
         return e.hasComponent(Component);
     }, (e, time) => {
@@ -17,7 +17,7 @@ describe("System", function () {
         return e.hasComponent(Component);
     }, (e, time) => {
         e.getComponent<number>(Component).data += time;
-    }, undefined, undefined, 'ooo');
+    }, 'ooo');
     world.add(s).add(e1);
     it('run', function () {
         world.run(1, 1);
@@ -30,6 +30,18 @@ describe("System", function () {
         world.removeSystem(s.name);
         world.run(3, 1);
         expect(c.data).to.equal(2);
+
+        world.add(s);
+        e1.add(e2);
+        world.run(1, 1);
+        expect(c.data).to.equal(3);
+        s.autoUpdate = false;
+        world.run(1, 1);
+        expect(c.data).to.equal(3);
+        world.remove(s);
+        e1.remove(e2);
+        c.data = 2;
+
 
         world.add(s2);
         e1.add(c);
@@ -66,7 +78,7 @@ describe("System", function () {
         }, (e) => {
             e.getComponent<number>('aaa').data++;
         });
-        const c = new Component(1, [], 'aaa');
+        const c = new Component(1, 'aaa');
         const entity = new Entity();
         const world1 = new World();
         const world2 = new World();
@@ -79,18 +91,19 @@ describe("System", function () {
         expect(c.data).to.equal(3);
     });
 
-    it('serialize', function () {
-        const json = (new System(() => true, () => {}, undefined, undefined, 'aaa')).serialize();
-        expect(json.name).to.equal('aaa');
-    });
-
     it('has no system', function () {
-        expect(world.systemManager.get(-1)).to.equal(null);
+        expect(world.getSystem(-1)).to.equal(null);
         class TestSystem extends System {};
         class TestEntity extends Entity {};
-        expect(world.systemManager.get(TestSystem)).to.equal(null);
+        expect(world.getSystem(TestSystem)).to.equal(null);
         expect(world.hasSystem(TestSystem)).to.equal(false);
         expect(world.removeEntity(TestEntity)).to.equal(world);
         expect(world.removeEntity(-1)).to.equal(world);
+    });
+
+    it('without handler', function () {
+        const s = new System(() => {return true;});
+        s.handle(new Entity(), 0, 0, new World());
+        expect(s).to.equal(s);
     });
 });
