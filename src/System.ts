@@ -1,6 +1,6 @@
 import { Entity } from "./Entity";
 import { IdGeneratorInstance } from "./Global";
-import { World, updateOrder } from "./World";
+import { World } from "./World";
 
 export type TQueryRule = (entity: Entity) => boolean;
 
@@ -37,7 +37,7 @@ export class System {
 		this._priority = v;
 
 		for (let i = 0, len = this.usedBy.length; i < len; i++) {
-			updateOrder(this.usedBy[i]);
+			this.usedBy[i].updateOrder();
 		}
 	}
 
