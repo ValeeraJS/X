@@ -1,9 +1,10 @@
 import { IdGeneratorInstance } from "./Global";
 import { TreeNode } from "@valeera/tree";
 import { Component, ComponentConstructor } from "./Component";
-import { EntitiesCache, World } from "./World";
+import { World } from "./World";
 import { IECSObject } from "./interfaces/IECSObject";
 import { add, clear, get, has, remove } from "./utils/ecsManagerOperations";
+import { EntitiesCache } from "./cache";
 
 export type EntityConstructor = new (...args: any[]) => Entity;
 
