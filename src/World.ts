@@ -1,25 +1,11 @@
+import { EntitiesCache, SystemOrderCache } from "./cache";
 import { Entity, EntityConstructor } from "./Entity";
 import { IdGeneratorInstance } from "./Global";
 import { System, SystemConstructor } from "./System";
 import { add, clear, get, has, remove } from "./utils/ecsManagerOperations";
 import { unsortedRemove } from "./utils/unsortedRemove";
 
-export const EntitiesCache = new WeakMap<World, Set<Entity>>();
-const SystemOrderCache = new WeakMap<World, System[]>();
-
 const sort = (a: System, b: System) => a.priority - b.priority;
-
-// TODO 此处应当直接插入，不能排序
-export function updateOrder<T extends World>(world: T) {
-	const arr: System[] = [];
-	world.systems.forEach((element) => {
-		arr.push(element);
-	});
-	arr.sort(sort);
-	SystemOrderCache.set(world, arr);
-
-	return world;
-}
 
 export class World {
 	public disabled = false;
@@ -58,9 +44,8 @@ export class World {
 	public addSystem(system: System): this {
 		add(system, this.systems, this as World);
 		system.checkEntityManager(this);
-		updateOrder(this);
 
-		return this;
+		return this.updateOrder();;
 	}
 
 	public clear(): this {
@@ -180,7 +165,7 @@ export class World {
 			remove(this.systems, systemTmp, this as World);
 		}
 
-		return updateOrder(this);
+		return this.updateOrder();
 	}
 
 	public rootEntities(): Entity[] {
@@ -215,6 +200,17 @@ export class World {
 		});
 
 		EntitiesCache.get(this).clear();
+
+		return this;
+	}
+
+	public updateOrder() {
+		const arr: System[] = [];
+		this.systems.forEach((element) => {
+			arr.push(element);
+		});
+		arr.sort(sort);
+		SystemOrderCache.set(this, arr);
 
 		return this;
 	}
