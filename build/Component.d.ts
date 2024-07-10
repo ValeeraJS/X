@@ -1,23 +1,14 @@
-import { ComponentTag } from "./interfaces/IComponent";
-import { IComponentSerializedJson } from "./interfaces/ISerializable";
-import { ComponentManager } from "./ComponentManager";
-import { EventFirer } from "@valeera/eventfire";
-export type ComponentConstructor<T> = new (...args: any[]) => Component<T>;
-export declare class Component<T> extends EventFirer {
-    #private;
-    static unserialize<T>(json: IComponentSerializedJson<T>): Component<T>;
+import { Entity } from "./Entity";
+import { IECSObject } from "./interfaces/IECSObject";
+export type ComponentConstructor<DataType> = new (...args: any[]) => Component<DataType>;
+export declare class Component<DataType> implements IECSObject<Entity> {
     readonly isComponent = true;
     readonly id: number;
-    data: T | null;
+    data: DataType | null;
     disabled: boolean;
     name: string;
-    usedBy: ComponentManager[];
-    tags: ComponentTag[];
-    get dirty(): boolean;
-    set dirty(v: boolean);
-    constructor(data?: T | null, tags?: ComponentTag[], name?: string);
-    clone(): Component<T>;
+    usedBy: Entity[];
+    constructor(data?: DataType | null, name?: string);
+    clone(): Component<DataType>;
     destroy(): void;
-    hasTagLabel(label: string): boolean;
-    serialize(): IComponentSerializedJson<T | null>;
 }

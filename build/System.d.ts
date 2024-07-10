@@ -1,39 +1,30 @@
-import { EventFirer } from "@valeera/eventfire";
 import { Entity } from "./Entity";
-import { EntityManager } from "./EntityManager";
-import { ISystemSerializedJson } from "./interfaces/ISerializable";
-import { SystemManager } from "./SystemManager";
 import { World } from "./World";
-type TQueryRule = (entity: Entity) => boolean;
-export declare class System extends EventFirer {
-    #private;
+export type TQueryRule = (entity: Entity) => boolean;
+export declare class System {
     readonly id: number;
     readonly isSystem = true;
     name: string;
     loopTimes: number;
-    entitySet: WeakMap<EntityManager, Set<Entity>>;
-    usedBy: SystemManager[];
-    cache: WeakMap<Entity, any>;
+    entitySet: WeakMap<World, Set<Entity>>;
+    usedBy: World[];
     autoUpdate: boolean;
+    handler: (entity: Entity, time: number, delta: number, world: World) => any;
     protected currentDelta: number;
     protected currentTime: number;
     protected currentWorld: World | null;
     protected rule: TQueryRule;
-    protected _disabled: boolean;
-    protected _priority: number;
+    private _disabled;
+    private _priority;
     get disabled(): boolean;
     set disabled(value: boolean);
     get priority(): number;
     set priority(v: number);
-    constructor(fitRule: TQueryRule, handler: (entity: Entity, time: number, delta: number, world: World) => any, handlerBefore?: (time: number, delta: number, world: World) => any, handlerAfter?: (time: number, delta: number, world: World) => any, name?: string);
-    checkEntityManager(manager: EntityManager): this;
+    constructor(fitRule: TQueryRule, handler?: (entity: Entity, time: number, delta: number, world: World) => any, name?: string);
+    checkEntityManager(world: World): this;
     query(entity: Entity): boolean;
     run(world: World, time: number, delta: number): this;
-    serialize(): ISystemSerializedJson;
     destroy(): this;
     handle(entity: Entity, time: number, delta: number, world: World): this;
-    handleAfter(time: number, delta: number, world: World): this;
-    handleBefore(time: number, delta: number, world: World): this;
 }
 export type SystemConstructor = new (...a: any[]) => System;
-export {};
