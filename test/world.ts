@@ -1,4 +1,4 @@
-/* eslint-disable max-nested-callbacks */
+/// <reference types="mocha" />
 import { System, unsortedRemove, World } from "../src";
 import { expect } from "chai";
 import { Entity } from "../src/Entity";
