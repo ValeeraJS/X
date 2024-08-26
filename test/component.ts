@@ -1,3 +1,4 @@
+/// <reference types="mocha" />
 import { Component } from "../src";
 import { expect } from "chai";
 
