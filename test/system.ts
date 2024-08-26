@@ -1,3 +1,4 @@
+/// <reference types="mocha" />
 import { Component, System, World } from "../src";
 import { expect } from "chai";
 import { Entity } from "../src/Entity";
