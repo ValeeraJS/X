@@ -22,28 +22,39 @@ export class World {
 		SystemOrderCache.set(this, []);
 	}
 
-	public add(element: Entity | System): this {
-		if ((element as Entity).isEntity) {
+	public add<T extends EntityConstructor>(element: T, ...args: ConstructorParameters<T>): this;
+	public add<T extends SystemConstructor>(element: T, ...args: ConstructorParameters<T>): this;
+	public add(element: Entity | System): this;
+	public add(element: Entity | System | EntityConstructor | SystemConstructor, ...args: any[]): this {
+		if (element instanceof Entity) {
 			return this.addEntity(element as Entity);
-		} else {
+		} else if (element instanceof System) {
 			return this.addSystem(element as System);
 		}
+		
+		return this.add(new element(...args));
 	}
 
-	public addEntity(entity: Entity): this {
-		add(entity, this.entities, this as World);
-		EntitiesCache.get(this).add(entity);
+	public addEntity<T extends EntityConstructor>(entity: T, ...args: ConstructorParameters<T>): this
+	public addEntity(entity: Entity): this;
+	public addEntity<T extends EntityConstructor>(entity: Entity | T, ...args: ConstructorParameters<T>): this {
+		const e = entity instanceof Entity ? entity : new entity(...args);
+		add(e, this.entities, this as World);
+		EntitiesCache.get(this).add(e);
 
-		for (const child of (entity as any).children) {
+		for (const child of e.children) {
 			this.add(child);
 		}
 
 		return this;
 	}
 
-	public addSystem(system: System): this {
-		add(system, this.systems, this as World);
-		system.checkEntityManager(this);
+	public addSystem<T extends SystemConstructor>(system: T, ...args: ConstructorParameters<T>): this;
+	public addSystem(system: System): this;
+	public addSystem<T extends SystemConstructor>(system: System | T, ...args: ConstructorParameters<T>): this {
+		const s = system instanceof System ? system : new system(...args);
+		add(s, this.systems, this as World);
+		s.checkEntityManager(this);
 
 		return this.updateOrder();;
 	}
