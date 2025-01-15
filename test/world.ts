@@ -128,3 +128,34 @@ describe("unsort remove", function () {
         expect(arr[0]).to.equal(6);
     });
 });
+
+describe("add class", function () {
+    class E2 extends Entity {
+        n: number;
+        constructor(n: number) {
+            super();
+            this.n = n;
+        }
+    }
+
+    class S2 extends System {
+        aaa: number;
+        constructor(aaa: number) {
+            super(() => true);
+            this.aaa = aaa;
+        }
+    }
+
+    const world = new World();
+
+    it('add', function () {
+        world.add(E2, 1);
+        expect(world.entities.size).to.equal(1);
+        world.addEntity(E2, 1);
+        expect(world.entities.size).to.equal(2);
+        world.add(S2, 2);
+        expect(world.systems.size).to.equal(1);
+        world.addSystem(S2, 2);
+        expect(world.systems.size).to.equal(2);
+    });
+});
