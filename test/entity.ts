@@ -73,3 +73,34 @@ describe("entity destroy", function () {
         expect(world.hasEntity(e1)).to.equal(false);
 	});
 });
+
+describe("entity add component", function () {
+    const e1 = new Entity();
+    class TestC extends Component<number> {
+        constructor(value: number) {
+            super(value, "testC");
+        }
+    }
+
+    class E2 extends Entity {
+        aaa: number;
+        bbb: string;
+        constructor(aaa: number, bbb: string) {
+            super();
+            this.aaa = aaa;
+            this.bbb = bbb;
+        }
+    }
+	it('entity add', function () {
+        e1.addComponent(TestC, 111);
+        expect(e1.hasComponent(TestC)).to.equal(true);
+        const c = e1.getComponent(TestC);
+        expect(c?.data).to.equal(111);
+
+        e1.add(E2, 111, 'aaa');
+        expect(e1.children[0] instanceof E2).to.equal(true);
+
+        e1.addChild(E2, 111, 'aaa');
+        expect(e1.children[1] instanceof E2).to.equal(true);
+	});
+});
