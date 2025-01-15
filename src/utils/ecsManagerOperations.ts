@@ -22,13 +22,13 @@ export const clear = <T extends IECSObject<U>, U>(map: Map<number, T>, owner: U)
 	return owner;
 }
 
-export const get = <T extends IECSObject<U>, U>(map: Map<number, T>, name: string | number | (new (...args: any[]) => any)): T | null => {
+export const get = <T extends IECSObject<U>, U>(map: Map<number, T>, name: string | number | (new (...args: any[]) => T)): T | null => {
 	if (typeof name === "number") {
 		return map.get(name) ?? null;
 	}
 	if (typeof name === "function") {
 		for (const [, item] of map) {
-			if (item.constructor === name) {
+			if (item instanceof name) {
 				return item;
 			}
 		}
@@ -42,7 +42,7 @@ export const get = <T extends IECSObject<U>, U>(map: Map<number, T>, name: strin
 	return null;
 }
 
-export const has = <T extends IECSObject<U>, U>(map: Map<number, T>, element: T | number | string | (new (...args: any) => any)): boolean => {
+export const has = <T extends IECSObject<U>, U>(map: Map<number, T>, element: T | number | string | (new (...args: any) => T)): boolean => {
 	if (typeof element === "number") {
 		return map.has(element);
 	} else if (typeof element === "string") {
