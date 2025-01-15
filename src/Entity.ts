@@ -8,7 +8,7 @@ import { EntitiesCache } from "./cache";
 
 export type EntityConstructor = new (...args: any[]) => Entity;
 
-export class Entity extends TreeNode implements IECSObject<World>{
+export class Entity extends TreeNode implements IECSObject<World> {
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
 	public readonly components = new Map<number, Component<any>>();
@@ -22,17 +22,29 @@ export class Entity extends TreeNode implements IECSObject<World>{
 		this.name = name;
 	}
 
-	public add(componentOrChild: Component<any> | Entity): this {
+	public add<T extends EntityConstructor>(child: T, ...args: ConstructorParameters<T>): this;
+	public add<T extends ComponentConstructor<any>>(componentOrChild: T, ...args: ConstructorParameters<T>): this;
+	public add(componentOrChild: Component<any> | Entity): this
+	public add(componentOrChild: Component<any> | Entity | ComponentConstructor<any> | EntityConstructor, ...args: ConstructorParameters<ComponentConstructor<any> | EntityConstructor>[]): this {
 		if (componentOrChild instanceof Entity) {
 			return this.addChild(componentOrChild);
 		}
+		if (componentOrChild instanceof Component) {
+			return this.addComponent(componentOrChild);
+		}
 
-		return this.addComponent(componentOrChild);
+		return this.add(new componentOrChild(...args));
 	}
 
-	public addComponent(component: Component<any>): this {
-		add(component, this.components, this as Entity);
-		
+	public addComponent(component: Component<any>): this;
+	public addComponent<T extends ComponentConstructor<any>>(componentOrChild: T, ...args: ConstructorParameters<T>): this;
+	public addComponent(component: Component<any> | ComponentConstructor<any>, ...args: ConstructorParameters<ComponentConstructor<any>>): this {
+		if (component instanceof Component) {
+			add(component, this.components, this as Entity);
+		} else {
+			add(new component(...args), this.components, this as Entity);
+		}
+
 		for (let i = 0, len = this.usedBy.length; i < len; i++) {
 			EntitiesCache.get(this.usedBy[i]).add(this);
 		}
@@ -40,18 +52,20 @@ export class Entity extends TreeNode implements IECSObject<World>{
 		return this;
 	}
 
-	public addChild(entity: Entity): this {
-		super.addChild(entity);
+	public addChild<T extends EntityConstructor>(entity: T, ...args: ConstructorParameters<T>): this
+	public addChild(entity: Entity): this;
+	public addChild<T extends EntityConstructor>(entity: Entity | T, ...args: ConstructorParameters<T>): this {
+		const e = entity instanceof Entity ? entity : new entity(...args);
 
 		for (const world of this.usedBy) {
-			world.add(entity);
+			world.add(e);
 		}
 
-		return this;
+		return super.addChild(e);
 	}
 
 	public clone(cloneComponents?: boolean, includeChildren?: boolean) {
-		const entity = new Entity(this.name);
+		const entity = new (this.constructor as EntityConstructor)(this.name);
 		if (cloneComponents) {
 			this.components.forEach((component) => {
 				entity.addComponent(component.clone());
@@ -77,7 +91,7 @@ export class Entity extends TreeNode implements IECSObject<World>{
 		this.components.forEach((c) => {
 			c.destroy();
 		});
-		
+
 		return clear(this.components, this as Entity) as this;
 	}
 
@@ -98,21 +112,19 @@ export class Entity extends TreeNode implements IECSObject<World>{
 	}
 
 	public removeChild(entity: Entity): this {
-		super.removeChild(entity);
-
 		for (const world of this.usedBy) {
 			world.removeEntity(entity);
 		}
 
-		return this;
+		return super.removeChild(entity);
 	}
 
 	public removeComponent(component: Component<any> | string | ComponentConstructor<any>): this {
-		for (let i = 0, len = this.usedBy.length; i < len; i++) {
-			EntitiesCache.get(this.usedBy[i]).add(this);
+		if (remove(this.components, component, this as Entity)) {
+			for (let i = 0, len = this.usedBy.length; i < len; i++) {
+				EntitiesCache.get(this.usedBy[i]).add(this);
+			}
 		}
-
-		remove(this.components, component, this as Entity);
 
 		return this;
 	}
