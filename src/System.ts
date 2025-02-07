@@ -42,14 +42,14 @@ export class System {
 	}
 
 	public constructor(
-		fitRule: TQueryRule,
+		rule: TQueryRule,
 		handler?: (entity: Entity, time: number, delta: number, world: World) => any,
 		name?: string,
 	) {
 		this.name = name ?? this.constructor.name;
 		this.disabled = false;
 		this.handler = handler ?? (() => {});
-		this.rule = fitRule;
+		this.rule = rule;
 	}
 
 	public checkEntityManager(world: World): this {
@@ -75,13 +75,12 @@ export class System {
 		return this.rule(entity);
 	}
 
-	public run(world: World, time: number, delta: number): this {
+	public update(world: World, time: number, delta: number): this {
 		if (this.disabled) {
 			return this;
 		}
 
 		this.entitySet.get(world)?.forEach((item: Entity) => {
-			// 此处不应该校验disabled。这个交给各自系统自行判断
 			this.handle(item, time, delta, world);
 		});
 
