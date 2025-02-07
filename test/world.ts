@@ -77,9 +77,9 @@ describe("world has system", function () {
 describe("world run", function () {
     const world = new World();
     it('add system', function () {
-        expect(world.run(0, 0)).to.equal(world);
+        expect(world.update(0, 0)).to.equal(world);
         world.disabled = true;
-        expect(world.run(0, 0)).to.equal(world);
+        expect(world.update(0, 0)).to.equal(world);
     });
 });
 
@@ -90,7 +90,7 @@ describe("world clear", function () {
         expect(world.entities.size).to.equal(1);
         expect(world.systems.size).to.equal(1);
 
-        expect(world.getEntity('aaa').name).to.equal('aaa');
+        expect(world.getEntity('aaa')!.name).to.equal('aaa');
 
         world.clear();
 
