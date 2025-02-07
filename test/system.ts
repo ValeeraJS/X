@@ -12,32 +12,32 @@ describe("System", function () {
     const s = new System((e) => {
         return e.hasComponent(Component);
     }, (e, time) => {
-        e.getComponent<number>(Component).data += time;
+        e.getComponent<number>(Component)!.data! += time;
     });
     const s2 = new System((e) => {
         return e.hasComponent(Component);
     }, (e, time) => {
-        e.getComponent<number>(Component).data += time;
+        e.getComponent<number>(Component)!.data! += time;
     }, 'ooo');
     world.add(s).add(e1);
     it('run', function () {
-        world.run(1, 1);
+        world.update(1, 1);
         world.removeSystem('000');
         world.removeSystem(s2);
         expect(c.data).to.equal(2);
         e1.remove(e2);
-        world.run(2, 1);
+        world.update(2, 1);
         expect(c.data).to.equal(2);
         world.removeSystem(s.name);
-        world.run(3, 1);
+        world.update(3, 1);
         expect(c.data).to.equal(2);
 
         world.add(s);
         e1.add(e2);
-        world.run(1, 1);
+        world.update(1, 1);
         expect(c.data).to.equal(3);
         s.autoUpdate = false;
-        world.run(1, 1);
+        world.update(1, 1);
         expect(c.data).to.equal(3);
         world.remove(s);
         e1.remove(e2);
@@ -46,14 +46,14 @@ describe("System", function () {
 
         world.add(s2);
         e1.add(c);
-        world.run(4, 1);
+        world.update(4, 1);
         s2.disabled = true;
         world.add(s2);
-        world.run(4, 1);
+        world.update(4, 1);
         expect(c.data).to.equal(6);
         e1.remove(c);
 
-        expect(s2.run(world, 1, 1)).to.equal(s2);
+        expect(s2.update(world, 1, 1)).to.equal(s2);
     });
 
     it('priority', function () {
@@ -67,7 +67,7 @@ describe("System", function () {
     it('disabled and destroy', function () {
         s.disabled = true;
         world.add(s);
-        world.run(1, 1);
+        world.update(1, 1);
         expect(c.data).to.equal(6);
         s.destroy();
         expect(world.hasSystem(s)).to.equal(false);
@@ -77,18 +77,18 @@ describe("System", function () {
         const s = new System((e) => {
             return e.hasComponent('aaa');
         }, (e) => {
-            e.getComponent<number>('aaa').data++;
+            e.getComponent<number>('aaa')!.data!++;
         });
         const c = new Component(1, 'aaa');
         const entity = new Entity();
         const world1 = new World();
         const world2 = new World();
         world1.add(s).add(entity);
-        world1.run(1, 1);
+        world1.update(1, 1);
         entity.add(c);
         world2.add(s).add(entity);
-        world1.run(1, 1);
-        world2.run(1, 1);
+        world1.update(1, 1);
+        world2.update(1, 1);
         expect(c.data).to.equal(3);
     });
 
