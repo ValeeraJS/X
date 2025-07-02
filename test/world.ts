@@ -57,6 +57,17 @@ describe("world has system", function () {
             return this;
         }
     }
+
+    class SSS extends System {
+        v: number;
+        constructor(v: number) {
+            super(() => true);
+            this.v = v;
+        }
+        handle() {
+            return this;
+        }
+    }
     it('add system', function () {
         expect(world.hasSystem(s1)).to.equal(false);
         world.add(s1);
@@ -71,13 +82,15 @@ describe("world has system", function () {
         expect(world.hasSystem(s1)).to.equal(true);
         world.remove(System);
         expect(world.hasSystem(s1)).to.equal(false);
+        world.add(SSS, 1);
+        expect(world.hasSystem(SSS)).to.equal(true);
     });
 });
 
 describe("world run", function () {
     const world = new World();
     it('add system', function () {
-        expect(world.update(0, 0)).to.equal(world);
+        expect(world.update()).to.equal(world);
         world.disabled = true;
         expect(world.update(0, 0)).to.equal(world);
     });
