@@ -24,8 +24,11 @@ export class Entity extends TreeNode implements IECSObject<World> {
 
 	public add<T extends EntityConstructor>(child: T, ...args: ConstructorParameters<T>): this;
 	public add<T extends ComponentConstructor<any>>(componentOrChild: T, ...args: ConstructorParameters<T>): this;
-	public add(componentOrChild: Component<any> | Entity): this
-	public add(componentOrChild: Component<any> | Entity | ComponentConstructor<any> | EntityConstructor, ...args: ConstructorParameters<ComponentConstructor<any> | EntityConstructor>[]): this {
+	public add(componentOrChild: Component<any> | Entity): this;
+	public add(
+		componentOrChild: Component<any> | Entity | ComponentConstructor<any> | EntityConstructor,
+		...args: ConstructorParameters<ComponentConstructor<any> | EntityConstructor>[]
+	): this {
 		if (componentOrChild instanceof Entity) {
 			return this.addChild(componentOrChild);
 		}
@@ -37,8 +40,14 @@ export class Entity extends TreeNode implements IECSObject<World> {
 	}
 
 	public addComponent(component: Component<any>): this;
-	public addComponent<T extends ComponentConstructor<any>>(componentOrChild: T, ...args: ConstructorParameters<T>): this;
-	public addComponent(component: Component<any> | ComponentConstructor<any>, ...args: ConstructorParameters<ComponentConstructor<any>>): this {
+	public addComponent<T extends ComponentConstructor<any>>(
+		componentOrChild: T,
+		...args: ConstructorParameters<T>
+	): this;
+	public addComponent(
+		component: Component<any> | ComponentConstructor<any>,
+		...args: ConstructorParameters<ComponentConstructor<any>>
+	): this {
 		if (component instanceof Component) {
 			add(component, this.components, this as Entity);
 		} else {
@@ -52,7 +61,7 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		return this;
 	}
 
-	public addChild<T extends EntityConstructor>(entity: T, ...args: ConstructorParameters<T>): this
+	public addChild<T extends EntityConstructor>(entity: T, ...args: ConstructorParameters<T>): this;
 	public addChild(entity: Entity): this;
 	public addChild<T extends EntityConstructor>(entity: Entity | T, ...args: ConstructorParameters<T>): this {
 		const e = entity instanceof Entity ? entity : new entity(...args);
