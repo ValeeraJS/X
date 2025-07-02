@@ -191,7 +191,7 @@ export class World {
 		return result;
 	}
 
-	public update(time: number, delta: number): this {
+	public update(time = performance.now(), delta = 0): this {
 		if (this.disabled) {
 			return this;
 		}
