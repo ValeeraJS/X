@@ -38,11 +38,11 @@ describe("world has entity", function () {
         e1.add(e2);
         e3.add(e4);
         world.add(e1).add(e3);
-        expect(world.rootEntities().length).to.equal(2);
+        expect(world.rootEntities.length).to.equal(2);
 
         world.add(new System(() => true));
         world.destroy();
-        expect(world.rootEntities().length).to.equal(0);
+        expect(world.rootEntities.length).to.equal(0);
     });
 });
 
