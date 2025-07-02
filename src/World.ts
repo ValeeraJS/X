@@ -206,7 +206,7 @@ export class World {
 				}
 			});
 			if (system.autoUpdate) {
-				system.run(this, time, delta);
+				system.update(this, time, delta);
 			}
 		});
 
