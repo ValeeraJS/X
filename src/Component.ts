@@ -2,8 +2,6 @@ import { Entity } from "./Entity";
 import { IdGeneratorInstance } from "./Global";
 import { IECSObject } from "./interfaces/IECSObject";
 
-export type ComponentConstructor<DataType> = new (...args: any[]) => Component<DataType>;
-
 export class Component<DataType> implements IECSObject<Entity> {
 	public readonly isComponent = true;
 	public readonly id = IdGeneratorInstance.next();
@@ -28,3 +26,5 @@ export class Component<DataType> implements IECSObject<Entity> {
 		this.data = null;
 	}
 }
+
+export type ComponentConstructor<DataType> = new (...args: any[]) => Component<DataType>;
