@@ -22,6 +22,18 @@ export class World {
 		SystemOrderCache.set(this, []);
 	}
 
+	public get rootEntities(): Entity[] {
+		const result: Entity[] = [];
+
+		this.entities.forEach((entity) => {
+			if (!entity.parent) {
+				result.push(entity);
+			}
+		});
+
+		return result;
+	}
+
 	public add<T extends EntityConstructor>(element: T, ...args: ConstructorParameters<T>): this;
 	public add<T extends SystemConstructor>(element: T, ...args: ConstructorParameters<T>): this;
 	public add(element: Entity | System): this;
@@ -31,11 +43,10 @@ export class World {
 		} else if (element instanceof System) {
 			return this.addSystem(element as System);
 		}
-		
 		return this.add(new element(...args));
 	}
 
-	public addEntity<T extends EntityConstructor>(entity: T, ...args: ConstructorParameters<T>): this
+	public addEntity<T extends EntityConstructor>(entity: T, ...args: ConstructorParameters<T>): this;
 	public addEntity(entity: Entity): this;
 	public addEntity<T extends EntityConstructor>(entity: Entity | T, ...args: ConstructorParameters<T>): this {
 		const e = entity instanceof Entity ? entity : new entity(...args);
@@ -56,7 +67,7 @@ export class World {
 		add(s, this.systems, this as World);
 		s.checkEntityManager(this);
 
-		return this.updateOrder();;
+		return this.updateOrder();
 	}
 
 	public clear(): this {
@@ -91,7 +102,7 @@ export class World {
 				this.removeSystem(item[1]);
 			}
 		}
-		const arr2 = this.rootEntities();
+		const arr2 = this.rootEntities;
 		for (let item of arr2) {
 			if (item.usedBy.length === 1) {
 				item.destroy();
@@ -130,7 +141,7 @@ export class World {
 	}
 
 	public removeEntity(entity: Entity | number | string | EntityConstructor): this {
-		if (typeof entity === 'number' || typeof entity === 'string' || typeof entity === 'function') {
+		if (typeof entity === "number" || typeof entity === "string" || typeof entity === "function") {
 			entity = get(this.entities, entity);
 		}
 
@@ -179,24 +190,11 @@ export class World {
 		return this.updateOrder();
 	}
 
-	public rootEntities(): Entity[] {
-		const result: Entity[] = [];
-
-		this.entities.forEach((entity) => {
-			if (!entity.parent) {
-				result.push(entity);
-			}
-		});
-
-		return result;
-	}
-
 	public update(time = performance.now(), delta = 0): this {
 		if (this.disabled) {
 			return this;
 		}
 		SystemOrderCache.get(this).forEach((system) => {
-
 			const weakMapTmp = system.entitySet.get(this);
 			EntitiesCache.get(this).forEach((item: Entity) => {
 				if (system.query(item)) {
