@@ -11,4 +11,4 @@ export const unsortedRemove = <T>(arr: T[], i: number): T | undefined => {
 	}
 
 	return last;
-}
+};
