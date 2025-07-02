@@ -1,7 +1,7 @@
 import { IECSObject } from "../interfaces/IECSObject";
 import { unsortedRemove } from "./unsortedRemove";
 
-export const add = <T extends IECSObject<U>, U>(element: T, map: Map<number, T>, owner: U): boolean => {
+export const add = <U, T extends IECSObject<U>>(element: T, map: Map<number, T>, owner: U): boolean => {
 	if (has(map, element)) {
 		return false;
 	}
@@ -10,9 +10,9 @@ export const add = <T extends IECSObject<U>, U>(element: T, map: Map<number, T>,
 	element.usedBy.push(owner);
 
 	return true;
-}
+};
 
-export const clear = <T extends IECSObject<U>, U>(map: Map<number, T>, owner: U) => {
+export const clear = <U, T extends IECSObject<U>>(map: Map<number, T>, owner: U) => {
 	const arr = Array.from(map);
 
 	for (let element of arr) {
@@ -20,9 +20,12 @@ export const clear = <T extends IECSObject<U>, U>(map: Map<number, T>, owner: U)
 	}
 
 	return owner;
-}
+};
 
-export const get = <T extends IECSObject<U>, U>(map: Map<number, T>, name: string | number | (new (...args: any[]) => T)): T | null => {
+export const get = <U, T extends IECSObject<U>>(
+	map: Map<number, T>,
+	name: string | number | (new (...args: any[]) => T),
+): T | null => {
 	if (typeof name === "number") {
 		return map.get(name) ?? null;
 	}
@@ -40,9 +43,12 @@ export const get = <T extends IECSObject<U>, U>(map: Map<number, T>, name: strin
 	}
 
 	return null;
-}
+};
 
-export const has = <T extends IECSObject<U>, U>(map: Map<number, T>, element: T | number | string | (new (...args: any) => T)): boolean => {
+export const has = <U, T extends IECSObject<U>>(
+	map: Map<number, T>,
+	element: T | number | string | (new (...args: any) => T),
+): boolean => {
 	if (typeof element === "number") {
 		return map.has(element);
 	} else if (typeof element === "string") {
@@ -64,9 +70,13 @@ export const has = <T extends IECSObject<U>, U>(map: Map<number, T>, element: T 
 	} else {
 		return map.has((element as T).id);
 	}
-}
+};
 
-export const remove = <T extends IECSObject<U>, U>(map: Map<number, T>, element: T | string | number | (new (...args: any[]) => T), owner: U): boolean => {
+export const remove = <U, T extends IECSObject<U>>(
+	map: Map<number, T>,
+	element: T | string | number | (new (...args: any[]) => T),
+	owner: U,
+): boolean => {
 	let elementTmp: T | undefined;
 	if (typeof element === "number" || typeof element === "string") {
 		elementTmp = get(map, element);
@@ -94,4 +104,4 @@ export const remove = <T extends IECSObject<U>, U>(map: Map<number, T>, element:
 	}
 
 	return false;
-}
+};
