@@ -6,7 +6,7 @@ export default {
 	output: [
 		{
 			file: "build/x.iife.js",
-			format: "umd",
+			format: "iife",
 			indent: "\t",
 			name: "X",
 			sourcemap: false,
