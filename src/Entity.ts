@@ -9,6 +9,26 @@ import { EntitiesCache } from "./cache";
 export type EntityConstructor = new (...args: any[]) => Entity;
 
 export class Entity extends TreeNode implements IECSObject<World> {
+	public static tagSet: Map<string, Set<ComponentConstructor<any>>> = new Map();
+
+	public static setTag(name: string, components: Array<ComponentConstructor<any> | string> | Set<ComponentConstructor<any> | string>) {
+		const set = new Set<ComponentConstructor<any>>();
+		Entity.tagSet.set(name, set);
+		components.forEach((val) => {
+			if (val instanceof Object) {
+				set.add(val);
+			} else {
+				Entity.tagSet.get(val)?.forEach((ele) => {
+					set.add(ele);
+				});
+			}
+		});
+	}
+
+	public static removeTag(name: string) {
+		Entity.tagSet.delete(name);
+	}
+
 	public readonly id: number = IdGeneratorInstance.next();
 	public readonly isEntity = true;
 	public readonly components = new Map<number, Component<any>>();
@@ -102,6 +122,22 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		});
 
 		return clear(this.components, this as Entity) as this;
+	}
+
+	public fitTag(name: string) {
+		const tags = Entity.tagSet.get(name);
+
+		if (!tags) {
+			return false;
+		}
+
+		for (const item of tags) {
+			if (!this.hasComponent(item)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public getComponent<T>(nameOrId: string | number | ComponentConstructor<T>): Component<T> | null {
