@@ -104,3 +104,49 @@ describe("entity add component", function () {
         expect(e1.children[1] instanceof E2).to.equal(true);
 	});
 });
+
+describe("entity tags", function () {
+    const e1 = new Entity();
+    class TestA extends Component<number> {
+        constructor(value: number) {
+            super(value, "testA");
+        }
+    }
+
+    class TestB extends Component<number> {
+        constructor(value: number) {
+            super(value, "testB");
+        }
+    }
+
+    class TestC extends Component<number> {
+        constructor(value: number) {
+            super(value, "testC");
+        }
+    }
+
+    const tagA: any[] = [];
+    const tagB = [TestA, TestB];
+
+    Entity.setTag('tagA', tagA);
+    Entity.setTag('tagB', tagB);
+    Entity.setTag('tagC', ['tagA', 'tagB', TestC]);
+
+	it('entity tag', function () {
+        expect(e1.fitTag("aaa")).to.equal(false);
+        expect(e1.fitTag("tagA")).to.equal(true);
+        expect(e1.fitTag("tagB")).to.equal(false);
+
+        e1.addComponent(new TestA(1));
+        expect(e1.fitTag("tagA")).to.equal(true);
+        expect(e1.fitTag("tagB")).to.equal(false);
+        e1.addComponent(new TestB(1));
+        expect(e1.fitTag("tagB")).to.equal(true);
+        expect(e1.fitTag("tagC")).to.equal(false);
+        e1.addComponent(new TestC(1));
+        expect(e1.fitTag("tagC")).to.equal(true);
+
+        Entity.removeTag("tagC");
+        expect(e1.fitTag("tagC")).to.equal(false);
+	});
+});
