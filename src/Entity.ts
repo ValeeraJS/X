@@ -124,7 +124,31 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		return clear(this.components, this as Entity) as this;
 	}
 
-	public fitTag(name: string) {
+	public fitTag(tag: string) {
+		const compClass = Entity.tagSet.get(tag);
+
+		if (!compClass) {
+			return;
+		}
+
+		compClass.forEach((val) => {
+			if (!this.hasComponent(val)) {
+				this.add(val);
+			}
+		});
+
+		return this;
+	}
+
+	public getComponent<T>(nameOrId: string | number | ComponentConstructor<T>): Component<T> | null {
+		return get(this.components, nameOrId);
+	}
+
+	public hasComponent(component: Component<any> | string | number | ComponentConstructor<any>): boolean {
+		return has(this.components, component);
+	}
+
+	public isFitTag(name: string) {
 		const tags = Entity.tagSet.get(name);
 
 		if (!tags) {
@@ -138,14 +162,6 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		}
 
 		return true;
-	}
-
-	public getComponent<T>(nameOrId: string | number | ComponentConstructor<T>): Component<T> | null {
-		return get(this.components, nameOrId);
-	}
-
-	public hasComponent(component: Component<any> | string | number | ComponentConstructor<any>): boolean {
-		return has(this.components, component);
 	}
 
 	public remove(entityOrComponent: Entity | Component<any> | ComponentConstructor<any>) {
