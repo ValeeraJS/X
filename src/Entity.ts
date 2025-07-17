@@ -190,3 +190,35 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		return this;
 	}
 }
+
+export function componentAccessor<T extends typeof Entity>(key: any) {
+	return function (entityConstructor: T) {
+		const update = (entity: any) => {
+			let value: any = entity[key];
+			const getter = function () {
+				return value;
+			};
+			const setter = function (newVal: Component<any> | undefined | null) {
+				const old = entity[key as keyof typeof entity];
+				if (old) {
+					entity.removeComponent(old);
+				}
+				value = newVal;
+				if (value) {
+					entity.addComponent(newVal);
+				}
+			};
+			Reflect.defineProperty(entity, key, {
+				configurable: true,
+				get: getter,
+				set: setter
+			});
+			entity[key] = value;
+		}
+		return function() {
+			const origin = new entityConstructor();
+			update(origin);
+			return origin;
+		} as any
+	}
+}
