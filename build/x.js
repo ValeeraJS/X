@@ -128,11 +128,11 @@
 	            this.usedBy[i].updateOrder();
 	        }
 	    }
-	    constructor(fitRule, handler, name) {
+	    constructor(rule, handler, name) {
 	        this.name = name ?? this.constructor.name;
 	        this.disabled = false;
 	        this.handler = handler ?? (() => { });
-	        this.rule = fitRule;
+	        this.rule = rule;
 	    }
 	    checkEntityManager(world) {
 	        let weakMapTmp = this.entitySet.get(world);
@@ -156,12 +156,11 @@
 	    query(entity) {
 	        return this.rule(entity);
 	    }
-	    run(world, time, delta) {
+	    update(world, time, delta) {
 	        if (this.disabled) {
 	            return this;
 	        }
 	        this.entitySet.get(world)?.forEach((item) => {
-	            // 此处不应该校验disabled。这个交给各自系统自行判断
 	            this.handle(item, time, delta, world);
 	        });
 	        return this;
@@ -373,7 +372,7 @@
 	    }
 	    if (typeof name === "function") {
 	        for (const [, item] of map) {
-	            if (item.constructor === name) {
+	            if (item instanceof name) {
 	                return item;
 	            }
 	        }
@@ -442,6 +441,24 @@
 	const SystemOrderCache = new WeakMap();
 
 	class Entity extends TreeNode {
+	    static tagSet = new Map();
+	    static setTag(name, components) {
+	        const set = new Set();
+	        Entity.tagSet.set(name, set);
+	        components.forEach((val) => {
+	            if (val instanceof Object) {
+	                set.add(val);
+	            }
+	            else {
+	                Entity.tagSet.get(val)?.forEach((ele) => {
+	                    set.add(ele);
+	                });
+	            }
+	        });
+	    }
+	    static removeTag(name) {
+	        Entity.tagSet.delete(name);
+	    }
 	    id = IdGeneratorInstance.next();
 	    isEntity = true;
 	    components = new Map();
@@ -453,28 +470,36 @@
 	        super();
 	        this.name = name;
 	    }
-	    add(componentOrChild) {
+	    add(componentOrChild, ...args) {
 	        if (componentOrChild instanceof Entity) {
 	            return this.addChild(componentOrChild);
 	        }
-	        return this.addComponent(componentOrChild);
+	        if (componentOrChild instanceof Component) {
+	            return this.addComponent(componentOrChild);
+	        }
+	        return this.add(new componentOrChild(...args));
 	    }
-	    addComponent(component) {
-	        add(component, this.components, this);
+	    addComponent(component, ...args) {
+	        if (component instanceof Component) {
+	            add(component, this.components, this);
+	        }
+	        else {
+	            add(new component(...args), this.components, this);
+	        }
 	        for (let i = 0, len = this.usedBy.length; i < len; i++) {
 	            EntitiesCache.get(this.usedBy[i]).add(this);
 	        }
 	        return this;
 	    }
-	    addChild(entity) {
-	        super.addChild(entity);
+	    addChild(entity, ...args) {
+	        const e = entity instanceof Entity ? entity : new entity(...args);
 	        for (const world of this.usedBy) {
-	            world.add(entity);
+	            world.add(e);
 	        }
-	        return this;
+	        return super.addChild(e);
 	    }
 	    clone(cloneComponents, includeChildren) {
-	        const entity = new Entity(this.name);
+	        const entity = new this.constructor(this.name);
 	        if (cloneComponents) {
 	            this.components.forEach((component) => {
 	                entity.addComponent(component.clone());
@@ -501,11 +526,35 @@
 	        });
 	        return clear(this.components, this);
 	    }
+	    fitTag(tag) {
+	        const compClass = Entity.tagSet.get(tag);
+	        if (!compClass) {
+	            return;
+	        }
+	        compClass.forEach((val) => {
+	            if (!this.hasComponent(val)) {
+	                this.add(val);
+	            }
+	        });
+	        return this;
+	    }
 	    getComponent(nameOrId) {
 	        return get(this.components, nameOrId);
 	    }
 	    hasComponent(component) {
 	        return has(this.components, component);
+	    }
+	    isFitTag(name) {
+	        const tags = Entity.tagSet.get(name);
+	        if (!tags) {
+	            return false;
+	        }
+	        for (const item of tags) {
+	            if (!this.hasComponent(item)) {
+	                return false;
+	            }
+	        }
+	        return true;
 	    }
 	    remove(entityOrComponent) {
 	        if (entityOrComponent instanceof Entity) {
@@ -514,19 +563,50 @@
 	        return this.removeComponent(entityOrComponent);
 	    }
 	    removeChild(entity) {
-	        super.removeChild(entity);
 	        for (const world of this.usedBy) {
 	            world.removeEntity(entity);
 	        }
-	        return this;
+	        return super.removeChild(entity);
 	    }
 	    removeComponent(component) {
-	        for (let i = 0, len = this.usedBy.length; i < len; i++) {
-	            EntitiesCache.get(this.usedBy[i]).add(this);
+	        if (remove(this.components, component, this)) {
+	            for (let i = 0, len = this.usedBy.length; i < len; i++) {
+	                EntitiesCache.get(this.usedBy[i]).add(this);
+	            }
 	        }
-	        remove(this.components, component, this);
 	        return this;
 	    }
+	}
+	function componentAccessor(key) {
+	    return function (entityConstructor) {
+	        const update = (entity) => {
+	            let value = entity[key];
+	            const getter = function () {
+	                return value;
+	            };
+	            const setter = function (newVal) {
+	                const old = entity[key];
+	                if (old) {
+	                    entity.removeComponent(old);
+	                }
+	                value = newVal;
+	                if (value) {
+	                    entity.addComponent(newVal);
+	                }
+	            };
+	            Reflect.defineProperty(entity, key, {
+	                configurable: true,
+	                get: getter,
+	                set: setter
+	            });
+	            entity[key] = value;
+	        };
+	        return function () {
+	            const origin = new entityConstructor();
+	            update(origin);
+	            return origin;
+	        };
+	    };
 	}
 
 	const sort = (a, b) => a.priority - b.priority;
@@ -542,25 +622,37 @@
 	        EntitiesCache.set(this, new Set());
 	        SystemOrderCache.set(this, []);
 	    }
-	    add(element) {
-	        if (element.isEntity) {
+	    get rootEntities() {
+	        const result = [];
+	        this.entities.forEach((entity) => {
+	            if (!entity.parent) {
+	                result.push(entity);
+	            }
+	        });
+	        return result;
+	    }
+	    add(element, ...args) {
+	        if (element instanceof Entity) {
 	            return this.addEntity(element);
 	        }
-	        else {
+	        else if (element instanceof System) {
 	            return this.addSystem(element);
 	        }
+	        return this.add(new element(...args));
 	    }
-	    addEntity(entity) {
-	        add(entity, this.entities, this);
-	        EntitiesCache.get(this).add(entity);
-	        for (const child of entity.children) {
+	    addEntity(entity, ...args) {
+	        const e = entity instanceof Entity ? entity : new entity(...args);
+	        add(e, this.entities, this);
+	        EntitiesCache.get(this).add(e);
+	        for (const child of e.children) {
 	            this.add(child);
 	        }
 	        return this;
 	    }
-	    addSystem(system) {
-	        add(system, this.systems, this);
-	        system.checkEntityManager(this);
+	    addSystem(system, ...args) {
+	        const s = system instanceof System ? system : new system(...args);
+	        add(s, this.systems, this);
+	        s.checkEntityManager(this);
 	        return this.updateOrder();
 	    }
 	    clear() {
@@ -589,7 +681,7 @@
 	                this.removeSystem(item[1]);
 	            }
 	        }
-	        const arr2 = this.rootEntities();
+	        const arr2 = this.rootEntities;
 	        for (let item of arr2) {
 	            if (item.usedBy.length === 1) {
 	                item.destroy();
@@ -622,7 +714,7 @@
 	        }
 	    }
 	    removeEntity(entity) {
-	        if (typeof entity === 'number' || typeof entity === 'string' || typeof entity === 'function') {
+	        if (typeof entity === "number" || typeof entity === "string" || typeof entity === "function") {
 	            entity = get(this.entities, entity);
 	        }
 	        if (!entity) {
@@ -663,16 +755,7 @@
 	        }
 	        return this.updateOrder();
 	    }
-	    rootEntities() {
-	        const result = [];
-	        this.entities.forEach((entity) => {
-	            if (!entity.parent) {
-	                result.push(entity);
-	            }
-	        });
-	        return result;
-	    }
-	    run(time, delta) {
+	    update(time = performance.now(), delta = 0) {
 	        if (this.disabled) {
 	            return this;
 	        }
@@ -687,7 +770,7 @@
 	                }
 	            });
 	            if (system.autoUpdate) {
-	                system.run(this, time, delta);
+	                system.update(this, time, delta);
 	            }
 	        });
 	        EntitiesCache.get(this).clear();
@@ -708,6 +791,7 @@
 	exports.Entity = Entity;
 	exports.System = System;
 	exports.World = World;
+	exports.componentAccessor = componentAccessor;
 	exports.unsortedRemove = unsortedRemove;
 
 }));

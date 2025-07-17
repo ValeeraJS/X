@@ -4,6 +4,9 @@ import { World } from "./World";
 import { IECSObject } from "./interfaces/IECSObject";
 export type EntityConstructor = new (...args: any[]) => Entity;
 export declare class Entity extends TreeNode implements IECSObject<World> {
+    static tagSet: Map<string, Set<ComponentConstructor<any>>>;
+    static setTag(name: string, components: Array<ComponentConstructor<any> | string> | Set<ComponentConstructor<any> | string>): void;
+    static removeTag(name: string): void;
     readonly id: number;
     readonly isEntity = true;
     readonly components: Map<number, Component<any>>;
@@ -12,14 +15,21 @@ export declare class Entity extends TreeNode implements IECSObject<World> {
     usedBy: World[];
     children: Entity[];
     constructor(name?: string);
+    add<T extends EntityConstructor>(child: T, ...args: ConstructorParameters<T>): this;
+    add<T extends ComponentConstructor<any>>(componentOrChild: T, ...args: ConstructorParameters<T>): this;
     add(componentOrChild: Component<any> | Entity): this;
     addComponent(component: Component<any>): this;
+    addComponent<T extends ComponentConstructor<any>>(componentOrChild: T, ...args: ConstructorParameters<T>): this;
+    addChild<T extends EntityConstructor>(entity: T, ...args: ConstructorParameters<T>): this;
     addChild(entity: Entity): this;
     clone(cloneComponents?: boolean, includeChildren?: boolean): Entity;
     destroy(): this;
+    fitTag(tag: string): this;
     getComponent<T>(nameOrId: string | number | ComponentConstructor<T>): Component<T> | null;
     hasComponent(component: Component<any> | string | number | ComponentConstructor<any>): boolean;
+    isFitTag(name: string): boolean;
     remove(entityOrComponent: Entity | Component<any> | ComponentConstructor<any>): this;
     removeChild(entity: Entity): this;
     removeComponent(component: Component<any> | string | ComponentConstructor<any>): this;
 }
+export declare function componentAccessor<T extends typeof Entity>(key: any): (entityConstructor: T) => any;

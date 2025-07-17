@@ -20,10 +20,10 @@ export declare class System {
     set disabled(value: boolean);
     get priority(): number;
     set priority(v: number);
-    constructor(fitRule: TQueryRule, handler?: (entity: Entity, time: number, delta: number, world: World) => any, name?: string);
+    constructor(rule: TQueryRule, handler?: (entity: Entity, time: number, delta: number, world: World) => any, name?: string);
     checkEntityManager(world: World): this;
     query(entity: Entity): boolean;
-    run(world: World, time: number, delta: number): this;
+    update(world: World, time: number, delta: number): this;
     destroy(): this;
     handle(entity: Entity, time: number, delta: number, world: World): this;
 }

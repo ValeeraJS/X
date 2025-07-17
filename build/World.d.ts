@@ -8,8 +8,13 @@ export declare class World {
     readonly id: number;
     readonly isWorld = true;
     constructor(name?: string);
+    get rootEntities(): Entity[];
+    add<T extends EntityConstructor>(element: T, ...args: ConstructorParameters<T>): this;
+    add<T extends SystemConstructor>(element: T, ...args: ConstructorParameters<T>): this;
     add(element: Entity | System): this;
+    addEntity<T extends EntityConstructor>(entity: T, ...args: ConstructorParameters<T>): this;
     addEntity(entity: Entity): this;
+    addSystem<T extends SystemConstructor>(system: T, ...args: ConstructorParameters<T>): this;
     addSystem(system: System): this;
     clear(): this;
     clearEntities(): this;
@@ -23,7 +28,6 @@ export declare class World {
     remove(element: Entity | System | SystemConstructor): this;
     removeEntity(entity: Entity | number | string | EntityConstructor): this;
     removeSystem(system: System | string | number | SystemConstructor): this;
-    rootEntities(): Entity[];
-    run(time: number, delta: number): this;
+    update(time?: number, delta?: number): this;
     updateOrder(): this;
 }

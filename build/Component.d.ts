@@ -1,6 +1,5 @@
 import { Entity } from "./Entity";
 import { IECSObject } from "./interfaces/IECSObject";
-export type ComponentConstructor<DataType> = new (...args: any[]) => Component<DataType>;
 export declare class Component<DataType> implements IECSObject<Entity> {
     readonly isComponent = true;
     readonly id: number;
@@ -12,3 +11,4 @@ export declare class Component<DataType> implements IECSObject<Entity> {
     clone(): Component<DataType>;
     destroy(): void;
 }
+export type ComponentConstructor<DataType> = new (...args: any[]) => Component<DataType>;
