@@ -1,5 +1,5 @@
 /// <reference types="mocha" />
-import { Component, World, Entity, XXXEntity } from "../src";
+import { Component, World, Entity, componentAccessor } from "../src";
 import { expect } from "chai";
 
 describe("entity has component", function () {
@@ -154,5 +154,40 @@ describe("entity tags", function () {
         e1.fitTag("tagX");
         expect(e1.isFitTag("tagC")).to.equal(true);
         expect(e1.isFitTag("tagX")).to.equal(false);
+    });
+});
+
+describe("as component", function () {
+    class TestA extends Component<number> {
+        constructor(value: number) {
+            super(value, "testA");
+        }
+    }
+
+    class TestB extends Component<number> {
+        constructor(value: number) {
+            super(value, "testB");
+        }
+    }
+
+    @componentAccessor('testa')
+    @componentAccessor('testb')
+    class XXXEntity extends Entity {
+        testa: TestA = new TestA(1);
+
+        constructor(name: string) {
+            super(name);
+        }
+    }
+
+    it('entity accessor', function () {
+        const x = new XXXEntity('xxx');
+        expect(x.hasComponent(TestA)).to.equal(true);
+        x.testa = TestA as any;
+        expect(x.testa.data).to.equal(undefined);
+
+        expect(x.hasComponent(TestB)).to.equal(false);
+        (x as any).testb = TestB as any;
+        expect(x.hasComponent(TestB)).to.equal(true);
     });
 });
