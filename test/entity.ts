@@ -34,8 +34,10 @@ describe("entity has component", function () {
         const bbb = new BBB();
         e1.add(bbb);
         expect(e1.hasComponent(bbb)).to.equal(true);
+        expect(e1.hasComponent(Component)).to.equal(true);
+        expect(e1.hasComponent(Component, true)).to.equal(false);
         e1.remove(Component);
-        expect(e1.hasComponent(bbb)).to.equal(true);
+        expect(e1.hasComponent(bbb)).to.equal(false);
 
     });
 });
@@ -189,5 +191,28 @@ describe("as component", function () {
         expect(x.hasComponent(TestB)).to.equal(false);
         (x as any).testb = TestB as any;
         expect(x.hasComponent(TestB)).to.equal(true);
+    });
+});
+
+describe("strict mode", function () {
+    class TestA extends Component<number> {
+        constructor(value: number) {
+            super(value, "testA");
+        }
+    }
+
+    const e = new Entity();
+    e.add(TestA, 1);
+
+    it('entity accessor', function () {
+        expect(e.hasComponent(TestA, true)).to.equal(true);
+        expect(e.hasComponent(Component, true)).to.equal(false);
+        expect(e.getComponent(TestA, true) instanceof TestA).to.equal(true);
+        expect(e.getComponent(Component, true) instanceof TestA).to.equal(false);
+
+        e.remove(Component, true);
+        expect(e.hasComponent(TestA, true)).to.equal(true);
+        e.remove(TestA, true);
+        expect(e.hasComponent(TestA, true)).to.equal(false);
     });
 });
