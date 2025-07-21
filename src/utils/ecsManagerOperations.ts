@@ -25,13 +25,18 @@ export const clear = <U, T extends IECSObject<U>>(map: Map<number, T>, owner: U)
 export const get = <U, T extends IECSObject<U>>(
 	map: Map<number, T>,
 	name: string | number | (new (...args: any[]) => T),
+	strict = false,
 ): T | null => {
 	if (typeof name === "number") {
 		return map.get(name) ?? null;
 	}
 	if (typeof name === "function") {
 		for (const [, item] of map) {
-			if (item instanceof name) {
+			if (strict) {
+				if (item.constructor === name) {
+					return item;
+				}
+			} else if (item instanceof name) {
 				return item;
 			}
 		}
@@ -48,6 +53,7 @@ export const get = <U, T extends IECSObject<U>>(
 export const has = <U, T extends IECSObject<U>>(
 	map: Map<number, T>,
 	element: T | number | string | (new (...args: any) => T),
+	strict = false,
 ): boolean => {
 	if (typeof element === "number") {
 		return map.has(element);
@@ -61,7 +67,11 @@ export const has = <U, T extends IECSObject<U>>(
 		return false;
 	} else if (typeof element === "function") {
 		for (const [, item] of map) {
-			if (item.constructor === element) {
+			if (strict) {
+				if (item.constructor === element) {
+					return true;
+				}
+			} else if (item instanceof element) {
 				return true;
 			}
 		}
@@ -76,13 +86,19 @@ export const remove = <U, T extends IECSObject<U>>(
 	map: Map<number, T>,
 	element: T | string | number | (new (...args: any[]) => T),
 	owner: U,
+	strict = false,
 ): boolean => {
 	let elementTmp: T | undefined;
 	if (typeof element === "number" || typeof element === "string") {
 		elementTmp = get(map, element);
 	} else if (typeof element === "function") {
 		for (let item of map) {
-			if (item[1].constructor === element) {
+			if (strict) {
+				if (item[1].constructor === element) {
+					elementTmp = item[1];
+					break;
+				}
+			} else if (item[1] instanceof element) {
 				elementTmp = item[1];
 				break;
 			}
