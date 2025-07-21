@@ -36,8 +36,7 @@ describe("entity has component", function () {
         e1.add(bbb);
 		expect(e1.hasComponent(bbb)).to.equal(true);
         e1.remove(Component);
-		expect(e1.hasComponent(bbb)).to.equal(true);
-
+		expect(e1.hasComponent(bbb)).to.equal(false);
 	});
 });
 
