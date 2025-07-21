@@ -124,7 +124,7 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		return clear(this.components, this as Entity) as this;
 	}
 
-	public fitTag(tag: string) {
+	public fitTag(tag: string, strict?: boolean) {
 		const compClass = Entity.tagSet.get(tag);
 
 		if (!compClass) {
@@ -132,7 +132,7 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		}
 
 		compClass.forEach((val) => {
-			if (!this.hasComponent(val)) {
+			if (!this.hasComponent(val, strict)) {
 				this.add(val);
 			}
 		});
@@ -140,15 +140,15 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		return this;
 	}
 
-	public getComponent<T>(nameOrId: string | number | ComponentConstructor<T>): Component<T> | null {
-		return get(this.components, nameOrId);
+	public getComponent<T>(nameOrId: string | number | ComponentConstructor<T>, strict?: boolean): Component<T> | null {
+		return get(this.components, nameOrId, strict);
 	}
 
-	public hasComponent(component: Component<any> | string | number | ComponentConstructor<any>): boolean {
-		return has(this.components, component);
+	public hasComponent(component: Component<any> | string | number | ComponentConstructor<any>, strict?: boolean): boolean {
+		return has(this.components, component, strict);
 	}
 
-	public isFitTag(name: string) {
+	public isFitTag(name: string, strict?: boolean) {
 		const tags = Entity.tagSet.get(name);
 
 		if (!tags) {
@@ -156,7 +156,7 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		}
 
 		for (const item of tags) {
-			if (!this.hasComponent(item)) {
+			if (!this.hasComponent(item, strict)) {
 				return false;
 			}
 		}
@@ -164,12 +164,12 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		return true;
 	}
 
-	public remove(entityOrComponent: Entity | Component<any> | ComponentConstructor<any>) {
+	public remove(entityOrComponent: Entity | Component<any> | ComponentConstructor<any>, strict?: boolean) {
 		if (entityOrComponent instanceof Entity) {
 			return this.removeChild(entityOrComponent);
 		}
 
-		return this.removeComponent(entityOrComponent);
+		return this.removeComponent(entityOrComponent, strict);
 	}
 
 	public removeChild(entity: Entity): this {
@@ -180,8 +180,8 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		return super.removeChild(entity);
 	}
 
-	public removeComponent(component: Component<any> | string | ComponentConstructor<any>): this {
-		if (remove(this.components, component, this as Entity)) {
+	public removeComponent(component: Component<any> | string | ComponentConstructor<any>, strict?: boolean): this {
+		if (remove(this.components, component, this as Entity, strict)) {
 			for (let i = 0, len = this.usedBy.length; i < len; i++) {
 				EntitiesCache.get(this.usedBy[i]).add(this);
 			}
@@ -215,10 +215,10 @@ export function componentAccessor<T extends typeof Entity>(key: any) {
 			});
 			entity[key] = value;
 		}
-		return function() {
-			const origin = new entityConstructor();
+		return function (...args: any[]) {
+			const origin = new entityConstructor(...args);
 			update(origin);
 			return origin;
-		} as any
+		};
 	}
 }
