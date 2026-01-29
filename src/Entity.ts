@@ -140,7 +140,9 @@ export class Entity extends TreeNode implements IECSObject<World> {
 		return this;
 	}
 
-	public getComponent<T>(nameOrId: string | number | ComponentConstructor<T>, strict?: boolean): Component<T> | null {
+	public getComponent<K, T extends Component<K>>(nameOrId: new (...args: any[]) => T, strict?: boolean): T | null;
+	public getComponent<T>(nameOrId: string | number | Symbol): Component<T> | null;
+	public getComponent<T>(nameOrId: ComponentConstructor<T> | string | number | Symbol, strict?: boolean): Component<T> | null {
 		return get(this.components, nameOrId, strict);
 	}
 
